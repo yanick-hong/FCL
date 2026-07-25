@@ -320,6 +320,10 @@ def train(
             os.makedirs(os.path.dirname(best_ckpt_path) or ".", exist_ok=True)
             torch.save(head.state_dict(), best_ckpt_path)
             print(f"[CKPT] >>> Best so far (acc) saved to {best_ckpt_path}")
+        if best_ckpt_path:
+            last_ckpt_path = os.path.join(os.path.dirname(best_ckpt_path) or ".", "last.ckpt")
+            torch.save(head.state_dict(), last_ckpt_path)
+            print(f"[CKPT] Last checkpoint saved to {last_ckpt_path}")
 
         if stopper.step(val_loss, val_acc):
             print(f"[EARLY STOP] No improvement in acc for {stopper.patience} epochs.")
