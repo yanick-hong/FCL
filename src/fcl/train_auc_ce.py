@@ -46,6 +46,8 @@ def parse_args():
     p.add_argument("--lam", type=float, default=1)
     p.add_argument("--best_ckpt", type=str, default=str(experiment_checkpoint("CIFAR100_auc_ce")))
     p.add_argument("--val_dir", type=str, default=str(experiment_logs("CIFAR100_auc_ce")))
+    p.add_argument("--experiment_name", type=str, default=None,
+                   help="Name used for the saved config snapshot.")
 
 
     p.add_argument("--print_every", type=int, default=20)
@@ -326,7 +328,10 @@ def train(
 
 # ----------------------- main -----------------------
 if __name__ == "__main__":
-    args = parse_args(); save_experiment_config("CIFAR100_auc_ce", args); set_seed(args.seed)
+    args = parse_args()
+    config_name = args.experiment_name or Path(args.best_ckpt).parent.name or "CIFAR100_auc_ce"
+    save_experiment_config(config_name, args)
+    set_seed(args.seed)
     train(
         cache_path=args.cache, obs_labels_path=args.obs_labels_path,
         P=args.P, K=args.K,
