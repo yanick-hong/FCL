@@ -1,0 +1,12 @@
+# Project-relative defaults. DATA_ROOT and OUTPUT_ROOT override these values.
+data_root: ./data
+output_root: ./outputs
+weights_root: ./weights
+
+# Raw inputs are read-only; processed contains reusable feature/split caches.
+raw_dirname: raw
+processed_dirname: processed
+
+# Shared CLIP model weights live under OUTPUT_ROOT/cache unless overridden.
+shared_cache_dirname: cache
+

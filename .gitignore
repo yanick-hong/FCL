@@ -1,0 +1,19 @@
+# Local data and experiment artifacts. Keep these outside version control.
+data/
+outputs/
+save/
+weights/
+
+# Legacy/generated runtime directories.
+cache/
+val/
+datasets/
+__pycache__/
+*.py[cod]
+
+# Local environment and notebook state.
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+
