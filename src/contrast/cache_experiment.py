@@ -48,9 +48,15 @@ def load_cache_and_observed(cache_path: str, obs_path: str) -> Dict[str, torch.T
         result[key] = F.normalize(result[key].float(), dim=-1)
     for key in ("train_labels", "val_labels", "test_labels"):
         result[key] = result[key].long()
-    result["num_classes"] = int(
-        cache.get("clip_label_embeds", cache["train_labels"]).shape[0]
-    )
+    label_embeds = cache.get("clip_label_embeds")
+    if isinstance(label_embeds, torch.Tensor) and label_embeds.ndim == 2:
+        result["num_classes"] = int(label_embeds.shape[0])
+    else:
+        max_labels = [result[key].max().item() for key in
+                      ("train_labels", "val_labels", "test_labels")
+                      if result[key].numel()]
+        max_labels.append(int(result["y_obs"].max().item()))
+        result["num_classes"] = int(max(max_labels) + 1)
     return result
 
 

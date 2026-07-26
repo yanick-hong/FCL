@@ -23,11 +23,13 @@ from pathlib import Path
 from typing import Any
 
 
-METHOD_ORDER = ("fcl_auc_ce", "nlprompt", "dcd")
+METHOD_ORDER = ("fcl_auc_ce", "nlprompt", "dcd", "ido", "dld")
 METHOD_NAMES = {
     "fcl_auc_ce": "FCL-AUC-CE",
     "nlprompt": "NLPrompt",
     "dcd": "DCD",
+    "ido": "IDO",
+    "dld": "DLD",
 }
 
 
