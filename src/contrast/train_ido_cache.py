@@ -34,6 +34,7 @@ from contrast.cache_experiment import (
     save_config,
     save_history,
     save_result,
+    save_run_metadata,
 )
 from paths import clip_cache, observed_labels_cache
 
@@ -221,6 +222,9 @@ def main() -> None:
         "wrong_event_mean": float(rates.mean()), "mixture": mixture_info,
         "epochs_completed": completed, "elapsed_seconds": time.time() - start_time,
     })
+    save_run_metadata(run_dir, method="IDO-NeurIPS2025-cache-adapted", dataset=args.dataset,
+                      script="src/contrast/train_ido_cache.py", args=args,
+                      command=sys.argv)
     print(f"[IDO][DONE] {run_dir}", flush=True)
 
 

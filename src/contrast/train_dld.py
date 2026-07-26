@@ -199,9 +199,9 @@ def train(
     print_every=20, best_ckpt_path=str(experiment_checkpoint("CIFAR100_dld")),
     early_metric="acc", patience=10, min_delta=0.0, val_dir=str(experiment_logs("CIFAR100_dld")),
     # 新增：线性头联合训练的强度（一个 knob），以及对齐温度
-    head_lambda: float = 0.2, align_T: float = 2.0,
+    head_lambda: float = 0.2, align_T: float = 2.0, seed: int = 42,
 ):
-    set_seed(42)
+    set_seed(seed)
 
     cache=load_clip_cache_strict(cache_path)
     train_feats=F.normalize(cache["train_feats"].to(torch.float32), dim=-1)
@@ -338,4 +338,4 @@ if __name__ == "__main__":
           hidden=args.hidden, tdim=args.tdim, steps=args.steps, tau_clip=args.tau_clip,
           print_every=args.print_every, best_ckpt_path=args.best_ckpt,
           early_metric=args.early_metric, patience=args.patience, min_delta=args.min_delta, val_dir=args.val_dir,
-          head_lambda=args.head_lambda, align_T=args.align_T)
+          head_lambda=args.head_lambda, align_T=args.align_T, seed=args.seed)

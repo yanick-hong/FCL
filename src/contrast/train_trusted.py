@@ -7,7 +7,7 @@
 - 在 全训练集 / 仅可信子集 / 测试集 的精度
 """
 
-import os, math, time, copy, pickle, argparse
+import os, math, time, copy, pickle, argparse, csv
 from typing import Dict, List, Tuple
 
 import numpy as np
@@ -283,7 +283,17 @@ def train_strong_supervised(
     head = LinearHead(D, C).to(device).float()
     optimizer = torch.optim.AdamW(head.parameters(), lr=lr, weight_decay=weight_decay)
 
-    # 简单的早停（基于测试集精度）
+    # Validation history is stored beside the checkpoint.  The cache's ``val``
+    # split is used for model selection; the test split is evaluated only by
+    # the external result finalizer.
+    run_dir = Path(save_path).resolve().parent
+    log_dir = run_dir / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    csv_path = log_dir / "val_metrics.csv"
+    with csv_path.open("w", newline="") as handle:
+        csv.writer(handle).writerow(["epoch", "train_loss", "train_acc", "trusted_acc", "val_loss", "val_acc"])
+
+    # 简单的早停（基于验证集精度）
     best_state, best_val_acc, wait = None, -1.0, 0
 
     print("[TRAIN] Strong-supervised (s=0 only) training starts...")
@@ -323,6 +333,13 @@ def train_strong_supervised(
         val_acc, val_ce = evaluate(head, val_feats, val_labels, batch_size=2048)
         dt = time.time() - t0
 
+        with csv_path.open("a", newline="") as handle:
+            csv.writer(handle).writerow([
+                epoch, f"{running_loss/max(1,running_batches):.8f}",
+                f"{train_acc_all:.8f}", f"{train_acc_trust:.8f}",
+                f"{val_ce:.8f}", f"{val_acc:.8f}",
+            ])
+
         print(f"[Epoch {epoch:03d}] time={dt:.1f}s | train_loss={running_loss/max(1,running_batches):.5f} | "
               f"TrainAcc(all)={train_acc_all*100:.2f}% | "
               f"TrainAcc(trusted)={train_acc_trust*100:.2f}% | "
@@ -332,6 +349,7 @@ def train_strong_supervised(
         if improved:
             best_val_acc = val_acc
             best_state = copy.deepcopy(head.state_dict())
+            Path(save_path).parent.mkdir(parents=True, exist_ok=True)
             torch.save(best_state, save_path)
             print(f"[CHECKPOINT] Improved. Saved to {save_path}")
             wait = 0

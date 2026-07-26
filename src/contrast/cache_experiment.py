@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import csv
 import json
+import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Any, Dict, Iterable
@@ -143,3 +145,57 @@ def save_config(run_dir: Path, payload: Dict[str, Any]) -> None:
     except ImportError:
         text = json.dumps(payload, indent=2, ensure_ascii=False)
     (run_dir / "config.yaml").write_text(text, encoding="utf-8")
+
+
+def _git_commit() -> str | None:
+    """Return the current commit when the project is running from a git checkout."""
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL,
+            text=True, cwd=Path(__file__).resolve().parents[2],
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def save_run_metadata(
+    run_dir: Path,
+    *,
+    method: str,
+    dataset: str,
+    script: str,
+    args: Any,
+    command: list[str] | None = None,
+    start_time: str | None = None,
+    end_time: str | None = None,
+    extra: Dict[str, Any] | None = None,
+) -> None:
+    """Write reproducibility metadata into one timestamped experiment directory."""
+    def convert(value: Any) -> Any:
+        if isinstance(value, Path):
+            return str(value)
+        if isinstance(value, torch.Tensor):
+            return value.item() if value.numel() == 1 else value.tolist()
+        if isinstance(value, dict):
+            return {str(k): convert(v) for k, v in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [convert(v) for v in value]
+        return value
+
+    arg_dict = vars(args) if hasattr(args, "__dict__") else dict(args)
+    payload: Dict[str, Any] = {
+        "method": method,
+        "dataset": dataset,
+        "script": script,
+        "command": command or [sys.executable, script],
+        "args": convert(arg_dict),
+        "start_time": start_time,
+        "end_time": end_time,
+        "git_commit": _git_commit(),
+    }
+    if extra:
+        payload.update(convert(extra))
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "run_metadata.json").write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
+    )

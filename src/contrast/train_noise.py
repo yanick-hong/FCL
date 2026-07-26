@@ -187,8 +187,9 @@ def train(
     best_ckpt_path=str(experiment_checkpoint("CIFAR100_noise")),
     early_metric="acc", patience=10, min_delta=0.0,
     val_dir=str(experiment_logs("CIFAR100_noise")),
+    seed: int = 42,
 ):
-    set_seed(42)
+    set_seed(seed)
 
     # 0) 缓存
     cache = load_clip_cache_strict(cache_path)
@@ -383,5 +384,6 @@ if __name__ == "__main__":
         conf_start=args.conf_start, conf_final=args.conf_final, conf_warmup_epochs=args.conf_warmup_epochs,
         use_ema=args.use_ema, ema_decay=args.ema_decay,
         print_every=args.print_every, best_ckpt_path=args.best_ckpt,
-        early_metric=args.early_metric, patience=args.patience, min_delta=args.min_delta, val_dir=args.val_dir
+         early_metric=args.early_metric, patience=args.patience, min_delta=args.min_delta, val_dir=args.val_dir,
+         seed=args.seed
     )

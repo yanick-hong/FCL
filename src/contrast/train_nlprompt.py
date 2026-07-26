@@ -24,7 +24,7 @@ if str(_SRC_ROOT) not in sys.path:
 
 from contrast.cache_experiment import (evaluate, load_cache_and_observed,
                                        make_run_dir, save_config, save_history,
-                                       save_result)
+                                       save_result, save_run_metadata)
 from paths import clip_cache, observed_labels_cache
 
 
@@ -137,6 +137,9 @@ def main() -> None:
                           "best_val_accuracy": best_acc, "best_epoch": best_epoch,
                           "test": test_metrics, "trusted_ratio": float(trusted.float().mean()),
                           "elapsed_seconds": time.time() - start_time})
+    save_run_metadata(run_dir, method="NLPrompt-cache-adapted", dataset=args.dataset,
+                      script="src/contrast/train_nlprompt.py", args=args,
+                      command=sys.argv)
     print(f"[NLPrompt][DONE] {run_dir}")
 
 

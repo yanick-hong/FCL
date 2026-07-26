@@ -27,6 +27,7 @@ _SRC_ROOT = Path(__file__).resolve().parents[1]
 if str(_SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(_SRC_ROOT))
 from paths import clip_cache, observed_labels_cache, experiment_checkpoint, experiment_logs, save_experiment_config
+from contrast.cache_experiment import save_run_metadata
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -44,6 +45,8 @@ def parse_args():
 
     
     p.add_argument("--lam", type=float, default=1)
+    p.add_argument("--mu", type=float, default=0.5,
+                   help="Weight of the model posterior in q=mu*p_model+(1-mu)*p_clip.")
     p.add_argument("--best_ckpt", type=str, default=str(experiment_checkpoint("CIFAR100_auc_ce")))
     p.add_argument("--val_dir", type=str, default=str(experiment_logs("CIFAR100_auc_ce")))
     p.add_argument("--experiment_name", type=str, default=None,
@@ -154,7 +157,10 @@ def auc_noise_only_a11_loss(logits, clip_probs, s, alpha=0.5, tau=0.5, eps: floa
     lo = logits[idx]                          # (m, C)
     p_clip = clip_probs[idx].detach()         # (m, C)
     p_model = F.softmax(lo, dim=-1).detach()           # (m, C)
-    q = 0.5 * p_model + 0.5 * p_clip          # alpha=0.5
+    alpha = float(alpha)
+    if not 0.0 <= alpha <= 1.0:
+        raise ValueError(f"alpha must be in [0, 1], got {alpha}")
+    q = alpha * p_model + (1.0 - alpha) * p_clip
     offdiag = ~torch.eye(m, dtype=torch.bool, device=device)
     total_loss = lo.new_tensor(0.0); total_w = lo.new_tensor(0.0)
     for i in range(C):
@@ -213,12 +219,14 @@ def train(
     lr: float, lr_max: float, weight_decay: float,
     max_epochs: int,
     lam: float,
+    mu: float,
+    seed: int,
     print_every: int,
     best_ckpt_path: str,
     patience: int, min_delta: float,
     val_dir: str,               
 ):
-    set_seed(42); lam = float(lam)
+    set_seed(seed); lam = float(lam)
 
     # 0) 缓存与标准化
     cache = load_clip_cache_strict(cache_path)
@@ -230,7 +238,7 @@ def train(
     N, D = train_feats.shape
     C = int(max(train_labels.max().item(), val_labels.max().item())) + 1
     print(f"[INFO] Ntrain={N}, Nval={val_labels.numel()}, D={D}, C={C} | P={P}, K={K}, batch={P*K}")
-    print(f"[OBJECTIVE] Loss = CE(trusted) + lam * AUC(untrusted) | lam={lam:.2f} | tau=0.5 | early_metric=acc")
+    print(f"[OBJECTIVE] Loss = CE(trusted) + lam * AUC(untrusted) | lam={lam:.2f} | mu={mu:.2f} | tau=0.5 | early_metric=acc")
 
     # 1) 读取 obs_path（y_obs, s）
     obs = load_obs_labels(obs_labels_path)
@@ -283,7 +291,7 @@ def train(
 
             # AUC 仅对不可信样本
             auc_untrusted = auc_noise_only_a11_loss(
-                logits=logits, clip_probs=p_clip, s=s, alpha=0.5, tau=0.5
+                logits=logits, clip_probs=p_clip, s=s, alpha=mu, tau=0.5
             )
 
             # Loss = CE + lam * AUC 
@@ -346,6 +354,8 @@ if __name__ == "__main__":
         lr=args.lr, lr_max=args.lr_max, weight_decay=args.weight_decay,
         max_epochs=args.max_epochs,
         lam=args.lam,
+        mu=args.mu,
+        seed=args.seed,
         print_every=args.print_every,
         best_ckpt_path=args.best_ckpt,
         patience=args.patience, min_delta=args.min_delta,
@@ -365,10 +375,15 @@ if __name__ == "__main__":
         import json
         json.dump({
             "method": "FCL-AUC-CE",
+            "mu": float(args.mu),
             "cache": args.cache,
             "observed_labels": args.obs_labels_path,
             **train_summary,
             "test_loss": float(test_loss),
             "test_accuracy": float(test_acc),
         }, handle, indent=2, ensure_ascii=False)
+    dataset_name = Path(args.cache).name.split("_clip_", 1)[0]
+    save_run_metadata(result_path.parent, method="FCL-AUC-CE", dataset=dataset_name,
+                      script="src/fcl/train_auc_ce.py", args=args,
+                      command=sys.argv)
     print(f"[RESULT] Metrics -> {result_path}")

@@ -146,11 +146,11 @@ class BalancedPKSampler(Sampler[List[int]]):
         self.batches_per_epoch = (self.num_samples // self.batch_size)
 
     def __len__(self):
-        return self.batches_per_epoch * self.batch_size if self.drop_last else self.num_samples
+        # This sampler yields complete batches and is passed as ``batch_sampler``.
+        return self.batches_per_epoch
 
     def __iter__(self):
         rng = np.random.default_rng()
-        batches = []
         for _ in range(self.batches_per_epoch):
             classes = rng.choice(self.valid_classes, size=self.P, replace=False)
             batch = []
@@ -162,8 +162,7 @@ class BalancedPKSampler(Sampler[List[int]]):
                     picks = rng.choice(pool, size=self.K, replace=True)
                 batch.extend(picks.tolist())
             rng.shuffle(batch)
-            batches.extend(batch)
-        return iter(batches)
+            yield batch
 
 # -----------------------
 # 数据集
@@ -312,21 +311,29 @@ def evaluate_val(clf: nn.Module, val_feats: torch.Tensor, val_labels: torch.Tens
         correct += (pred==y).sum().item()
         total += y.numel()
         ce_sum += ce.item()
-    acc = 100.0 * correct / max(1,total)
+    # Keep the CSV/metrics convention consistent with the other baselines:
+    # accuracy is stored as a fraction in [0, 1].
+    acc = correct / max(1,total)
     loss = ce_sum / max(1,total)
     return loss, acc
 
 def plot_curves(csv_path: str, save_png_prefix: str):
-    import pandas as pd
-    df = pd.read_csv(csv_path)
+    # Avoid requiring pandas for a simple two-column diagnostic plot.
+    import csv
+    epochs, val_acc, val_loss = [], [], []
+    with open(csv_path, newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            epochs.append(int(float(row["epoch"])))
+            val_acc.append(float(row["val_acc"]))
+            val_loss.append(float(row["val_loss"]))
     plt.figure()
-    plt.plot(df["epoch"], df["val_acc"], marker="o")
+    plt.plot(epochs, val_acc, marker="o")
     plt.xlabel("epoch"); plt.ylabel("val_acc (%)"); plt.title("Validation Accuracy")
     plt.grid(True); plt.tight_layout()
     plt.savefig(f"{save_png_prefix}_val_acc.png", dpi=180); plt.close()
 
     plt.figure()
-    plt.plot(df["epoch"], df["val_loss"], marker="o")
+    plt.plot(epochs, val_loss, marker="o")
     plt.xlabel("epoch"); plt.ylabel("val_loss (CE)"); plt.title("Validation Loss (CE)")
     plt.grid(True); plt.tight_layout()
     plt.savefig(f"{save_png_prefix}_val_loss.png", dpi=180); plt.close()
@@ -364,7 +371,12 @@ def main():
     train_feats = cache["train_feats"]; val_feats = cache["val_feats"]; test_feats = cache["test_feats"]
     val_labels = cache["val_labels"];   test_labels = cache["test_labels"]
     in_dim = int(train_feats.size(-1))
-    num_classes = int(max(val_labels.max().item(), test_labels.max().item()) + 1)
+    # Do not infer the vocabulary from test labels: some legacy caches use -1
+    # for unavailable test labels.
+    if isinstance(cache.get("clip_label_embeds"), torch.Tensor):
+        num_classes = int(cache["clip_label_embeds"].shape[0])
+    else:
+        num_classes = int(max(cache["train_labels"].max().item(), val_labels.max().item()) + 1)
 
     y_obs, s = load_y_obs(args.obs_labels_path, n_train=len(train_feats))
 
@@ -372,7 +384,7 @@ def main():
     batch_size = args.P * args.K
     train_ds = FeaturesWithNoisyLabels(train_feats, y_obs)
     sampler = BalancedPKSampler(labels=y_obs, P=args.P, K=args.K, drop_last=True)
-    train_loader = DataLoader(train_ds, batch_size=batch_size, sampler=sampler, num_workers=2, pin_memory=True)
+    train_loader = DataLoader(train_ds, batch_sampler=sampler, num_workers=2, pin_memory=True)
 
     # 模型
     clf = ClassifierHead(in_dim, num_classes).to(device)
@@ -418,7 +430,7 @@ def main():
             w = csv.writer(f); w.writerow([epoch, f"{val_loss:.6f}", f"{val_acc:.4f}",
                                            f"{epoch_elbo/max(1,n_batch):.4f}", f"{epoch_sup/max(1,n_batch):.4f}"])
         print(f"[Epoch {epoch:03d}] time={time.time()-t_ep:.1f}s | val_loss={val_loss:.4f} | "
-              f"val_acc={val_acc:.2f}% | elbo(avg)={epoch_elbo/max(1,n_batch):.4f} | "
+              f"val_acc={val_acc*100:.2f}% | elbo(avg)={epoch_elbo/max(1,n_batch):.4f} | "
               f"supCE(avg)={epoch_sup/max(1,n_batch):.4f}")
 
         # 早停（按 val_acc），保存 best_ckpt —— ✅ 兼容 eval_acc.py 的保存格式
@@ -457,7 +469,7 @@ def main():
 
     # 曲线（输出到 val_dir）
     plot_curves(csv_path, save_png_prefix=os.path.join(args.val_dir, "csgn_linear"))
-    print(f"[DONE] total time = {time.time()-t0:.1f}s | best acc = {best_acc:.2f}% @ epoch {best_epoch}")
+    print(f"[DONE] total time = {time.time()-t0:.1f}s | best acc = {best_acc*100:.2f}% @ epoch {best_epoch}")
 
 if __name__ == "__main__":
     main()

@@ -33,6 +33,7 @@ from contrast.cache_experiment import (
     save_config,
     save_history,
     save_result,
+    save_run_metadata,
 )
 from paths import clip_cache, observed_labels_cache
 
@@ -200,6 +201,9 @@ def main() -> None:
         "test": test_metrics, "trusted_ratio": float(trusted.float().mean()),
         "epochs_completed": completed, "elapsed_seconds": time.time() - start_time,
     })
+    save_run_metadata(run_dir, method="DLD-CVPR2025-cache-adapted", dataset=args.dataset,
+                      script="src/contrast/train_dld_cache.py", args=args,
+                      command=sys.argv)
     print(f"[DLD][DONE] {run_dir}", flush=True)
 
 

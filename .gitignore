@@ -17,3 +17,6 @@ venv/
 .env
 .ipynb_checkpoints/
 .autodl/
+
+# Temporary local SSH authentication helper; never commit credentials.
+_ssh_askpass*.cmd
