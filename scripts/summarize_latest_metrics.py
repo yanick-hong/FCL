@@ -12,6 +12,7 @@ from typing import Any
 
 METHOD_ORDER = (
     "fcl_auc_ce", "nlprompt", "dcd", "ido", "dld",
+    "fl_c", "nl_c", "l2b", "csgn",
     "clip_zero_ce", "random_filter_ce", "clip_conf_ce", "fcl_filter_ce",
     "xie_trim_auc", "fixmatch_cache", "softmatch_cache", "dividemix_cache",
     "deft_cache",
@@ -19,6 +20,7 @@ METHOD_ORDER = (
 METHOD_NAMES = {
     "fcl_auc_ce": "FCL-AUC-CE", "nlprompt": "NLPrompt", "dcd": "DCD",
     "ido": "IDO", "dld": "DLD", "clip_zero_ce": "CLIP-Zero-CE",
+    "fl_c": "FL-C", "nl_c": "NL-C", "l2b": "L2B", "csgn": "CSGN",
     "random_filter_ce": "Random-Filter-CE", "clip_conf_ce": "CLIP-Conf-CE",
     "fcl_filter_ce": "FCL-Filter-CE", "xie_trim_auc": "Xie-Trim-AUC",
     "fixmatch_cache": "FixMatch*", "softmatch_cache": "SoftMatch*",
@@ -55,6 +57,9 @@ def read_accuracy(metrics_file: Path) -> float | None:
             for key in ("accuracy", "acc"):
                 if block.get(key) is not None:
                     return float(block[key])
+    selection = metrics.get("selection")
+    if isinstance(selection, dict) and selection.get("best_val_accuracy") is not None:
+        return float(selection["best_val_accuracy"])
     return None
 
 
