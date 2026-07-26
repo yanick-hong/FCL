@@ -37,7 +37,11 @@ def read_records(annotation_file, image_dir):
     records = []
     for annotation in annotations.ravel():
         filename = str(scalar(annotation.fname))
-        label = int(scalar(getattr(annotation, "class"))) - 1
+        # The official test annotation file contains filenames/bounding boxes
+        # but intentionally omits class labels.  Test labels are not needed
+        # for the noisy-label training run, so retain -1 for that split.
+        class_value = getattr(annotation, "class", None)
+        label = -1 if class_value is None else int(scalar(class_value)) - 1
         records.append((str(Path(image_dir) / filename), label))
     return records
 
