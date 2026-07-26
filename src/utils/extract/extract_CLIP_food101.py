@@ -139,10 +139,16 @@ def main():
     model.eval()
 
     # 2) 加载 Food-101 官方划分
-    print(f"[DATA] Loading Food-101 from: {args.data_root} | download={args.download}")
-    ds_train_for_split = Food101(root=args.data_root, split='train', transform=None, download=args.download)
-    ds_train = Food101(root=args.data_root, split='train', transform=preprocess, download=False)
-    ds_test  = Food101(root=args.data_root, split='test',  transform=preprocess, download=False)
+    # torchvision expects ``root/food-101/{images,meta}``, while our project
+    # convention stores the extracted dataset itself at
+    # ``data/raw/food-101/{images,meta}``.  Accept both forms.
+    data_root = Path(args.data_root)
+    if (data_root / "images").is_dir() and (data_root / "meta").is_dir():
+        data_root = data_root.parent
+    print(f"[DATA] Loading Food-101 from: {data_root} | download={args.download}")
+    ds_train_for_split = Food101(root=data_root, split='train', transform=None, download=args.download)
+    ds_train = Food101(root=data_root, split='train', transform=preprocess, download=False)
+    ds_test  = Food101(root=data_root, split='test',  transform=preprocess, download=False)
 
     # 3) 类名顺序
     classnames = list(ds_train.classes)

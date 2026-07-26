@@ -329,6 +329,10 @@ def train(
             print(f"[EARLY STOP] No improvement in acc for {stopper.patience} epochs.")
             break
     print("[DONE] Training finished.")
+    return head, {
+        "best_val_accuracy": float(stopper.best),
+        "best_epoch": int(val_epochs[int(np.argmax(val_accs))]) if val_accs else 0,
+    }
 
 # ----------------------- main -----------------------
 if __name__ == "__main__":
@@ -336,7 +340,7 @@ if __name__ == "__main__":
     config_name = args.experiment_name or Path(args.best_ckpt).parent.name or "CIFAR100_auc_ce"
     save_experiment_config(config_name, args)
     set_seed(args.seed)
-    train(
+    head, train_summary = train(
         cache_path=args.cache, obs_labels_path=args.obs_labels_path,
         P=args.P, K=args.K,
         lr=args.lr, lr_max=args.lr_max, weight_decay=args.weight_decay,
@@ -347,3 +351,24 @@ if __name__ == "__main__":
         patience=args.patience, min_delta=args.min_delta,
         val_dir=args.val_dir,  
     )
+    # Keep the same complete result contract as the cache-only comparison methods.
+    cache = load_clip_cache_strict(args.cache)
+    test_loss, test_acc = evaluate(
+        head,
+        F.normalize(cache["test_feats"].to(torch.float32), dim=-1),
+        cache["test_labels"].long(),
+        batch_size=2048,
+    )
+    result_path = Path(args.best_ckpt).parent / "metrics.json"
+    result_path.parent.mkdir(parents=True, exist_ok=True)
+    with result_path.open("w", encoding="utf-8") as handle:
+        import json
+        json.dump({
+            "method": "FCL-AUC-CE",
+            "cache": args.cache,
+            "observed_labels": args.obs_labels_path,
+            **train_summary,
+            "test_loss": float(test_loss),
+            "test_accuracy": float(test_acc),
+        }, handle, indent=2, ensure_ascii=False)
+    print(f"[RESULT] Metrics -> {result_path}")
