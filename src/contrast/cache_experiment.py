@@ -5,7 +5,7 @@ import csv
 import json
 import time
 from pathlib import Path
-from typing import Any, Dict, Iterable, Tuple
+from typing import Any, Dict, Iterable
 
 import torch
 import torch.nn.functional as F
@@ -56,8 +56,14 @@ def load_cache_and_observed(cache_path: str, obs_path: str) -> Dict[str, torch.T
 
 @torch.no_grad()
 def classification_metrics(logits: torch.Tensor, labels: torch.Tensor,
-                            ece_bins: int = 15) -> Dict[str, float]:
+                            ece_bins: int = 15) -> Dict[str, Any]:
     labels = labels.long()
+    valid = (labels >= 0) & (labels < logits.shape[-1])
+    if not valid.any():
+        return {"accuracy": None, "nll": None, "macro_f1": None, "ece": None,
+                "valid_count": 0, "total_count": int(labels.numel())}
+    logits = logits[valid]
+    labels = labels[valid]
     probs = logits.float().softmax(dim=-1)
     pred = probs.argmax(dim=-1)
     correct = pred.eq(labels)
@@ -65,6 +71,8 @@ def classification_metrics(logits: torch.Tensor, labels: torch.Tensor,
     metrics: Dict[str, float] = {
         "accuracy": float(correct.float().mean().item()),
         "nll": float(F.cross_entropy(logits.float(), labels).item()),
+        "valid_count": int(labels.numel()),
+        "total_count": int(valid.numel()),
     }
     classes = int(logits.shape[-1])
     f1_values = []
