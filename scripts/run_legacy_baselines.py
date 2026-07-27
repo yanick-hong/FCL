@@ -33,6 +33,18 @@ METHOD_SCRIPTS = {
 }
 
 
+def safe_torch_load(path: Path) -> object:
+    """Load project checkpoints/caches without the pickle safety warning.
+
+    The fallback keeps this runner usable with older PyTorch versions that do
+    not yet support the ``weights_only`` argument.
+    """
+    try:
+        return torch.load(path, map_location="cpu", weights_only=True)
+    except TypeError:
+        return torch.load(path, map_location="cpu")
+
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser()
     p.add_argument("--datasets", nargs="+", default=None)
@@ -127,7 +139,7 @@ def best_from_history(history: list[dict[str, str]]) -> tuple[float | None, int 
 
 
 def load_linear_state(path: Path) -> tuple[torch.Tensor, torch.Tensor]:
-    payload = torch.load(path, map_location="cpu")
+    payload = safe_torch_load(path)
     state = payload.get("state_dict", payload) if isinstance(payload, dict) else payload
     if not isinstance(state, dict):
         raise TypeError(f"Unsupported checkpoint format: {path}")
@@ -141,7 +153,7 @@ def load_linear_state(path: Path) -> tuple[torch.Tensor, torch.Tensor]:
 
 @torch.no_grad()
 def test_metrics(cache_path: Path, ckpt_path: Path) -> dict[str, object]:
-    cache = torch.load(cache_path, map_location="cpu")
+    cache = safe_torch_load(cache_path)
     labels = cache.get("test_labels")
     feats = cache.get("test_feats")
     if not isinstance(feats, torch.Tensor) or not isinstance(labels, torch.Tensor):
