@@ -86,7 +86,13 @@ def main():
     root = Path(args.data_root)
     devkit = root / "devkit"
     train_records = read_records(devkit / "cars_train_annos.mat", root / "cars_train")
-    test_records = read_records(devkit / "cars_test_annos.mat", root / "cars_test")
+    # Prefer the public annotation file that includes test classes when it is
+    # available.  The official ``cars_test_annos.mat`` intentionally omits
+    # classes, so fall back to it only for feature extraction without labels.
+    test_annotation = devkit / "cars_test_annos_withlabels.mat"
+    if not test_annotation.exists():
+        test_annotation = devkit / "cars_test_annos.mat"
+    test_records = read_records(test_annotation, root / "cars_test")
     names_raw = loadmat(devkit / "cars_meta.mat", squeeze_me=True)["class_names"]
     class_names = [str(scalar(name)) for name in names_raw.ravel()]
     train_records, val_records = split_train(train_records, args.seed)
