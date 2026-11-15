@@ -2,6 +2,8 @@
 
 This snapshot records measured test accuracy from `/root/autodl-tmp/outputs/paper` on 2026-11-15. Values are percentages; the reference column comes from `configs/paper_targets.yaml` and is not used as a measured result. The protocol uses CLIP ViT-L/14 frozen features, `rho=0.3`, 100 epochs, and the dataset-specific `P/K` values.
 
+These are historical runs preceding the current audit fixes. The sampler and protocol-validation changes require new fingerprinted runs before claiming these values were produced by the repaired source. The audit's local synthetic smoke test checks execution only and does not replace these measured GPU results.
+
 | Dataset | Method | Measured | Reference | Status |
 |---|---:|---:|---:|---|
 | CIFAR-100 | Zero-shot | 75.59 | 75.63 | complete |
@@ -36,7 +38,15 @@ This snapshot records measured test accuracy from `/root/autodl-tmp/outputs/pape
 | Tiny-ImageNet-200 | DLD | 83.43 | 78.76 | complete |
 | Tiny-ImageNet-200 | CSGN | 83.30 | 80.42 | complete |
 | Tiny-ImageNet-200 | FCL | 84.07 | 81.30 | complete |
+| Food-101 | Zero-shot | 92.06 | 89.01 | complete |
+| Food-101 | FL-C | 94.27 | 93.32 | complete |
+| Food-101 | NL-C | 92.93 | 92.67 | complete |
+| Food-101 | FS-C | 95.09 | 95.07 | complete |
+| Food-101 | L2B | 94.19 | 94.49 | complete |
+| Food-101 | DLD | 94.54 | 94.42 | complete |
+| Food-101 | CSGN | 94.34 | 94.44 | complete |
+| Food-101 | FCL | 94.78 | 94.70 | complete |
 
-Stanford Cars has no local cache because the official test labels file was unavailable on AutoDL. Food-101 is being downloaded from the official archive with resumable 8-way Range requests; its main-suite controls and learners will be added after extraction and cache validation.
+Stanford Cars has no local cache because the official test labels file was unavailable on AutoDL. Food-101 was downloaded with resumable 8-way Range requests, passed `gzip -t`, and completed all eight main-suite jobs. The Food-101 values above are rounded from the remote `metrics.json` files.
 
 The Caltech-101 comparison baselines are substantially below the published values, which is retained as an explicit protocol/result discrepancy rather than silently replacing the measured values.

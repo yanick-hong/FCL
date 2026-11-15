@@ -128,7 +128,15 @@ def annotate(args):
     manifest, classes = Manifest.read(args.manifest, args.split), read_classes(args.classes)
     prompt = build_prompt(classes, args.prompt_variant, args.prompt_file)
     settings = {"mode": "qwen", "backend": args.backend, "prompt_sha256": fingerprint(prompt),
+                "prompt_variant": "custom" if args.prompt_file else args.prompt_variant,
                 "max_new_tokens": args.max_new_tokens, "image_root": str(Path(args.image_root).resolve())}
+    meta_path = Path(args.output).with_suffix(Path(args.output).suffix + ".meta.json")
+    if args.resume and meta_path.exists():
+        previous_settings = json.loads(meta_path.read_text(encoding="utf-8")).get("settings", {})
+        if "prompt_variant" not in previous_settings:
+            # Older progress still verifies the exact prompt hash; adding a
+            # descriptive variant must not prevent a safe interrupted resume.
+            settings.pop("prompt_variant")
     store = AnnotationStore(args.output, manifest, classes, args.model, settings, args.resume)
     todo = [sample for sample in manifest.samples if sample["sample_id"] not in store.records]
     if args.limit is not None:
@@ -168,7 +176,13 @@ def export_cache(args):
     records = load_annotations(args.annotations, manifest, classes)
     if len(records) != len(manifest.samples):
         raise AnnotationError("Cache export requires labels for every sample in the selected manifest split")
-    cache = torch.load(args.cache, map_location="cpu", weights_only=False)
+    # Feature caches are data artifacts.  Keep pickle execution disabled when
+    # the runtime supports the safer loader; old PyTorch versions are handled
+    # by the narrow compatibility fallback.
+    try:
+        cache = torch.load(args.cache, map_location="cpu", weights_only=True)
+    except TypeError:
+        cache = torch.load(args.cache, map_location="cpu")
     split = args.split or "train"
     if "class_names" in cache and list(cache["class_names"]) != classes:
         raise AnnotationError("Cache class order differs from annotation class order")
@@ -205,10 +219,17 @@ def export_cache(args):
         cache[f"clip_probs_{split}"], cache[f"clip_argmax_{split}"] = probabilities, argmax
     cache[f"{split}_sample_ids"] = [row["sample_id"] for row in ordered]
     cache[f"{split}_paths"] = [row["path"] for row in ordered]
+    source_models = sorted({row["source_model"] for row in labels})
+    annotation_meta_path = Path(args.annotations).with_suffix(Path(args.annotations).suffix + ".meta.json")
+    annotation_settings = {}
+    if annotation_meta_path.exists():
+        annotation_settings = json.loads(annotation_meta_path.read_text(encoding="utf-8")).get("settings", {})
     cache.setdefault("annotation_metadata", {})[split] = {
         "manifest_sha256": manifest.sha256, "annotations_sha256": fingerprint(labels),
-        "source_models": sorted({row["source_model"] for row in labels}),
+        "source_models": source_models,
         "probability_sources": sorted({row["probability_source"] for row in labels}),
+        "prompt_variant": annotation_settings.get("prompt_variant"),
+        "prompt_sha256": annotation_settings.get("prompt_sha256"),
         "legacy_cache_order_confirmed": identity is None and path_identity is None,
         "replaced_clip_fields": args.replace_clip_fields}
     output = Path(args.output)

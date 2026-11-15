@@ -32,6 +32,14 @@ from paths import clip_cache, observed_labels_cache, experiment_checkpoint, expe
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
+def _safe_torch_load(path: str):
+    """Load tensor/dict caches without enabling arbitrary pickle execution."""
+    try:
+        return torch.load(path, map_location="cpu", weights_only=True)
+    except TypeError:  # PyTorch < 2.0
+        return torch.load(path, map_location="cpu")
+
 # --------------- 通用 ---------------
 def set_seed(seed=42):
     import random
@@ -41,7 +49,7 @@ def set_seed(seed=42):
 
 def load_clip_cache_strict(cache_path: str) -> Dict[str, torch.Tensor]:
     assert os.path.isfile(cache_path), f"Cache not found: {cache_path}"
-    data = torch.load(cache_path, map_location="cpu")
+    data = _safe_torch_load(cache_path)
     fp32 = ["train_feats","val_feats","test_feats","clip_probs_train","clip_probs_val","clip_probs_test","clip_label_embeds"]
     lng  = ["train_labels","val_labels","test_labels","clip_argmax_train","clip_argmax_val","clip_argmax_test","train_idx_from_train50k","val_idx_from_train50k"]
     for k in fp32:
@@ -52,7 +60,7 @@ def load_clip_cache_strict(cache_path: str) -> Dict[str, torch.Tensor]:
 
 def load_obs_labels(obs_path: str) -> Dict[str, torch.Tensor]:
     if not os.path.exists(obs_path): raise FileNotFoundError(obs_path)
-    data = torch.load(obs_path, map_location="cpu")
+    data = _safe_torch_load(obs_path)
     if not ("y_obs" in data and "s" in data): raise KeyError(f"need y_obs & s, got {list(data.keys())}")
     return {"y_obs": data["y_obs"].long(), "s": data["s"].long()}
 
@@ -65,19 +73,31 @@ class FeatureDataset(Dataset):
 
 class PKBatchSampler(Sampler[List[int]]):
     def __init__(self, labels_obs: torch.Tensor, P: int, K: int, seed: int = 42):
-        super().__init__(None)
+        super().__init__()
         import random
         lab = labels_obs.cpu().numpy()
         self.P, self.K, self.seed = int(P), int(K), int(seed)
         self.class_to_indices = {int(c): np.where(lab==c)[0].tolist() for c in np.unique(lab)}
         self.classes = list(self.class_to_indices.keys())
+        if not self.classes:
+            raise ValueError("Cannot sample an empty training set")
+        if self.P <= 0 or self.K <= 0:
+            raise ValueError("P and K must be positive")
+        if len(self.classes) < self.P:
+            raise ValueError(f"Available classes {len(self.classes)} < P={self.P}")
         self.N = len(lab); self.batch_size = self.P*self.K
         self.steps_per_epoch = max(1, self.N//self.batch_size)
+        self.epoch = 0
         self.ptrs = {}
         for c, idxs in self.class_to_indices.items():
             rng = random.Random(self.seed+c); rng.shuffle(idxs)
             self.ptrs[c] = {"idxs": idxs, "p": 0, "rng": rng}
     def __len__(self): return self.steps_per_epoch
+
+    def set_epoch(self, epoch: int):
+        if int(epoch) != epoch or epoch < 0:
+            raise ValueError("epoch must be a nonnegative integer")
+        self.epoch = int(epoch)
     def _next_k(self, c, K):
         st = self.ptrs[c]; idxs, p, rng = st["idxs"], st["p"], st["rng"]; out=[]
         for _ in range(K):
@@ -86,7 +106,15 @@ class PKBatchSampler(Sampler[List[int]]):
         st["p"]=p; return out
     def __iter__(self):
         import random
-        rng=random.Random(self.seed)
+        epoch = self.epoch
+        self.epoch += 1
+        rng=random.Random(self.seed + epoch)
+        self.ptrs = {}
+        for c, original in self.class_to_indices.items():
+            idxs = original.copy()
+            class_rng = random.Random((self.seed + epoch) * 1000003 + c)
+            class_rng.shuffle(idxs)
+            self.ptrs[c] = {"idxs": idxs, "p": 0, "rng": class_rng}
         for _ in range(self.steps_per_epoch):
             chosen = rng.sample(self.classes, self.P) if len(self.classes)>=self.P else [rng.choice(self.classes) for _ in range(self.P)]
             batch=[]
@@ -133,9 +161,10 @@ def smooth_probs(p, tau=0.7, eps=1e-6):
     p=p.float().clamp_min(eps); return F.softmax(torch.log(p)/max(1e-6,tau), dim=-1)
 
 @torch.no_grad()
-def dld_predict_proba(model, feats, p_clip, steps=5, batch_size=2048):
+def dld_predict_proba(model, feats, p_clip, steps=5, batch_size=2048, num_workers=0):
     model.eval(); probs_out=[]
-    dl=DataLoader(TensorDataset(feats, p_clip), batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=(device.type=="cuda"))
+    dl=DataLoader(TensorDataset(feats, p_clip), batch_size=batch_size, shuffle=False,
+                   num_workers=num_workers, pin_memory=(device.type=="cuda"))
     t_grid=torch.linspace(1.0,0.0,steps=steps+1, device=device)
     for xb,pb in dl:
         xb=xb.to(device).float(); y_n=smooth_probs(pb.to(device).float())
@@ -152,17 +181,19 @@ def dld_predict_proba(model, feats, p_clip, steps=5, batch_size=2048):
     return torch.cat(probs_out,0)
 
 @torch.no_grad()
-def evaluate_dld(model, feats, labels, p_clip, steps=5, batch_size=2048):
-    probs=dld_predict_proba(model, feats, p_clip, steps=steps, batch_size=batch_size).to(device)
+def evaluate_dld(model, feats, labels, p_clip, steps=5, batch_size=2048, num_workers=0):
+    probs=dld_predict_proba(model, feats, p_clip, steps=steps, batch_size=batch_size,
+                            num_workers=num_workers).to(device)
     labels=labels.to(device)
     ce=F.nll_loss((probs+1e-12).log(), labels, reduction="mean").item()
     acc=(probs.argmax(dim=-1)==labels).float().mean().item()
     return ce, acc
 
 @torch.no_grad()
-def evaluate_head(head, feats, labels, batch_size=2048):
+def evaluate_head(head, feats, labels, batch_size=2048, num_workers=0):
     head.eval(); ce_sum=0.0; correct=0; total=0
-    dl=DataLoader(TensorDataset(feats, labels), batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=(device.type=="cuda"))
+    dl=DataLoader(TensorDataset(feats, labels), batch_size=batch_size, shuffle=False,
+                  num_workers=num_workers, pin_memory=(device.type=="cuda"))
     for xb,yb in dl:
         xb=xb.to(device).float(); yb=yb.to(device).long()
         logits=head(xb)
@@ -200,8 +231,11 @@ def train(
     early_metric="acc", patience=10, min_delta=0.0, val_dir=str(experiment_logs("CIFAR100_dld")),
     # 新增：线性头联合训练的强度（一个 knob），以及对齐温度
     head_lambda: float = 0.2, align_T: float = 2.0, seed: int = 42,
+    num_workers: int = 0,
 ):
     set_seed(seed)
+    if num_workers < 0:
+        raise ValueError("num_workers must be nonnegative")
 
     cache=load_clip_cache_strict(cache_path)
     train_feats=F.normalize(cache["train_feats"].to(torch.float32), dim=-1)
@@ -214,8 +248,9 @@ def train(
     if y_obs_all.numel()!=N: raise RuntimeError("obs length mismatch")
 
     train_ds=FeatureDataset(train_feats, train_labels, y_obs_all, p_train)
-    batch_sampler=PKBatchSampler(labels_obs=y_obs_all, P=P, K=K, seed=42)
-    train_loader=DataLoader(train_ds, batch_sampler=batch_sampler, num_workers=2, pin_memory=True)
+    batch_sampler=PKBatchSampler(labels_obs=y_obs_all, P=P, K=K, seed=seed)
+    train_loader=DataLoader(train_ds, batch_sampler=batch_sampler,
+                            num_workers=num_workers, pin_memory=True)
 
     dld = DLDLinear(in_dim=D, num_classes=C, hidden=hidden, tdim=tdim).to(device)
     head= LinearHead(in_dim=D, num_classes=C).to(device)
@@ -275,9 +310,12 @@ def train(
                       f"Loss(avg)={run_loss/ib:.5f}")
 
         # 验证：线性头（用于早停与保存）
-        val_ce_head, val_acc_head = evaluate_head(head, val_feats, val_labels, batch_size=2048)
+        val_ce_head, val_acc_head = evaluate_head(head, val_feats, val_labels,
+                                                   batch_size=2048, num_workers=num_workers)
         # 同时打印 DLD 的指标供参考（不作为早停）
-        val_ce_dld,  val_acc_dld  = evaluate_dld(dld,  val_feats, val_labels, p_val, steps=steps, batch_size=2048)
+        val_ce_dld,  val_acc_dld  = evaluate_dld(dld, val_feats, val_labels, p_val,
+                                                 steps=steps, batch_size=2048,
+                                                 num_workers=num_workers)
         print(f"[VAL] epoch={epoch:03d} | Head: CE={val_ce_head:.4f} Acc={val_acc_head*100:.2f}% "
               f"| DLD: CE={val_ce_dld:.4f} Acc={val_acc_dld*100:.2f}% | time={time.time()-t0:.1f}s")
 
@@ -326,6 +364,8 @@ def parse_args():
     p.add_argument("--patience", type=int, default=10); p.add_argument("--min_delta", type=float, default=0.0)
     p.add_argument("--val_dir", type=str, default=str(experiment_logs("CIFAR100_dld")))
     p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--num_workers", type=int, default=0,
+                   help="DataLoader workers; 0 is the reproducible/safe default.")
     # 一个超参：线性头强度；以及对齐温度（通常 2~4）
     p.add_argument("--head_lambda", type=float, default=0.2)
     p.add_argument("--align_T", type=float, default=2.0)
@@ -338,4 +378,5 @@ if __name__ == "__main__":
           hidden=args.hidden, tdim=args.tdim, steps=args.steps, tau_clip=args.tau_clip,
           print_every=args.print_every, best_ckpt_path=args.best_ckpt,
           early_metric=args.early_metric, patience=args.patience, min_delta=args.min_delta, val_dir=args.val_dir,
-          head_lambda=args.head_lambda, align_T=args.align_T, seed=args.seed)
+          head_lambda=args.head_lambda, align_T=args.align_T, seed=args.seed,
+          num_workers=args.num_workers)

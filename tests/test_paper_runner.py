@@ -54,6 +54,12 @@ def test_resume_matches_job_and_fingerprint(tmp_path: Path):
     (run_dir / "paper_run.json").write_text(json.dumps({
         "status": "completed", "job_key": identity, "fingerprint": fingerprint,
     }), encoding="utf-8")
+    assert find_completed_job(tmp_path, identity, fingerprint) is None
+    (run_dir / "metrics.json").write_text("{}", encoding="utf-8")
+    assert find_completed_job(tmp_path, identity, fingerprint) is None
+    (run_dir / "metrics.json").write_text('{"test_accuracy": NaN}', encoding="utf-8")
+    assert find_completed_job(tmp_path, identity, fingerprint) is None
+    (run_dir / "metrics.json").write_text(json.dumps({"test_accuracy": 0.1}), encoding="utf-8")
     assert find_completed_job(tmp_path, identity, fingerprint) == run_dir
 
 
@@ -62,3 +68,14 @@ def test_summary_extracts_supported_accuracy_shapes():
     assert metric_accuracy({"test": {"accuracy": 81.0}}) == 0.81
     assert metric_accuracy({"metrics": {"test": {"accuracy": 0.79}}}) == 0.79
     assert metric_accuracy({}) is None
+    assert metric_accuracy([]) is None
+    for value in (float("nan"), float("inf"), -0.1, 101, True):
+        assert metric_accuracy({"test_accuracy": value}) is None
+
+
+def test_resume_fingerprint_changes_with_external_protocol_config(tmp_path: Path):
+    cfg = load_yaml(Path(__file__).parents[1] / "configs" / "paper_reproduction.yaml")
+    before = build_jobs(cfg, runner_args(tmp_path))[0]
+    cfg["protocol"]["lr"] *= 2
+    after = build_jobs(cfg, runner_args(tmp_path))[0]
+    assert job_fingerprint(before, "unchanged-source")[0] != job_fingerprint(after, "unchanged-source")[0]

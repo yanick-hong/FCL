@@ -2,8 +2,7 @@
 
 实验工程：冻结 CLIP 特征 → 过滤并模拟校正标签 → FCL+AUC-C / 对比方法 → 独立评估 → 汇总。
 
-GitHub 已核对版本：`fb65f126274581af6f931c4de1eca0ff8e364c6e`；保留本地后续修复和未提交修改。
-本地详细说明位于 docs/；AutoDL 只同步实验所需代码与本说明，不上传论文材料。
+恢复分支：[`reproduction/recover-fcl`](https://github.com/yanick-hong/FCL/tree/reproduction/recover-fcl)。详细目录用途见 [目录说明](docs/project_structure.md)，已修复问题与剩余限制见 [项目审计](docs/project_audit.md)，可执行协议见 [论文复现说明](docs/paper_reproduction.md)。
 
 ## 当前结构
 
@@ -30,8 +29,18 @@ outputs/                      不提交：<dataset>/<method>/<timestamp>/
 
 不再并列使用 data/dataset 或 output/outputs；统一 dataset 与 outputs。
 src 是算法实现，scripts 是批量入口，configs 是声明配置，三者职责不同。
-本地 docs/、tests/ 和 .experiment_archive/ 分别用于说明、回归检查和可恢复归档，
-不上传 AutoDL。远程保留 .git 版本信息与 .autodl 平台状态。
+docs/、tests/ 分别用于说明与回归检查，均受 Git 管理；`.experiment_archive/` 是本地可恢复归档，Git 忽略。远程保留 `.git` 版本信息与 `.autodl` 平台状态。
+
+## 论文实验统一入口
+
+```bash
+python scripts/run_paper_experiments.py --datasets cifar100 --dry-run
+python scripts/run_paper_experiments.py --datasets cifar100 --preflight --strict-paper-splits
+python scripts/run_paper_experiments.py --datasets cifar100 --prepare-labels --execute
+python scripts/summarize_paper_results.py --source clip
+```
+
+主表八方法、lambda/rho/prompt/epoch 套件由 `configs/paper_reproduction.yaml` 配置。Qwen 的 train/test 标注必须分别导出并具有 split 来源元数据；Qwen 主表与全部消融仍未完成实测。审计修复后的代码需要重新运行生成新指纹；历史 GPU 结果只代表各自保存的旧协议。
 
 ## AutoDL
 
@@ -46,14 +55,14 @@ python -m pip check
 requirements.txt 是唯一依赖清单；OpenAI CLIP 在当前实例已安装。
 新环境需从官方项目安装：`python -m pip install git+https://github.com/openai/CLIP.git`。
 
-## 最短实验流程（缓存恢复并校验后）
+## 数据准备与旧入口（缓存恢复并校验后）
 
-当前准备范围：DTD、Caltech-101、EuroSAT、CIFAR-100、Tiny-ImageNet。
-Food-101 与 Stanford Cars 暂缓；保留入口，避免后续恢复时重新找代码。
+当前已准备范围：DTD、Caltech-101、EuroSAT、CIFAR-100、Tiny-ImageNet、Food-101。
+Food-101 已完成 AutoDL 的 CLIP 主套件复现；Stanford Cars 仍缺少官方带标签测试文件。两者的状态和限制见 `docs/remote_clip_results_seed42.md` 与 `docs/project_audit.md`。
 
 ```bash
 # 自动解压、特征提取、原型导出、过滤校正、字段/标签/划分校验；可复用已完成缓存。
-python scripts/prepare_materials.py --run-dir "$OUTPUT_ROOT/_preparation/rebuild_20261115"
+python scripts/prepare_materials.py --datasets cifar100 --run-dir outputs/_preparation/rebuild_cifar100
 ```
 
 使用各数据集专用脚本：Caltech-101 30/10/剩余划分，DTD 官方 partition=1，

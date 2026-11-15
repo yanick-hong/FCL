@@ -33,7 +33,7 @@
 
 CLIP 默认读取 `${DATA_ROOT}/processed/<dataset>_clip_vit-l-14_embeddings.pt`。Qwen 默认读取 `<dataset>_qwen_prompt-C_embeddings.pt`，可用 `--cache-template` 指定已有派生缓存。Qwen 派生缓存保留同一组 CLIP 图像特征，把训练接口兼容字段 `clip_probs_*` / `clip_argmax_*` 明确替换为 Qwen 来源并在 metadata 中记录 Qwen、prompt、原缓存和样本对齐信息。这些字段在 Qwen 实验里表示 Qwen 分布，名称仅为兼容旧接口。若只有硬标签，应记录分布是 one-hot，而非伪装成生成模型的校准后验。
 
-Qwen 原模型为 `Qwen/Qwen2.5-VL-7B-Instruct`。生成或导入必须先完成；运行器不会在缺失 Qwen 文件时使用 CLIP 标签。`--suite prompts` 使用 A/B/C 三种独立 Qwen 缓存；prompt 原文以附录/已恢复生成脚本为依据，文件名本身不能证明 prompt 对齐。预检要求 Qwen 缓存显式包含来源 metadata；缺少 prompt metadata 时会报告未核验。
+Qwen 恢复脚本使用 `Qwen/Qwen2.5-VL-7B-Instruct`；论文的 Qwen-VL-7B 命名不能证明二者版本等同。生成或导入必须先完成；运行器不会在缺失 Qwen 文件时使用 CLIP 标签。`--suite prompts` 使用 A/B/C 三种独立 Qwen 缓存；当前内置 prompt 不是已核实的论文原文，需通过 `--prompt-file` 指定确切历史模板。预检核验 `annotation_metadata[split]` 的 `source_models` 与 `replaced_clip_fields=true`：训练需要 train Qwen 标注，Qwen 零样本需要 test Qwen 标注，未替换的 CLIP split 不报告为 Qwen 指标。已知 prompt variant 与请求不一致时拒绝；缺少 A/B/C 映射信息时报告未核验。
 
 校正缓存按数据集、来源、prompt、rho 分开放在 `processed/paper_labels/` 下。`--prepare-labels --execute` 只创建不存在的校正缓存，不覆盖既有文件。已有校正缓存须包含 `y_obs, s`；Qwen 校正缓存必须显式记录 `meta.label_source=qwen`。使用旧路径时可通过 `--obs-template` 显式指定，并自行审计顺序与来源。
 

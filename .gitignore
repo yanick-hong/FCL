@@ -10,6 +10,8 @@ cache/
 val/
 datasets/
 __pycache__/
+.pytest_cache/
+.Trash-0/
 *.py[cod]
 
 # Local environment and notebook state.

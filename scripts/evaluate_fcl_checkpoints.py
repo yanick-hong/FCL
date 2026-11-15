@@ -29,16 +29,21 @@ def latest_metrics(output_root: Path, dataset: str) -> Path | None:
 
 
 def evaluate_checkpoint(checkpoint: Path, cache_path: Path) -> dict[str, float]:
-    cache = torch.load(cache_path, map_location="cpu")
+    cache = torch.load(cache_path, map_location="cpu", weights_only=True)
     features = F.normalize(cache["test_feats"].float(), dim=-1)
     labels = cache["test_labels"].long()
-    classes = int(max(labels.max().item(), cache["train_labels"].max().item())) + 1
-    model = nn.Linear(features.shape[1], classes)
-    state = torch.load(checkpoint, map_location="cpu")
+    state = torch.load(checkpoint, map_location="cpu", weights_only=True)
     if isinstance(state, dict) and "state_dict" in state:
         state = state["state_dict"]
     if isinstance(state, dict) and "fc.weight" in state:
         state = {key.removeprefix("fc."): value for key, value in state.items()}
+    # A split may omit one or more classes.  The trained head defines the full
+    # vocabulary; inferring it from test/train label maxima can truncate it and
+    # fail to load an otherwise valid checkpoint.
+    if not isinstance(state, dict) or not isinstance(state.get("weight"), torch.Tensor):
+        raise ValueError(f"Checkpoint has no linear weight matrix: {checkpoint}")
+    classes = int(state["weight"].shape[0])
+    model = nn.Linear(features.shape[1], classes)
     model.load_state_dict(state)
     with torch.no_grad():
         logits = model(features)

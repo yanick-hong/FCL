@@ -115,6 +115,7 @@ def build_jobs(cfg: dict, args: argparse.Namespace) -> list[dict]:
                                          seed=int(seed), cache=cache, obs=obs, run_dir=run_dir,
                                          P=classes_per_batch, K=samples_per_class,
                                          pairwise_tau=pairwise_tau, num_workers=args.num_workers,
+                                         protocol_settings=dict(protocol),
                                          epochs=args.epochs or int(ablation.get("epochs", protocol["epochs"]))))
     return jobs
 
@@ -135,6 +136,8 @@ def command_for(job: dict, cfg: dict) -> list[str] | None:
                "--patience", str(job["epochs"] + 1), "--seed", str(job["seed"]),
                "--best_ckpt", str(job["run_dir"] / "best.ckpt"),
                "--val_dir", str(job["run_dir"] / "logs")]
+    if method in ("l2b", "dld", "csgn"):
+        command += ["--num_workers", str(job["num_workers"])]
     if method in ("fcl", "dld"):
         command += ["--lr_max", str(settings["lr_max"])]
     if method == "fcl":
@@ -204,6 +207,7 @@ def job_fingerprint(job: dict, source_sha: str, git_dirty: bool | None = None) -
 
 def find_completed_job(output_root: Path, identity: dict, fingerprint: str) -> Path | None:
     """Find a prior completed run with the exact same job and fingerprints."""
+    from scripts.summarize_paper_results import metric_accuracy
     if not output_root.exists():
         return None
     for manifest_path in output_root.rglob("paper_run.json"):
@@ -213,6 +217,15 @@ def find_completed_job(output_root: Path, identity: dict, fingerprint: str) -> P
             continue
         if payload.get("status") == "completed" and payload.get("job_key") == identity \
                 and payload.get("fingerprint") == fingerprint:
+            metrics_path = manifest_path.parent / "metrics.json"
+            if not metrics_path.is_file():
+                continue
+            try:
+                metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if not isinstance(metrics, dict) or metric_accuracy(metrics) is None:
+                continue
             return manifest_path.parent
     return None
 
@@ -225,32 +238,88 @@ def torch_load(path: Path):
         return torch.load(path, map_location="cpu")
 
 
+def qwen_split_metadata(cache: dict, split: str) -> dict | None:
+    """Prove the compatibility clip_* fields were replaced for this split.
+
+    A global source string cannot establish that an exporter overlaid test as
+    well as train; the remaining clip_* fields may still be genuine CLIP.
+    """
+    all_metadata = cache.get("annotation_metadata", {})
+    if not isinstance(all_metadata, dict):
+        return None
+    metadata = all_metadata.get(split, {})
+    if not isinstance(metadata, dict):
+        return None
+    models = metadata.get("source_models", [])
+    if (metadata.get("replaced_clip_fields") is True and isinstance(models, (list, tuple)) and models
+            and all(str(model).lower().rsplit("/", 1)[-1].startswith("qwen") for model in models)):
+        return metadata
+    return None
+
+
+def prediction_splits(job: dict, cache: dict) -> tuple[str, ...]:
+    if job["method"] != "zero_shot":
+        return ("train",)
+    if job["source"] == "qwen":
+        # Report only Qwen-labelled splits. In particular never label leftover
+        # CLIP validation/test predictions as Qwen zero-shot measurements.
+        return tuple(split for split in ("train", "val", "test") if qwen_split_metadata(cache, split))
+    return ("train", "val", "test")
+
+
 def inspect_input(job: dict, cfg: dict, strict: bool = False) -> tuple[dict, list[str]]:
     import torch
+    from fcl.train_auc_ce import _label_tensor
     if not job["cache"].is_file():
         raise FileNotFoundError(f"Missing {job['source']} feature/pseudo-label cache: {job['cache']}")
     cache = torch_load(job["cache"])
+    if not isinstance(cache, dict):
+        raise ValueError("Feature cache must be a dictionary")
     required = [f"{split}_{kind}" for split in ("train", "val", "test") for kind in ("feats", "labels")]
     for key in required:
         if key not in cache:
             raise KeyError(f"{job['cache']} has no {key}")
     prior = cache.get("clip_probs_train")
-    if not isinstance(prior, torch.Tensor) or prior.ndim != 2:
+    if not isinstance(prior, torch.Tensor) or prior.ndim != 2 or prior.shape[1] == 0:
         raise ValueError("Training requires a source probability matrix clip_probs_train")
     classes = prior.shape[1]
     warnings = []
+    source_splits = prediction_splits(job, cache)
+    if job["source"] == "qwen":
+        required_source_split = "test" if job["method"] == "zero_shot" else "train"
+        if qwen_split_metadata(cache, required_source_split) is None:
+            raise ValueError(f"Qwen {job['method']} requires explicit Qwen source metadata for "
+                             f"{required_source_split} with replaced_clip_fields=true; CLIP fallback is forbidden")
+        for split in source_splits:
+            metadata = qwen_split_metadata(cache, split)
+            variant = metadata.get("prompt_variant")
+            if variant in ("A", "B", "C") and variant != job["prompt"]:
+                raise ValueError(f"Qwen {split} prompt metadata {variant} does not match requested {job['prompt']}")
+            if variant not in ("A", "B", "C"):
+                warnings.append(f"Qwen {split} cache has no verified prompt variant; prompt A/B/C alignment is unverified")
+    elif any(qwen_split_metadata(cache, split) for split in source_splits):
+        raise ValueError("Selected CLIP source contains Qwen-overlaid prediction fields")
     for split in ("train", "val", "test"):
         features, labels = cache[f"{split}_feats"], cache[f"{split}_labels"]
+        if not isinstance(features, torch.Tensor) or not isinstance(labels, torch.Tensor):
+            raise ValueError(f"{split} features and labels must be tensors")
         if features.ndim != 2 or labels.ndim != 1 or len(features) != len(labels) or not len(labels):
             raise ValueError(f"Invalid/empty {split} features or labels")
         if not torch.isfinite(features).all() or labels.min() < 0 or labels.max() >= classes:
             raise ValueError(f"Invalid {split} values or unavailable ground-truth labels")
+        _label_tensor(labels, f"{split}_labels", len(features), classes)
+        if features.shape[1] != cache["train_feats"].shape[1] or features.shape[1] == 0:
+            raise ValueError(f"{split} feature dimension differs from train or is empty")
+        if split not in source_splits:
+            continue
         probabilities = cache.get(f"clip_probs_{split}")
         predictions = cache.get(f"clip_argmax_{split}")
+        if predictions is not None:
+            _label_tensor(predictions, f"clip_argmax_{split}", len(labels), classes)
         if probabilities is not None:
-            if probabilities.shape != (len(labels), classes) or not torch.isfinite(probabilities).all():
+            if not isinstance(probabilities, torch.Tensor) or probabilities.shape != (len(labels), classes) or not torch.isfinite(probabilities).all():
                 raise ValueError(f"Invalid {split} source probabilities")
-            if probabilities.min() < 0 or not torch.allclose(probabilities.sum(1), torch.ones(len(labels)), atol=1e-3):
+            if probabilities.min() < 0 or not torch.allclose(probabilities.float().sum(1), torch.ones(len(labels)), atol=1e-3):
                 raise ValueError(f"{split} source probability rows must sum to one")
             if predictions is not None and not torch.equal(predictions.long().view(-1), probabilities.argmax(1)):
                 raise ValueError(f"{split} argmax/probability disagreement; refusing an ambiguous label source")
@@ -263,21 +332,19 @@ def inspect_input(job: dict, cfg: dict, strict: bool = False) -> tuple[dict, lis
         if strict:
             raise ValueError(message)
         warnings.append(message)
-    if job["source"] == "qwen":
-        metadata = str({k: v for k, v in cache.items() if k in ("meta", "metadata", "label_source", "source")}).lower()
-        if "qwen" not in metadata:
-            raise ValueError("Qwen cache must carry explicit Qwen source metadata; CLIP fallback is forbidden")
-        if "prompt" not in metadata:
-            warnings.append("Qwen cache has no prompt metadata; prompt A/B/C alignment is unverified")
     if cache["train_feats"].shape[1] != 768:
         warnings.append("Feature dimension differs from the paper's CLIP ViT-L/14 dimension 768")
     if job["method"] not in ("zero_shot", "fs_c") and job["obs"].exists():
         observed = torch_load(job["obs"])
         n = len(cache["train_labels"])
+        if not isinstance(observed, dict):
+            raise ValueError("Observed-label cache must be a dictionary")
         if any(key not in observed or observed[key].numel() != n for key in ("y_obs", "s")):
             raise ValueError(f"Observed-label length mismatch: {job['obs']}")
         if not torch.all((observed["s"] == 0) | (observed["s"] == 1)):
             raise ValueError("Observed flags must be zero (corrected) or one (uncorrected)")
+        _label_tensor(observed["y_obs"], "y_obs", n, classes)
+        _label_tensor(observed["s"], "s", n, 2)
         meta = observed.get("meta", {})
         if job["source"] == "qwen" and meta.get("label_source") != "qwen":
             raise ValueError("Qwen observed labels require explicit label_source=qwen metadata")
@@ -314,7 +381,10 @@ def run_ce_or_zeroshot(job: dict, cfg: dict, cache: dict) -> None:
     output, method = job["run_dir"], job["method"]
     if method == "zero_shot":
         metrics = {}
-        for split in ("train", "val", "test"):
+        splits = prediction_splits(job, cache)
+        if job["source"] == "qwen" and "test" not in splits:
+            raise ValueError("Qwen zero_shot requires Qwen test predictions; CLIP fallback is forbidden")
+        for split in splits:
             predictions = cache.get(f"clip_argmax_{split}")
             if predictions is None:
                 predictions = cache[f"clip_probs_{split}"].argmax(1)
@@ -372,7 +442,15 @@ def run_ce_or_zeroshot(job: dict, cfg: dict, cache: dict) -> None:
 
 
 def main() -> int:
+    # Subprocess logs use UTF-8 on every host. Windows otherwise defaults to
+    # GBK for redirected Python output, which can corrupt decoded text or make
+    # forwarding a child log raise UnicodeEncodeError and abort a valid run.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     args = arguments()
+    if args.epochs is not None and args.epochs <= 0:
+        raise ValueError("--epochs must be positive")
     if args.num_workers < 0:
         raise ValueError("--num-workers must be nonnegative")
     if args.P is not None and args.P <= 0:
@@ -436,6 +514,7 @@ def main() -> int:
             if command:
                 env = os.environ.copy()
                 env["PYTHONUNBUFFERED"] = "1"
+                env["PYTHONIOENCODING"] = "utf-8"
                 with (output / "logs" / "console.log").open("w", encoding="utf-8") as log:
                     proc = subprocess.Popen(command, cwd=ROOT, env=env, stdout=subprocess.PIPE,
                                             stderr=subprocess.STDOUT, text=True, encoding="utf-8", errors="replace")

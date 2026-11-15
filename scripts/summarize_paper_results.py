@@ -8,15 +8,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from paths import OUTPUT_ROOT
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output-root", type=Path, default=ROOT / "outputs" / "paper")
+    parser.add_argument("--output-root", type=Path, default=OUTPUT_ROOT / "paper")
     parser.add_argument("--targets", type=Path, default=ROOT / "configs" / "paper_targets.yaml")
     parser.add_argument("--source", choices=("clip", "qwen"), default="clip")
     parser.add_argument("--seed", type=int, default=42)
@@ -31,16 +34,21 @@ def load_yaml(path: Path) -> dict:
 
 def metric_accuracy(metrics: dict) -> float | None:
     """Extract an accuracy in [0,1] from each supported result format."""
+    if not isinstance(metrics, dict):
+        return None
     test = metrics.get("test") if isinstance(metrics.get("test"), dict) else {}
     nested = metrics.get("metrics") if isinstance(metrics.get("metrics"), dict) else {}
     nested_test = nested.get("test") if isinstance(nested.get("test"), dict) else {}
     candidates = [metrics.get("test_accuracy"), test.get("accuracy"), nested_test.get("accuracy")]
     for value in candidates:
+        if isinstance(value, bool):
+            continue
         try:
             value = float(value)
         except (TypeError, ValueError):
             continue
-        return value / 100.0 if value > 1.0 else value
+        if math.isfinite(value) and 0 <= value <= 100:
+            return value / 100.0 if value > 1.0 else value
     return None
 
 
@@ -52,9 +60,13 @@ def completed_runs(root: Path, source: str, seed: int) -> dict[tuple[str, str], 
             payload = json.loads(manifest.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        if payload.get("status") != "completed" or payload.get("suite") != "main":
+        if not isinstance(payload, dict) or payload.get("status") != "completed" or payload.get("suite") != "main":
             continue
-        if payload.get("source") != source or int(payload.get("seed", -1)) != seed:
+        try:
+            run_seed = int(payload.get("seed", -1))
+        except (TypeError, ValueError):
+            continue
+        if payload.get("source") != source or run_seed != seed:
             continue
         metrics_path = manifest.parent / "metrics.json"
         if not metrics_path.exists():

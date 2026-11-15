@@ -312,6 +312,13 @@ def main() -> None:
     completed = history[-1]["epoch"] if history else 0
     torch.save({"state_dict": model.state_dict(), "epoch": completed}, run_dir / "last.ckpt")
     save_history(run_dir, history)
+    # Report test metrics for the validation-selected checkpoint.  Using the
+    # final epoch here silently changes the comparison when early stopping is
+    # enabled and can make the reported test score inconsistent with best.ckpt.
+    best_path = run_dir / "best.ckpt"
+    if best_path.exists():
+        best_state = torch.load(best_path, map_location=device, weights_only=True)
+        model.load_state_dict(best_state["state_dict"] if isinstance(best_state, dict) and "state_dict" in best_state else best_state)
     test_metrics = evaluate(model, test_x, test_y, device)
     reported_verified_count = 0 if args.method == "clip_zero_ce" else verified_count
     reported_rho = reported_verified_count / max(1, len(verified))

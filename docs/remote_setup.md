@@ -7,6 +7,10 @@ ssh -p 32132 root@connect.westb.seetacloud.com
 python scripts/remote_diagnose.py --interactive-password --output outputs/remote_diagnostic.json
 ```
 
+## 后续只读核查（2026-11-15）
+
+AutoDL 的 Food-101 分片下载、gzip 校验、解压、CLIP 特征/观察标签准备以及八个主套件任务均已完成；实测结果记录在 `docs/remote_clip_results_seed42.md`。Stanford Cars 仍因缺少官方带标签测试文件而未纳入完整表。远端 `reproduction/recover-fcl` 分支保持恢复提交，当前没有运行中的 Food 下载或实验进程；`dataset/`、`outputs/` 和远端 `.Trash-0/` 仍属于运行时状态，不纳入版本控制。
+
 密码仅在 OpenSSH 提示时交互输入，不写入脚本、命令参数或 Git。诊断脚本只读取主机、GPU、依赖版本、Git 和缓存清单，连接失败会重试一次。已有密钥可使用 `--identity-file`。连接中断后先检查 AutoDL 实例是否开机、端口是否改变以及本机网络。
 
 ## 统一标签文件

@@ -209,6 +209,11 @@ def main() -> None:
     torch.save({"state_dict": model.state_dict(), "epoch": completed,
                 "clean_probability": clean_probability}, run_dir / "last.ckpt")
     save_history(run_dir, history)
+    # Keep test evaluation aligned with the checkpoint selected on validation.
+    best_path = run_dir / "best.ckpt"
+    if best_path.exists():
+        best_state = torch.load(best_path, map_location=device, weights_only=True)
+        model.load_state_dict(best_state["state_dict"] if isinstance(best_state, dict) and "state_dict" in best_state else best_state)
     test_metrics = evaluate(model, test_x, test_y, device)
     save_config(run_dir, {"method": "IDO-NeurIPS2025-cache-adapted", "dataset": args.dataset,
                           "cache": cache_path, "observed_labels": obs_path,

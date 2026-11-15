@@ -78,12 +78,15 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     bundle = load_cache_and_observed(cache_path, obs_path)
     train_x, val_x, test_x = bundle["train_feats"], bundle["val_feats"], bundle["test_feats"]
-    train_y, val_y, test_y = bundle["train_labels"], bundle["val_labels"], bundle["test_labels"]
+    val_y, test_y = bundle["val_labels"], bundle["test_labels"]
     y_obs, trusted = bundle["y_obs"], bundle["s"].eq(0)
     classes = int(bundle["num_classes"])
     prototypes = bundle.get("clip_label_embeds", torch.randn(classes, train_x.shape[1]))
     model = CachedPromptHead(prototypes, classes).to(device)
-    loader = DataLoader(TensorDataset(train_x, train_y, y_obs, trusted),
+    # The cache's true train labels are evaluation-only.  Trusted labels are
+    # represented by y_obs after the simulated human correction and must be the
+    # sole supervision signal here.
+    loader = DataLoader(TensorDataset(train_x, y_obs, trusted),
                         batch_size=args.batch_size, shuffle=True, num_workers=2,
                         pin_memory=True)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr,
@@ -95,13 +98,12 @@ def main() -> None:
     for epoch in range(1, args.epochs + 1):
         model.train()
         running = 0.0
-        for features, true_y, observed_y, is_trusted in loader:
+        for features, observed_y, is_trusted in loader:
             features = features.to(device, non_blocking=True)
-            true_y = true_y.to(device)
             observed_y = observed_y.to(device)
             is_trusted = is_trusted.to(device)
             logits = model(features)
-            clean_loss = F.cross_entropy(logits[is_trusted], true_y[is_trusted]) if is_trusted.any() else logits.sum() * 0
+            clean_loss = F.cross_entropy(logits[is_trusted], observed_y[is_trusted]) if is_trusted.any() else logits.sum() * 0
             noisy_logits = logits[~is_trusted]
             if noisy_logits.shape[0]:
                 target = F.one_hot(observed_y[~is_trusted], classes).float()
@@ -128,6 +130,11 @@ def main() -> None:
                 break
     torch.save({"state_dict": model.state_dict(), "epoch": epoch}, run_dir / "last.ckpt")
     save_history(run_dir, history)
+    # Evaluate the same validation-selected parameters saved in best.ckpt.
+    best_path = run_dir / "best.ckpt"
+    if best_path.exists():
+        best_state = torch.load(best_path, map_location=device, weights_only=True)
+        model.load_state_dict(best_state["state_dict"] if isinstance(best_state, dict) and "state_dict" in best_state else best_state)
     test_metrics = evaluate(model, test_x, test_y, device)
     save_config(run_dir, {"method": "NLPrompt-cache-adapted", "dataset": args.dataset,
                           "cache": cache_path, "observed_labels": obs_path,

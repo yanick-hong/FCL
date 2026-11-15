@@ -15,6 +15,19 @@ import torch.nn.functional as F
 from paths import OUTPUT_ROOT
 
 
+def _safe_torch_load(path: str | Path) -> Any:
+    """Load a project cache without enabling arbitrary pickle execution.
+
+    ``weights_only`` is available in recent PyTorch releases.  The fallback is
+    kept for older environments, where project caches are still trusted local
+    artifacts and the keyword is unsupported.
+    """
+    try:
+        return torch.load(path, map_location="cpu", weights_only=True)
+    except TypeError:  # PyTorch < 2.0
+        return torch.load(path, map_location="cpu")
+
+
 def make_run_dir(dataset: str, method: str, run_dir: str | None = None) -> Path:
     if run_dir:
         path = Path(run_dir).expanduser()
@@ -31,8 +44,10 @@ def make_run_dir(dataset: str, method: str, run_dir: str | None = None) -> Path:
 
 
 def load_cache_and_observed(cache_path: str, obs_path: str) -> Dict[str, torch.Tensor | list]:
-    cache = torch.load(cache_path, map_location="cpu")
-    obs = torch.load(obs_path, map_location="cpu")
+    cache = _safe_torch_load(cache_path)
+    obs = _safe_torch_load(obs_path)
+    if not isinstance(cache, dict) or not isinstance(obs, dict):
+        raise TypeError("Feature and observed-label caches must be dictionaries")
     required = ("train_feats", "val_feats", "test_feats", "train_labels",
                 "val_labels", "test_labels")
     missing = [key for key in required if key not in cache]
@@ -40,9 +55,33 @@ def load_cache_and_observed(cache_path: str, obs_path: str) -> Dict[str, torch.T
         raise KeyError(f"Cache {cache_path} is missing: {missing}")
     if "y_obs" not in obs or "s" not in obs:
         raise KeyError(f"Observed-label cache {obs_path} must contain y_obs and s")
+    for key in required:
+        value = cache[key]
+        if not isinstance(value, torch.Tensor):
+            raise TypeError(f"Cache field {key} must be a tensor")
+        if key.endswith("_feats"):
+            if value.ndim != 2 or value.shape[0] == 0 or not torch.isfinite(value).all():
+                raise ValueError(f"Cache field {key} must be a finite nonempty 2-D tensor")
+        else:
+            if value.ndim != 1 or value.shape[0] == 0:
+                raise ValueError(f"Cache field {key} must be a nonempty 1-D tensor")
+            if len(value) != len(cache[key.replace('_labels', '_feats')]):
+                raise ValueError(f"Cache field {key} length differs from its features")
+    feature_dim = cache["train_feats"].shape[1]
+    if any(cache[key].shape[1] != feature_dim for key in ("val_feats", "test_feats")):
+        raise ValueError("Feature dimensions differ between cache splits")
+    if not all(torch.isfinite(cache[key]).all() for key in ("train_labels", "val_labels", "test_labels")):
+        raise ValueError("Cache labels must be finite")
     n = cache["train_feats"].shape[0]
-    if obs["y_obs"].numel() != n or obs["s"].numel() != n:
+    if not isinstance(obs["y_obs"], torch.Tensor) or not isinstance(obs["s"], torch.Tensor):
+        raise TypeError("Observed labels y_obs and s must be tensors")
+    if obs["y_obs"].ndim != 1 or obs["s"].ndim != 1 or obs["y_obs"].numel() != n or obs["s"].numel() != n:
         raise ValueError(f"Observed labels length does not match train cache: {n}")
+    for key, value in [(key, cache[key]) for key in ("train_labels", "val_labels", "test_labels")] + list(obs.items()):
+        if key not in ("train_labels", "val_labels", "test_labels", "y_obs", "s"):
+            continue
+        if not torch.isfinite(value).all() or (value.is_floating_point() and not torch.equal(value, value.round())):
+            raise ValueError(f"{key} must contain finite integer values")
     result: Dict[str, Any] = dict(cache)
     result["y_obs"] = obs["y_obs"].long()
     result["s"] = obs["s"].long()
@@ -53,12 +92,24 @@ def load_cache_and_observed(cache_path: str, obs_path: str) -> Dict[str, torch.T
     label_embeds = cache.get("clip_label_embeds")
     if isinstance(label_embeds, torch.Tensor) and label_embeds.ndim == 2:
         result["num_classes"] = int(label_embeds.shape[0])
+    elif isinstance(cache.get("clip_probs_train"), torch.Tensor) and cache["clip_probs_train"].ndim == 2:
+        result["num_classes"] = int(cache["clip_probs_train"].shape[1])
     else:
         max_labels = [result[key].max().item() for key in
-                      ("train_labels", "val_labels", "test_labels")
+                      ("train_labels", "val_labels")
                       if result[key].numel()]
         max_labels.append(int(result["y_obs"].max().item()))
         result["num_classes"] = int(max(max_labels) + 1)
+    classes = result["num_classes"]
+    for key in ("train_labels", "val_labels", "y_obs"):
+        labels = result[key]
+        if (labels < 0).any() or (labels >= classes).any():
+            raise ValueError(f"{key} contains labels outside [0, {classes})")
+    test_labels = result["test_labels"]
+    if ((test_labels < -1) | (test_labels >= classes)).any():
+        raise ValueError(f"test_labels contains values outside [-1, {classes})")
+    if (result["s"] < 0).any() or (result["s"] > 1).any():
+        raise ValueError("Observed selection flags s must be binary 0/1")
     return result
 
 

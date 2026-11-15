@@ -36,6 +36,14 @@ from paths import clip_cache, observed_labels_cache, experiment_checkpoint, expe
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
+
+def _safe_torch_load(path: str):
+    """Load tensor/dict caches without enabling arbitrary pickle execution."""
+    try:
+        return torch.load(path, map_location="cpu", weights_only=True)
+    except TypeError:  # PyTorch < 2.0
+        return torch.load(path, map_location="cpu")
+
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--cache", type=str, default=str(clip_cache("CIFAR100")))
@@ -51,6 +59,8 @@ def parse_args():
     p.add_argument("--meta_batch_size", type=int, default=256)
     p.add_argument("--grad_clip", type=float, default=1.0)
     p.add_argument("--print_every", type=int, default=20)
+    p.add_argument("--num_workers", type=int, default=0,
+                   help="DataLoader workers; 0 is the reproducible/safe default.")
 
     p.add_argument("--best_ckpt", type=str, default=str(experiment_checkpoint("CIFAR100_l2b")))
     p.add_argument("--val_dir", type=str, default=str(experiment_logs("CIFAR100_l2b")))
@@ -80,31 +90,33 @@ def load_clip_cache_strict(cache_path: str) -> Dict[str, torch.Tensor]:
     if not os.path.exists(cache_path):
         raise FileNotFoundError(f"Cache not found: {cache_path}")
     print(f"[CACHE] Loading from: {cache_path}")
-    data = torch.load(cache_path, map_location="cpu")
+    data = _safe_torch_load(cache_path)
 
     needed = [
         "train_feats", "train_labels",
         "val_feats", "val_labels",
         "test_feats", "test_labels",
-        # 下面这些即便不用，也尝试兼容读取；若不存在则创建占位
+        # These fields are part of the source-label contract.  Silently
+        # fabricating uniform probabilities would turn a malformed cache into
+        # a different experiment, so missing fields are rejected below.
         "clip_probs_train", "clip_probs_val",
         "clip_argmax_train",
     ]
-    for k in needed:
-        if k not in data:
-            print(f"[WARN] {k} not in cache; creating placeholder.")
-            if k.startswith("clip_probs"):
-                split = "train" if "train" in k else "val"
-                feats = data[f"{split}_feats"]
-                C = int(max(data["train_labels"].max().item(),
-                            data["val_labels"].max().item(),
-                            data["test_labels"].max().item()) + 1)
-                data[k] = torch.full((feats.size(0), C), 1.0 / C, dtype=torch.float32)
-            elif k == "clip_argmax_train":
-                C = int(max(data["train_labels"].max().item(),
-                            data["val_labels"].max().item(),
-                            data["test_labels"].max().item()) + 1)
-                data[k] = torch.zeros((data["train_feats"].size(0),), dtype=torch.long)
+    missing = [k for k in needed if k not in data]
+    if missing:
+        raise KeyError(f"Cache is missing required source-label fields: {missing}")
+    for split in ("train", "val"):
+        probs = data[f"clip_probs_{split}"]
+        if not isinstance(probs, torch.Tensor) or probs.ndim != 2:
+            raise ValueError(f"clip_probs_{split} must be a 2-D tensor")
+        if probs.shape[0] != data[f"{split}_feats"].shape[0] or not torch.isfinite(probs).all():
+            raise ValueError(f"clip_probs_{split} shape/finite-value check failed")
+        if (probs < 0).any() or not torch.allclose(probs.sum(-1), torch.ones(len(probs)), atol=2e-3):
+            raise ValueError(f"clip_probs_{split} must be valid probability rows")
+    predictions = data["clip_argmax_train"].long().view(-1)
+    if predictions.numel() != data["train_feats"].shape[0] or not torch.equal(
+            predictions, data["clip_probs_train"].argmax(-1)):
+        raise ValueError("clip_argmax_train disagrees with clip_probs_train")
     return data
 
 
@@ -114,7 +126,7 @@ def load_clip_cache_strict(cache_path: str) -> Dict[str, torch.Tensor]:
 def load_obs_labels(obs_path: str) -> Dict[str, torch.Tensor]:
     if not os.path.exists(obs_path):
         raise FileNotFoundError(f"Obs labels not found: {obs_path}")
-    data = torch.load(obs_path, map_location="cpu")
+    data = _safe_torch_load(obs_path)
     if not ("y_obs" in data and "s" in data):
         raise KeyError(f"Obs file must contain 'y_obs' and 's'. Got keys: {list(data.keys())}")
     y_obs = data["y_obs"].long()
@@ -144,7 +156,7 @@ class PKBatchSampler(Sampler[List[int]]):
     这里用 y_obs 做类别均衡
     """
     def __init__(self, labels_obs: torch.Tensor, P: int, K: int, seed: int = 42):
-        super().__init__(None)
+        super().__init__()
         self.labels = labels_obs.cpu().numpy()
         self.P = int(P)
         self.K = int(K)
@@ -156,7 +168,12 @@ class PKBatchSampler(Sampler[List[int]]):
             self.class_to_indices[int(c)] = idx
 
         self.classes = list(self.class_to_indices.keys())
-        self.steps_per_epoch = len(self.labels) // max(1, (self.P * self.K))
+        if not self.classes:
+            raise ValueError("Cannot sample an empty training set")
+        if self.P <= 0 or self.K <= 0:
+            raise ValueError("P and K must be positive")
+        self.epoch = 0
+        self.steps_per_epoch = max(1, len(self.labels) // (self.P * self.K))
 
         import random
         self.ptrs = {}
@@ -167,6 +184,11 @@ class PKBatchSampler(Sampler[List[int]]):
 
     def __len__(self):
         return self.steps_per_epoch
+
+    def set_epoch(self, epoch: int):
+        if int(epoch) != epoch or epoch < 0:
+            raise ValueError("epoch must be a nonnegative integer")
+        self.epoch = int(epoch)
 
     def _next_k(self, c, K):
         buf = []
@@ -183,7 +205,15 @@ class PKBatchSampler(Sampler[List[int]]):
 
     def __iter__(self):
         import random
-        rng = random.Random(self.seed)
+        epoch = self.epoch
+        self.epoch += 1
+        rng = random.Random(self.seed + epoch)
+        self.ptrs = {}
+        for c, original in self.class_to_indices.items():
+            idxs = original.copy()
+            class_rng = random.Random((self.seed + epoch) * 1000003 + c)
+            class_rng.shuffle(idxs)
+            self.ptrs[c] = {"idxs": idxs, "p": 0, "rng": class_rng}
         for _ in range(self.steps_per_epoch):
             if len(self.classes) >= self.P:
                 chosen = rng.sample(self.classes, self.P)
@@ -212,10 +242,11 @@ class LinearHead(nn.Module):
 # -----------------------
 # 评估 & 早停 & 曲线
 # -----------------------
-def evaluate(head: nn.Module, feats: torch.Tensor, labels: torch.Tensor, batch_size: int = 2048) -> Tuple[float, float]:
+def evaluate(head: nn.Module, feats: torch.Tensor, labels: torch.Tensor, batch_size: int = 2048,
+             num_workers: int = 0) -> Tuple[float, float]:
     head.eval()
     ds = TensorDataset(feats, labels)
-    dl = DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=True)
+    dl = DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
     ce = nn.CrossEntropyLoss(reduction="mean")
     total_loss, total_correct, total = 0.0, 0, 0
     for xb, yb in dl:
@@ -301,6 +332,9 @@ def l2b_meta_update_and_loss(
     # 1) 前向，得到 per-sample CE_real / CE_pseudo（向量）
     logits = head(f_train)
     ce_vec_real = F.cross_entropy(logits, y_obs_train, reduction="none")  # (B,)
+    # L2B bootstraps from the current classifier prediction.  The external VLM
+    # label is already represented by y_obs_train (after selected correction);
+    # replacing this branch with the VLM argmax changes the method.
     with torch.no_grad():
         y_pseudo = logits.argmax(dim=-1)
     ce_vec_pseudo = F.cross_entropy(logits, y_pseudo, reduction="none")   # (B,)
@@ -366,8 +400,11 @@ def train(
     patience: int = 5,
     min_delta: float = 0.0,
     seed: int = 42,
+    num_workers: int = 0,
 ):
     set_seed(seed)
+    if num_workers < 0:
+        raise ValueError("num_workers must be nonnegative")
 
     # 0) 载入缓存并单位化特征
     cache = load_clip_cache_strict(cache_path)
@@ -392,11 +429,13 @@ def train(
     # 2) 数据集 & 采样器（按 y_obs 做类均衡）
     ds_train = FeatureDataset(train_feats, train_labels, y_obs, s_mark, p_clip=None)
     batch_sampler = PKBatchSampler(labels_obs=y_obs, P=P, K=K, seed=seed)
-    train_loader = DataLoader(ds_train, batch_sampler=batch_sampler, num_workers=2, pin_memory=True)
+    train_loader = DataLoader(ds_train, batch_sampler=batch_sampler,
+                              num_workers=num_workers, pin_memory=True)
 
     # meta loader（从 5k 验证集中随机采样 meta_batch）
     ds_meta = TensorDataset(val_feats, val_labels)
-    meta_loader = DataLoader(ds_meta, batch_size=meta_batch_size, shuffle=True, num_workers=2, pin_memory=True)
+    meta_loader = DataLoader(ds_meta, batch_size=meta_batch_size, shuffle=True,
+                             num_workers=num_workers, pin_memory=True)
     meta_iter = iter(meta_loader)
 
     # 3) 头部与优化器
@@ -449,7 +488,8 @@ def train(
             else:
                 # L2B 一步元学习
                 loss, alpha_mean, beta_mean = l2b_meta_update_and_loss(
-                    head, f, y_obs_b, f_meta, y_meta, inner_lr=inner_lr, meta_lr=meta_lr
+                    head, f, y_obs_b, f_meta, y_meta,
+                    inner_lr=inner_lr, meta_lr=meta_lr
                 )
 
             loss.backward()
@@ -475,7 +515,8 @@ def train(
               f"| alpha≈{alpha_running:.3f} | beta≈{beta_running:.3f}")
 
         # 验证与早停
-        val_loss, val_acc = evaluate(head, val_feats, val_labels, batch_size=2048)
+        val_loss, val_acc = evaluate(head, val_feats, val_labels, batch_size=2048,
+                                     num_workers=num_workers)
         print(f"[VAL] epoch={epoch:03d} | val_loss={val_loss:.5f} | val_acc={val_acc*100:.2f}%")
 
         # 记录、写入 CSV、刷新曲线
@@ -523,5 +564,5 @@ if __name__ == "__main__":
         print_every=args.print_every,
         best_ckpt_path=args.best_ckpt, val_save_dir=args.val_dir,
         early_metric=args.early_metric, patience=args.patience, min_delta=args.min_delta,
-        seed=args.seed,
+        seed=args.seed, num_workers=args.num_workers,
     )

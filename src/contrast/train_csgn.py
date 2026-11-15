@@ -24,6 +24,14 @@ from paths import clip_cache, observed_labels_cache, experiment_checkpoint, expe
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
+def _safe_torch_load(path: str):
+    """Load tensor/dict caches without enabling arbitrary pickle execution."""
+    try:
+        return torch.load(path, map_location="cpu", weights_only=True)
+    except TypeError:  # PyTorch < 2.0
+        return torch.load(path, map_location="cpu")
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     # 数据
@@ -36,6 +44,8 @@ def parse_args():
     parser.add_argument("--patience", type=int, default=10)
     parser.add_argument("--P", type=int, default=32)
     parser.add_argument("--K", type=int, default=16)
+    parser.add_argument("--num_workers", type=int, default=0,
+                        help="DataLoader workers; 0 is the reproducible/safe default.")
 
     # 模型/损失
     parser.add_argument("--z_dim", type=int, default=64)
@@ -75,7 +85,7 @@ def ensure_dir(path: str):
 def load_cache_strict(cache_path: str) -> Dict[str, torch.Tensor]:
     if not os.path.exists(cache_path):
         raise FileNotFoundError(f"Cache not found: {cache_path}")
-    data = torch.load(cache_path, map_location="cpu")
+    data = _safe_torch_load(cache_path)
 
     required = ["train_feats","train_labels","val_feats","val_labels","test_feats","test_labels"]
     missing = [k for k in required if k not in data]
@@ -96,7 +106,7 @@ def load_cache_strict(cache_path: str) -> Dict[str, torch.Tensor]:
 def load_y_obs(obs_labels_path: str, n_train: int):
     if not os.path.exists(obs_labels_path):
         raise FileNotFoundError(f"Obs labels not found: {obs_labels_path}")
-    obj = torch.load(obs_labels_path, map_location="cpu")
+    obj = _safe_torch_load(obs_labels_path)
 
     y_obs = None; s = None; meta = None
     if isinstance(obj, torch.Tensor):
@@ -132,25 +142,37 @@ def load_y_obs(obs_labels_path: str, n_train: int):
 # P×K 均衡采样（按 y_obs）
 # -----------------------
 class BalancedPKSampler(Sampler[List[int]]):
-    def __init__(self, labels: torch.Tensor, P: int, K: int, drop_last: bool = True):
+    def __init__(self, labels: torch.Tensor, P: int, K: int, drop_last: bool = True,
+                 seed: int = 42):
         self.labels = labels.cpu().numpy()
         self.P = int(P); self.K = int(K)
+        self.seed = int(seed)
         self.batch_size = self.P * self.K
         self.drop_last = drop_last
         self.num_classes = int(self.labels.max()) + 1
         self.idxs_by_cls = [np.where(self.labels == c)[0].tolist() for c in range(self.num_classes)]
         self.num_samples = len(self.labels)
+        if self.P <= 0 or self.K <= 0:
+            raise ValueError("P and K must be positive")
         self.valid_classes = [c for c in range(self.num_classes) if len(self.idxs_by_cls[c]) > 0]
         if len(self.valid_classes) < self.P:
             raise ValueError(f"可用类别数 {len(self.valid_classes)} < P={self.P}")
-        self.batches_per_epoch = (self.num_samples // self.batch_size)
+        self.batches_per_epoch = max(1, self.num_samples // self.batch_size)
+        self.epoch = 0
 
     def __len__(self):
         # This sampler yields complete batches and is passed as ``batch_sampler``.
         return self.batches_per_epoch
 
+    def set_epoch(self, epoch: int):
+        if int(epoch) != epoch or epoch < 0:
+            raise ValueError("epoch must be a nonnegative integer")
+        self.epoch = int(epoch)
+
     def __iter__(self):
-        rng = np.random.default_rng()
+        epoch = self.epoch
+        self.epoch += 1
+        rng = np.random.default_rng(self.seed + epoch)
         for _ in range(self.batches_per_epoch):
             classes = rng.choice(self.valid_classes, size=self.P, replace=False)
             batch = []
@@ -327,7 +349,7 @@ def plot_curves(csv_path: str, save_png_prefix: str):
             val_acc.append(float(row["val_acc"]))
             val_loss.append(float(row["val_loss"]))
     plt.figure()
-    plt.plot(epochs, val_acc, marker="o")
+    plt.plot(epochs, [value * 100.0 for value in val_acc], marker="o")
     plt.xlabel("epoch"); plt.ylabel("val_acc (%)"); plt.title("Validation Accuracy")
     plt.grid(True); plt.tight_layout()
     plt.savefig(f"{save_png_prefix}_val_acc.png", dpi=180); plt.close()
@@ -383,8 +405,10 @@ def main():
     # batch_size = P*K
     batch_size = args.P * args.K
     train_ds = FeaturesWithNoisyLabels(train_feats, y_obs)
-    sampler = BalancedPKSampler(labels=y_obs, P=args.P, K=args.K, drop_last=True)
-    train_loader = DataLoader(train_ds, batch_sampler=sampler, num_workers=2, pin_memory=True)
+    sampler = BalancedPKSampler(labels=y_obs, P=args.P, K=args.K, drop_last=True,
+                                seed=args.seed)
+    train_loader = DataLoader(train_ds, batch_sampler=sampler,
+                              num_workers=args.num_workers, pin_memory=True)
 
     # 模型
     clf = ClassifierHead(in_dim, num_classes).to(device)

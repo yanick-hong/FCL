@@ -47,9 +47,12 @@ def set_seed(seed: int) -> None:
 
 
 def initial_centers(features: torch.Tensor, observed: torch.Tensor,
-                    true_labels: torch.Tensor, trusted: torch.Tensor,
                     classes: int) -> torch.Tensor:
-    assignments = torch.where(trusted, true_labels, observed)
+    # ``observed`` already contains the human-corrected labels for trusted
+    # samples.  Never read the hidden ground-truth training labels here: those
+    # labels are evaluation-only and using them would leak the answer into the
+    # baseline.
+    assignments = observed
     centers = torch.zeros(classes, features.shape[1], dtype=features.dtype)
     fallback = features.mean(dim=0)
     for cls in range(classes):
@@ -105,12 +108,12 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     bundle = load_cache_and_observed(cache_path, obs_path)
     train_x, val_x, test_x = bundle["train_feats"], bundle["val_feats"], bundle["test_feats"]
-    train_y, val_y, test_y = bundle["train_labels"], bundle["val_labels"], bundle["test_labels"]
+    val_y, test_y = bundle["val_labels"], bundle["test_labels"]
     y_obs, trusted = bundle["y_obs"], bundle["s"].eq(0)
     classes = int(bundle["num_classes"])
     model = LinearHead(train_x.shape[1], classes).to(device)
-    centers = initial_centers(train_x, y_obs, train_y, trusted, classes)
-    loader = DataLoader(TensorDataset(train_x, train_y, y_obs, trusted),
+    centers = initial_centers(train_x, y_obs, classes)
+    loader = DataLoader(TensorDataset(train_x, y_obs, trusted),
                         batch_size=args.batch_size, shuffle=True, num_workers=2,
                         pin_memory=True)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr,
@@ -122,16 +125,15 @@ def main() -> None:
     for epoch in range(1, args.epochs + 1):
         model.train()
         running, used = 0.0, 0
-        for features, true_y, observed_y, is_trusted in loader:
+        for features, observed_y, is_trusted in loader:
             features = features.to(device, non_blocking=True)
-            true_y = true_y.to(device)
             observed_y = observed_y.to(device)
             is_trusted = is_trusted.to(device)
-            target = torch.where(is_trusted, true_y, observed_y)
+            target = observed_y
             logits = model(features)
             per_sample_loss = F.cross_entropy(logits, target, reduction="none")
             confidence, predicted = logits.softmax(dim=-1).max(dim=-1)
-            assignments = torch.where(is_trusted, true_y, predicted)
+            assignments = torch.where(is_trusted, observed_y, predicted)
             with torch.no_grad():
                 center = centers.to(device)[assignments]
                 distance = 1.0 - F.cosine_similarity(features, center, dim=-1)
@@ -175,6 +177,14 @@ def main() -> None:
                 break
     torch.save({"state_dict": model.state_dict(), "centers": centers, "epoch": epoch}, run_dir / "last.ckpt")
     save_history(run_dir, history)
+    # Report the test score for the same validation-selected model that is
+    # stored in ``best.ckpt``.  Evaluating the final (possibly overfit) epoch
+    # makes comparisons depend on the patience setting and disagrees with the
+    # advertised best-validation checkpoint.
+    best_path = run_dir / "best.ckpt"
+    if best_path.exists():
+        best_state = torch.load(best_path, map_location=device, weights_only=True)
+        model.load_state_dict(best_state["state_dict"] if isinstance(best_state, dict) and "state_dict" in best_state else best_state)
     test_metrics = evaluate(model, test_x, test_y, device)
     save_config(run_dir, {"method": "DCD-cache-level", "dataset": args.dataset,
                           "cache": cache_path, "observed_labels": obs_path,
