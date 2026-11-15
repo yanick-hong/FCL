@@ -184,8 +184,15 @@ def export_cache(args):
     except TypeError:
         cache = torch.load(args.cache, map_location="cpu")
     split = args.split or "train"
-    if "class_names" in cache and list(cache["class_names"]) != classes:
-        raise AnnotationError("Cache class order differs from annotation class order")
+    cached_names = cache.get("class_names", cache.get("classnames", cache.get("meta", {}).get("classes")))
+    if cached_names is not None:
+        cached_names = [name.decode() if isinstance(name, bytes) else str(name) for name in cached_names]
+        duplicates = {name.casefold() for name in cached_names
+                      if sum(other.casefold() == name.casefold() for other in cached_names) > 1}
+        display_names = [f"{name} ({cache['wnids'][i]})" if name.casefold() in duplicates and "wnids" in cache
+                         else name for i, name in enumerate(cached_names)]
+        if classes != display_names:
+            raise AnnotationError("Cache class order differs from annotation class order")
     if f"clip_probs_{split}" in cache and cache[f"clip_probs_{split}"].shape[1] != len(classes):
         raise AnnotationError("Cache class count differs from annotation class count")
     count = len(cache[f"{split}_feats"])
@@ -195,6 +202,10 @@ def export_cache(args):
     path_keys = (f"{split}_paths", f"paths_{split}")
     identity = next((cache[k] for k in id_keys if k in cache), None)
     path_identity = next((cache[k] for k in path_keys if k in cache), None)
+    if identity is None and isinstance(cache.get("sample_ids"), dict):
+        identity = cache["sample_ids"].get(split)
+    if path_identity is None and isinstance(cache.get("sample_paths"), dict):
+        path_identity = cache["sample_paths"].get(split)
     if identity is not None:
         ordered = [manifest.match({"sample_id": str(value)}) for value in identity]
     elif path_identity is not None:

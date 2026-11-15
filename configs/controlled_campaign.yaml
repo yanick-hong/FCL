@@ -1,0 +1,48 @@
+version: 1
+campaign: controlled_correction_20261115
+datasets: [caltech101, eurosat, cifar100, food101, tinyimagenet200, stanfordcars, dtd]
+main_table_datasets: [cifar100, caltech101, stanfordcars, eurosat, food101, tinyimagenet200]
+supplementary_datasets: [dtd]
+labeling:
+  model: Qwen/Qwen2.5-VL-7B-Instruct
+  backend: qwen2.5-vl
+  prompt: appendix_C
+  prompt_source: reference_backup/Learning from filter-corrected lables/appendix.pdf
+  revision: main
+  seed: 42
+  do_sample: false
+  max_new_tokens: 16
+  batch_size: 8
+  min_pixels: 200704
+  max_pixels: 200704
+  visual_note: "448x448-equivalent pixel budget (256 visual tokens); saved explicitly, not claimed as a recovered paper constant."
+  dtype: bfloat16
+  attention: sdpa
+  splits: [train, val, test]
+correction:
+  rho: 0.3
+  random_mask_seeds: [42, 43, 44]
+  exact_random_budget: floor(rho * N + 0.5)
+  prototype_budget: per-class ceil(rho * N_predicted_class)
+  simulation: "Only selected training labels are replaced with dataset ground truth."
+training:
+  seeds: [42, 43, 44]
+  epochs: 100
+  patience: 0
+  lr: 0.001
+  lr_max: 0.005
+  weight_decay: 0.0001
+  lam: 1.0
+  mu: 0.5
+  tau: 0.5
+  num_workers: 0
+  sampler: PK_grouped_by_observed_labels
+  selection: highest validation accuracy; test evaluated after best checkpoint selection
+  mask_policy: "Hold a single mask fixed across training seeds and objective comparisons; report correction-seed variation separately."
+  objectives:
+    fcl_auc: CE(corrected, y_obs) + lam * AUC-C(uncorrected)
+    ce_soft: CE(corrected, y_obs) + lam * CE(uncorrected, original CLIP probabilities)
+statistics:
+  std: sample standard deviation with ddof=1 across independent training seeds
+  confidence_interval: two-sided 95% Student-t interval for the mean
+  pairing: paired seed differences for objective and selection comparisons

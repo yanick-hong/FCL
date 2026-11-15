@@ -51,6 +51,15 @@ def get_device() -> str:
     return "cuda" if torch.cuda.is_available() else "cpu"
 
 
+def image_path(dataset, index: int) -> str:
+    if hasattr(dataset, "_image_files"):
+        return str(Path(dataset._image_files[index]).resolve())
+    # torchvision Caltech101 exposes y/index, but usually no _image_files.
+    return str((Path(dataset.root) / "101_ObjectCategories" /
+                dataset.categories[int(dataset.y[index])] /
+                f"image_{int(dataset.index[index]):04d}.jpg").resolve())
+
+
 def build_prompts(class_names: List[str]) -> List[str]:
     # 你可以按需扩展模板；保持与 CIFAR 一致的简单模板
     return [f"a photo of a {name.replace('_', ' ')}." for name in class_names]
@@ -287,12 +296,9 @@ def main():
             "test": [f"caltech101/{int(i):05d}" for i in test_idx],
         },
         "sample_paths": {
-            "train": [str(Path(full_ds._image_files[ds.kept_idx[int(i)]]).resolve()) for i in train_idx]
-            if hasattr(full_ds, "_image_files") else [],
-            "val": [str(Path(full_ds._image_files[ds.kept_idx[int(i)]]).resolve()) for i in val_idx]
-            if hasattr(full_ds, "_image_files") else [],
-            "test": [str(Path(full_ds._image_files[ds.kept_idx[int(i)]]).resolve()) for i in test_idx]
-            if hasattr(full_ds, "_image_files") else [],
+            "train": [image_path(full_ds, ds.kept_idx[int(i)]) for i in train_idx],
+            "val": [image_path(full_ds, ds.kept_idx[int(i)]) for i in val_idx],
+            "test": [image_path(full_ds, ds.kept_idx[int(i)]) for i in test_idx],
         },
         "meta": {
             "dataset": "Caltech-101 (no BACKGROUND_Google)",
