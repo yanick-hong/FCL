@@ -41,6 +41,11 @@ def cifar_images(cache, raw_root, image_root):
     import numpy as np
     import torch
     from PIL import Image
+    with (Path(raw_root) / "meta").open("rb") as handle:
+        names = pickle.load(handle, encoding="latin1")["fine_label_names"]
+    names = [name.decode() if isinstance(name, bytes) else str(name) for name in names]
+    if list(cache.get("class_names", cache.get("classnames", []))) != names:
+        raise ValueError("CIFAR official/cache class order differs")
     originals = {}
     for name in ("train", "test"):
         with (Path(raw_root) / name).open("rb") as handle:
@@ -111,7 +116,7 @@ def recover_indexed_images(dataset, cache, raw_root):
     for split in ("train", "val", "test"):
         indices = cache[f"{split}_indices"]
         if (not isinstance(indices, torch.Tensor) or indices.ndim != 1
-                or indices.is_floating_point() or indices.dtype == torch.bool):
+                or indices.is_floating_point() or indices.is_complex() or indices.dtype == torch.bool):
             raise ValueError(f"Invalid saved {dataset}/{split} indices")
         indices = indices.long()
         if len(indices) != len(cache[f"{split}_labels"]) or (indices < 0).any() or (indices >= len(records)).any():
@@ -130,9 +135,32 @@ def recover_indexed_images(dataset, cache, raw_root):
                          "class_order_and_all_labels_verified": True}
 
 
-def prepare(dataset, cache_path, destination, cifar_raw=None):
+def consistent_identity(cache, split, kind, recovered=None):
+    """Every saved alias must agree; a recovered mapping cannot hide conflicts."""
+    if kind == "id":
+        keys, nested = (f"{split}_sample_ids", f"sample_ids_{split}"), "sample_ids"
+        normalize = str
+    else:
+        keys, nested = (f"{split}_paths", f"paths_{split}"), "sample_paths"
+        normalize = lambda value: str(Path(value).resolve())
+    candidates = [(key, cache[key]) for key in keys if key in cache]
+    if isinstance(cache.get(nested), dict) and split in cache[nested]:
+        candidates.append((f"{nested}.{split}", cache[nested][split]))
+    expected = [normalize(value) for value in recovered] if recovered is not None else None
+    for name, values in candidates:
+        if not isinstance(values, (list, tuple)):
+            raise ValueError(f"Cache identity alias {name} must be a list")
+        current = [normalize(value) for value in values]
+        if expected is not None and expected != current:
+            raise ValueError(f"Cache identity alias disagrees with verified order: {name}")
+        expected = current
+    return expected
+
+
+def prepare(dataset, cache_path, destination, cifar_raw=None, raw_root=None):
     import torch
     cache_path, destination = Path(cache_path), Path(destination)
+    raw_root = Path(raw_root or RAW_ROOT)
     cache = torch.load(cache_path, map_location="cpu", weights_only=True)
     classes = cache.get("class_names", cache.get("classnames", cache.get("meta", {}).get("classes")))
     if not isinstance(classes, (list, tuple)) or not classes:
@@ -140,6 +168,14 @@ def prepare(dataset, cache_path, destination, cifar_raw=None):
     classes = [name.decode() if isinstance(name, bytes) else str(name) for name in classes]
     if len(classes) != cache["clip_probs_train"].shape[1]:
         raise ValueError("Class vocabulary and CLIP probability width disagree")
+    for split in ("train", "val", "test"):
+        labels, features = cache[f"{split}_labels"], cache[f"{split}_feats"]
+        if (not isinstance(labels, torch.Tensor) or labels.ndim != 1 or not len(labels)
+                or labels.is_complex() or labels.dtype == torch.bool or not torch.isfinite(labels).all()
+                or (labels.is_floating_point() and not torch.equal(labels, labels.round()))
+                or (labels < 0).any() or (labels >= len(classes)).any()
+                or not isinstance(features, torch.Tensor) or features.ndim != 2 or len(features) != len(labels)):
+            raise ValueError(f"Invalid frozen features/ground-truth labels: {dataset}/{split}")
     # Label IDs remain unchanged even when the display strings need disambiguation.
     duplicates = {x.casefold() for x in classes if sum(y.casefold() == x.casefold() for y in classes) > 1}
     display_classes = [f"{name} ({cache['wnids'][i]})" if name.casefold() in duplicates and "wnids" in cache else name
@@ -149,18 +185,25 @@ def prepare(dataset, cache_path, destination, cifar_raw=None):
     paths = cache.get("sample_paths", {})
     recovered_ids, recovery = {}, None
     if dataset == "cifar100":
-        paths, recovered_ids = cifar_images(cache, cifar_raw or RAW_ROOT / "CIFAR100",
+        official_root = Path(cifar_raw or raw_root / "CIFAR100")
+        paths, recovered_ids = cifar_images(cache, official_root,
                                            destination / "images")
         recovery = {"method": "official_cifar_pixels_and_saved_split_indices",
+                    "official_files_sha256": {name: sha256_file(official_root / name) for name in ("train", "test", "meta")},
                     "class_order_and_all_labels_verified": True}
     elif dataset in ("caltech101", "eurosat") and not all(paths.get(split) for split in ("train", "val", "test")):
-        paths, recovered_ids, recovery = recover_indexed_images(dataset, cache, RAW_ROOT)
+        paths, recovered_ids, recovery = recover_indexed_images(dataset, cache, raw_root)
+        recovery["historical_features_reencoded"] = False
+        markers = [path for path in (raw_root / ".fcl_extraction.json", raw_root / dataset / ".fcl_extraction.json") if path.is_file()]
+        recovery["extraction_records"] = {str(path): {"sha256": sha256_file(path),
+                                                      "content": json.loads(path.read_text(encoding="utf-8"))}
+                                           for path in markers}
     rows, split_counts = [], {}
     all_ids = set()
     all_paths = set()
     for split in ("train", "val", "test"):
-        ids = cache.get(f"{split}_sample_ids", cache.get("sample_ids", {}).get(split, recovered_ids.get(split)))
-        split_paths = cache.get(f"{split}_paths", paths.get(split))
+        ids = consistent_identity(cache, split, "id", recovered_ids.get(split))
+        split_paths = consistent_identity(cache, split, "path", paths.get(split))
         n = len(cache[f"{split}_labels"])
         if ids is None or split_paths is None or len(ids) != n or len(split_paths) != n:
             raise ValueError(f"Missing/misaligned stable cache identities for {dataset}/{split}")
@@ -195,11 +238,12 @@ def main():
     parser.add_argument("--datasets", nargs="+", required=True)
     parser.add_argument("--processed-root", type=Path, default=PROCESSED_ROOT)
     parser.add_argument("--output-root", type=Path, default=PROCESSED_ROOT / "annotation_manifests")
-    parser.add_argument("--cifar-raw", type=Path, default=RAW_ROOT / "CIFAR100")
+    parser.add_argument("--raw-root", type=Path, default=RAW_ROOT)
+    parser.add_argument("--cifar-raw", type=Path)
     args = parser.parse_args()
     for dataset in args.datasets:
         prepare(dataset, args.processed_root / f"{dataset}_clip_vit-l-14_embeddings.pt",
-                args.output_root / dataset, args.cifar_raw)
+                args.output_root / dataset, args.cifar_raw, args.raw_root)
 
 
 if __name__ == "__main__":

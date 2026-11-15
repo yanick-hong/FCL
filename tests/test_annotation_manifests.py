@@ -44,10 +44,24 @@ def test_recover_legacy_caltech_order_from_original_loader_and_frozen_indices(tm
     assert "sample_ids" not in torch.load(path, weights_only=True)  # Frozen cache remains unchanged.
 
 
-@pytest.mark.parametrize("indices", [[0, 1], [-1, 4], [1, 1]])
+@pytest.mark.parametrize("indices", [[0, 1], [-1, 4], [1, 1], [1+9j, 4+0j]])
 def test_recovery_rejects_misaligned_or_invalid_frozen_indices(tmp_path, monkeypatch, indices):
     path, cache = legacy_caltech(tmp_path, monkeypatch)
     cache["train_indices"] = torch.tensor(indices)
     torch.save(cache, path)
     with pytest.raises(ValueError):
+        manifests.prepare("caltech101", path, tmp_path / "manifest")
+
+
+def test_recovery_cannot_hide_conflicting_flat_paths_or_fractional_labels(tmp_path, monkeypatch):
+    path, cache = legacy_caltech(tmp_path, monkeypatch)
+    recovered, _, _ = manifests.recover_indexed_images("caltech101", cache, manifests.RAW_ROOT)
+    cache["train_paths"] = list(reversed(recovered["train"]))
+    torch.save(cache, path)
+    with pytest.raises(ValueError, match="alias disagrees"):
+        manifests.prepare("caltech101", path, tmp_path / "manifest")
+    cache.pop("train_paths")
+    cache["train_labels"] = torch.tensor([.4, 1.])
+    torch.save(cache, path)
+    with pytest.raises(ValueError, match="ground-truth labels"):
         manifests.prepare("caltech101", path, tmp_path / "manifest")

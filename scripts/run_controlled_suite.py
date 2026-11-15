@@ -316,7 +316,7 @@ def run(args):
         for phase in plan["phases"]:
             state["stages"][phase] = "running"
             training.write_json(ledger / "status.json", state)
-            if phase == "corrections":
+            if phase in ("corrections", "train_core", "summary"):
                 for dataset in datasets:
                     verify_qwen(args, config, dataset)
                     verified_qwen.add(dataset)
