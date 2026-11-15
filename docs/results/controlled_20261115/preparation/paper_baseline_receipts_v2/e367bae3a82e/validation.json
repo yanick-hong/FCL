@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "validated_at_utc": "2026-11-15T17:31:22.915778+00:00",
+  "wrapper_sha256": "e367bae3a82ea07127d934c806a5d13c5993311023f6d0fc8f9ee71ba9fe1a5a",
+  "previous_wrapper_sha256": "2938a725ea208c4a585938687162ace6a5144275bfb1e71c1b03d48462b9f66e",
+  "previous_wrapper_backup": "paper_baseline_followup_previous_2938a725.py",
+  "initial_wrapper_sha256": "86c27d3e083c1fd1df21f06e8335e60d48adbe4abfe076b10dc4070aba417641",
+  "remote_head_before": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+  "remote_head_after": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+  "synthetic_receipt_tests": 27,
+  "synthetic_receipt_test_sha256": "c578650a434703e18a59c36869198e62a4e0e363e601d4a7cc1a57d2c57be796",
+  "plan_gate_lock_checks": 12,
+  "plan_job_count": 84,
+  "preflight_status": "passed",
+  "preflight_datasets": [
+    "caltech101"
+  ],
+  "preflight_sources": [
+    "clip",
+    "qwen"
+  ],
+  "preflight_status_remote": "/root/autodl-tmp/outputs/paper_baseline_recheck/preflight/20261115T173111774975Z/status.json",
+  "preflight_status_local": "F:\\CodeProjects\\FCL2\\docs\\results\\controlled_20261115\\preparation\\paper_baseline_receipts_v2\\e367bae3a82e\\caltech_preflight\\20261115T173111774975Z\\status.json",
+  "training_performed": false,
+  "gpu_used": false,
+  "source_or_head_modified": false
+}

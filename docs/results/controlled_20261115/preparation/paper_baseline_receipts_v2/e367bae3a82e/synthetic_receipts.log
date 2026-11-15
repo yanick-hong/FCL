@@ -1,0 +1,32 @@
+test_checkpoint_not_maximum_validation_rejected (__main__.ReceiptValidationTests.test_checkpoint_not_maximum_validation_rejected) ... ok
+test_csgn_raw_validation_features_are_valid (__main__.ReceiptValidationTests.test_csgn_raw_validation_features_are_valid) ... ok
+test_csgn_rounded_first_tie_need_not_equal_payload_epoch (__main__.ReceiptValidationTests.test_csgn_rounded_first_tie_need_not_equal_payload_epoch) ... ok
+test_dld_actual_alternative_history_path_is_valid (__main__.ReceiptValidationTests.test_dld_actual_alternative_history_path_is_valid) ... ok
+test_duplicate_epoch_rejected (__main__.ReceiptValidationTests.test_duplicate_epoch_rejected) ... ok
+test_finite_but_wrong_test_accuracy_rejected (__main__.ReceiptValidationTests.test_finite_but_wrong_test_accuracy_rejected) ... ok
+test_incomplete_manifest_rejected (__main__.ReceiptValidationTests.test_incomplete_manifest_rejected) ... ok
+test_internal_ce_methods_valid (__main__.ReceiptValidationTests.test_internal_ce_methods_valid) ... ok
+test_invalid_classifier_shape_rejected (__main__.ReceiptValidationTests.test_invalid_classifier_shape_rejected) ... ok
+test_l2b_last_max_tie_is_valid (__main__.ReceiptValidationTests.test_l2b_last_max_tie_is_valid) ... ok
+test_missing_best_checkpoint_rejected (__main__.ReceiptValidationTests.test_missing_best_checkpoint_rejected) ... ok
+test_missing_internal_last_checkpoint_rejected (__main__.ReceiptValidationTests.test_missing_internal_last_checkpoint_rejected) ... ok
+test_nonfinite_history_rejected (__main__.ReceiptValidationTests.test_nonfinite_history_rejected) ... ok
+test_output_inventory_detects_finite_metric_edit (__main__.ReceiptValidationTests.test_output_inventory_detects_finite_metric_edit) ... ok
+test_resume_added_unsealed_file_rejected (__main__.ReceiptValidationTests.test_resume_added_unsealed_file_rejected) ... ok
+test_resume_finite_metric_tampering_rejected (__main__.ReceiptValidationTests.test_resume_finite_metric_tampering_rejected) ... ok
+test_resume_incomplete_epoch_proof_rejected (__main__.ReceiptValidationTests.test_resume_incomplete_epoch_proof_rejected) ... ok
+test_resume_missing_checkpoint_rejected (__main__.ReceiptValidationTests.test_resume_missing_checkpoint_rejected) ... ok
+test_resume_missing_receipt_rejected (__main__.ReceiptValidationTests.test_resume_missing_receipt_rejected) ... ok
+test_resume_modified_receipt_without_updated_hash_rejected (__main__.ReceiptValidationTests.test_resume_modified_receipt_without_updated_hash_rejected) ... ok
+test_resume_wrong_fingerprint_even_with_updated_receipt_hash_rejected (__main__.ReceiptValidationTests.test_resume_wrong_fingerprint_even_with_updated_receipt_hash_rejected) ... ok
+test_sealed_receipt_valid_resume (__main__.ReceiptValidationTests.test_sealed_receipt_valid_resume) ... ok
+test_short_history_rejected (__main__.ReceiptValidationTests.test_short_history_rejected) ... ok
+test_two_interruptions_preserve_later_completed_receipts (__main__.ReceiptValidationTests.test_two_interruptions_preserve_later_completed_receipts) ... ok
+test_two_restores_keep_reviewed_commands_instead_of_prior_commands (__main__.ReceiptValidationTests.test_two_restores_keep_reviewed_commands_instead_of_prior_commands) ... ok
+test_zero_shot_clip_and_qwen_without_training_artifacts (__main__.ReceiptValidationTests.test_zero_shot_clip_and_qwen_without_training_artifacts) ... ok
+test_zero_shot_qwen_missing_test_source_metadata_rejected (__main__.ReceiptValidationTests.test_zero_shot_qwen_missing_test_source_metadata_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.367s
+
+OK

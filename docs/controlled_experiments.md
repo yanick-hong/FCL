@@ -90,6 +90,8 @@ selected_mask=False: s=1，y_obs=原始伪标签 y_pseudo
 
 共同参数为 AdamW，`lr=1e-3`、OneCycleLR `lr_max=5e-3`、`weight_decay=1e-4`、`lambda=1`、`mu=0.5`、pairwise `tau=0.5`、`num_workers=0`。PK 采样按观察标签 `y_obs` 分组。P/K 是恢复协议中的数据集设置：CIFAR-100/Food-101 为 32/32，Caltech-101/EuroSAT 为 8/8，Stanford Cars/Tiny-ImageNet 为 16/16。DTD 本次显式选择 **P=16、K=16**，由 suite 传入；它是本次补充实验设置，不是已恢复的论文常数。
 
+`lr=1e-3` 是优化器构造参数；随后 OneCycleLR 使用 `div_factor=10` 将实际起始学习率设为 `5e-4`，以 `pct_start=0.15` 升到 `5e-3`，再按 cosine 降到约 `5e-5`（`final_div_factor=10`）。不能把 CLI 的 `lr` 当成实际第一步学习率；每个训练的 `config.json` 和 `history.csv` 保存了调度设置与实际学习率。
+
 - `fcl_auc`：已校正部分对 `y_obs` 做 CE，未校正部分做后验加权的 soft pairwise AUC-C。后验为 `mu*softmax(model).detach()+(1-mu)*p_source`，来源按 CLIP/Qwen 条件选择。
 - `ce_soft`：已校正部分保持同一 CE；未校正部分改成对**原始 CLIP 概率**的 soft CE。Qwen overlay 中使用 `original_clip_probs_train`，不能把 Qwen one-hot 冒充 CLIP 软概率。
 

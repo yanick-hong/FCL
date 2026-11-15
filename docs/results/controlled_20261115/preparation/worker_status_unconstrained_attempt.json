@@ -1,0 +1,59 @@
+{
+  "status": "failed",
+  "pid": 66539,
+  "started_at": "2026-11-15T15:02:31.458527+00:00",
+  "git_commit": "78eccfc51b7ef1d2bb8e18fab8a91935f9fa8a49",
+  "dataset_order": [
+    "dtd",
+    "caltech101",
+    "stanfordcars",
+    "eurosat",
+    "cifar100",
+    "food101",
+    "tinyimagenet200"
+  ],
+  "datasets": {
+    "dtd": {
+      "qwen": "running",
+      "controlled_suite": "pending"
+    },
+    "caltech101": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    },
+    "stanfordcars": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    },
+    "eurosat": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    },
+    "cifar100": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    },
+    "food101": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    },
+    "tinyimagenet200": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    }
+  },
+  "current_dataset": "dtd",
+  "current_phase": "qwen",
+  "current_command": [
+    "/root/autodl-tmp/.autodl/qwen-venv/bin/python",
+    "/root/autodl-tmp/scripts/run_qwen_campaign.py",
+    "--datasets",
+    "dtd",
+    "--model-path",
+    "/root/autodl-tmp/dataset/weights/Qwen2.5-VL-7B-Instruct",
+    "--resume"
+  ],
+  "updated_at": "2026-11-15T15:02:31.460841+00:00",
+  "error": "CalledProcessError(1, ['/root/autodl-tmp/.autodl/qwen-venv/bin/python', '/root/autodl-tmp/scripts/run_qwen_campaign.py', '--datasets', 'dtd', '--model-path', '/root/autodl-tmp/dataset/weights/Qwen2.5-VL-7B-Instruct', '--resume'])",
+  "failed_at": "2026-11-15T15:06:51.373665+00:00"
+}

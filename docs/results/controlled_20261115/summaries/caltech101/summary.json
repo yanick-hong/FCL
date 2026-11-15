@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "status": "completed",
+  "required_training_seeds": [
+    42,
+    43,
+    44
+  ],
+  "method": "sample SD (ddof=1); unbounded two-sided 95% Student-t CI; paired objective differences",
+  "groups": [
+    {
+      "dataset": "caltech101",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "ce_soft",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 96.32236162821452,
+      "sample_std": 0.10418528276824232,
+      "ci95_low": 96.06355103828056,
+      "ci95_high": 96.58117221814848,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+        "obs_sha256": "e769ad3bb697c62c4b20588d329e4c57764fb5e983831ccbe0f1bed9b799406b",
+        "mask_sha256": "a5410dd87feb9c9ff8270b420553984637b836ee750f5935741545881d5ae037",
+        "y_obs_sha256": "495fe3ee94f7ac590c20630f36712ff497e6d6c25b702c38cc3cfa1ceb007e71",
+        "sample_order_sha256": "2f3a73d8ff2e7ebecafd237331e4b05028f2586e28cc3edc2df7029a4bc269da",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "14bbc2ab71094dc9a32e5f3a439826e3d62cf0fc0b67b890cee1a036555b2282"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.9641895890235901,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/prototype/ce_soft/seed-42/metrics.json",
+          "metrics_sha256": "dc816895dd398e9419ccdc3b7fa1ae12d3515133cbebad5a4e255aa5a410c9cd"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9621196389198303,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/prototype/ce_soft/seed-43/metrics.json",
+          "metrics_sha256": "b7a20e09d8f078ce60ef55b5fb2ba62e69d6608299ca741953f77001a0603b1a"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.9633616209030151,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/prototype/ce_soft/seed-44/metrics.json",
+          "metrics_sha256": "571697d44f78d74066afd9e1d091c55814b638e6d1e120f1cfe0265d96579a04"
+        }
+      ]
+    },
+    {
+      "dataset": "caltech101",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 95.68757216135661,
+      "sample_std": 0.011948109475531463,
+      "ci95_low": 95.65789141202433,
+      "ci95_high": 95.7172529106889,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+        "obs_sha256": "e769ad3bb697c62c4b20588d329e4c57764fb5e983831ccbe0f1bed9b799406b",
+        "mask_sha256": "a5410dd87feb9c9ff8270b420553984637b836ee750f5935741545881d5ae037",
+        "y_obs_sha256": "495fe3ee94f7ac590c20630f36712ff497e6d6c25b702c38cc3cfa1ceb007e71",
+        "sample_order_sha256": "2f3a73d8ff2e7ebecafd237331e4b05028f2586e28cc3edc2df7029a4bc269da",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "14bbc2ab71094dc9a32e5f3a439826e3d62cf0fc0b67b890cee1a036555b2282"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.956737756729126,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "7845ad0b2099ad36d52dee51b005d1babf26e3cafbb9c3203a809545d38a4e74"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9569447040557861,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "966b8268106077fd30b2e8bcf25fd4f82fcc3c4082972c1d64a4a50549e9ca36"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.9569447040557861,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "a1d36dda00ea2d527df7700cf04aa966de9ab58f64a3b5669edfc29c80b07f5f"
+        }
+      ]
+    },
+    {
+      "dataset": "caltech101",
+      "label_source": "clip",
+      "selection": "random_global_exact",
+      "objective": "fcl_auc",
+      "selection_seed": 42,
+      "n": 3,
+      "mean": 92.61022607485454,
+      "sample_std": 0.10755707421017738,
+      "ci95_low": 92.3430394906435,
+      "ci95_high": 92.87741265906557,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+        "obs_sha256": "509f162f52ed0775ff2514de8f5f9f75060d33a79ca17663151cf98d7f820766",
+        "mask_sha256": "d344dd766e183047d9091f99672beaa630392faaca3e4a55aa64007a425635c2",
+        "y_obs_sha256": "0c45d9d1c4ed5aa631f393c9254e636ab4865ab34e593a75293e0e5bbf065232",
+        "sample_order_sha256": "2f3a73d8ff2e7ebecafd237331e4b05028f2586e28cc3edc2df7029a4bc269da",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "14bbc2ab71094dc9a32e5f3a439826e3d62cf0fc0b67b890cee1a036555b2282"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.9267232418060303,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/random_global_exact/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "30d61b8a81be0998c351d28ef2887e6ec3b39415b1e6ab7ee00f719737f5738f"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9267232418060303,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/random_global_exact/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "7be8e6a35981dad052764cf6e983a81ab599ced777cc54562ab8f3dfad1c12b8"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.9248602986335754,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/random_global_exact/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "86172a34d7bc9877c56e6228ea9a5e6f87c5eaa34b6a0439a71affc9cd817d4b"
+        }
+      ]
+    },
+    {
+      "dataset": "caltech101",
+      "label_source": "qwen",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 85.58614452679952,
+      "sample_std": 0.09782198343417564,
+      "ci95_low": 85.34314124871247,
+      "ci95_high": 85.82914780488656,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "9bfd626a2537c5f12ca792f7192046fde71e74ef0897054b8bd5b8fbdbbd843c",
+        "obs_sha256": "bfd2159585c7d997410709e9961fbb24125cb948b5663615036238efc187c811",
+        "mask_sha256": "adbd24e2ac9552d1b0aa5178cf21233cc2806dc647909d7e4645207f7a29a677",
+        "y_obs_sha256": "afb40afa82d4354cddd9aebd641017aae1d15515551dff13c953f3c959de2adf",
+        "sample_order_sha256": "2855d7d643e17d68b95c1d3668fdaffc55cc12b1530c4c4cfa32a8ca376d202f",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "14bbc2ab71094dc9a32e5f3a439826e3d62cf0fc0b67b890cee1a036555b2282"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.8551024794578552,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/qwen/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "7aaed7c771da871c0cb1c6ac8e90ae8007ac2c4ddc5edae10f932df2ea62972b"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.8555164337158203,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/qwen/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "e6dcd74b86502b48ea44371f6a76e4962b01b6a90b7dab70e41bc221de272357"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.8569654226303101,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/qwen/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "ad959ec7d38b824b3d330b6c7d3f775ee1f8544b468abd2f0b23b85fe2e7db34"
+        }
+      ]
+    }
+  ],
+  "paired_objective_differences": [
+    {
+      "dataset": "caltech101",
+      "label_source": "clip",
+      "selection": "prototype",
+      "selection_seed": null,
+      "contrast": "fcl_auc - ce_soft",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "units": "percentage_points",
+      "per_seed_differences": [
+        -0.7451832294464111,
+        -0.517493486404419,
+        -0.6416916847229004
+      ],
+      "n": 3,
+      "mean": -0.6347894668579102,
+      "sample_std": 0.11400168959372467,
+      "ci95_low": -0.9179853631809367,
+      "ci95_high": -0.35159357053488355
+    }
+  ]
+}

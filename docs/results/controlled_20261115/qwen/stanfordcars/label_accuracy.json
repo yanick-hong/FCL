@@ -1,0 +1,25 @@
+{
+  "status": "running",
+  "splits": {
+    "train": {
+      "annotated": 7356,
+      "expected": 7356,
+      "correct": 3972,
+      "accuracy": 0.5399673581123352,
+      "annotations_sha256": "a485673cb932710d940575702beac8f87abb4f8913a046e40a92db9a96bdd4fe",
+      "status": "completed"
+    },
+    "val": {
+      "annotated": 788,
+      "expected": 788,
+      "correct": 413,
+      "accuracy": 0.5241116881370544,
+      "annotations_sha256": "4adf9f03c20060c94aeeaff85ca8d15529bee401d8bf1b2cc36452984acc71af",
+      "status": "completed"
+    }
+  },
+  "prompt_sha256": "f344cd2881821992e4b3d2c69914b812517aa5a0042b58802080590342782f6a",
+  "cache_sha256": "5773148817a0ec9e0f9c8d9040375eb817049e979a405fb9e756432c4bee22af",
+  "source_model": "Qwen/Qwen2.5-VL-7B-Instruct",
+  "decoding": "greedy_legal_class_id_token_trie"
+}

@@ -1,0 +1,38 @@
+{
+  "syntax_compile": "passed",
+  "finite_plan_jobs": 84,
+  "methods": [
+    "zero_shot",
+    "fl_c",
+    "nl_c",
+    "fs_c",
+    "l2b",
+    "dld",
+    "csgn"
+  ],
+  "main_table_datasets": [
+    "cifar100",
+    "caltech101",
+    "stanfordcars",
+    "eurosat",
+    "food101",
+    "tinyimagenet200"
+  ],
+  "excludes_dtd_jobs": true,
+  "excludes_fcl_rerun": true,
+  "core_gate_checks_passed": [
+    "missing",
+    "failed",
+    "incomplete_completed",
+    "fully_completed",
+    "revision_mismatch"
+  ],
+  "wrapper_sha256": "86c27d3e083c1fd1df21f06e8335e60d48adbe4abfe076b10dc4070aba417641",
+  "local_evidence_copy_matches_remote_plan": true,
+  "cpu_preflight_sources": [
+    "clip",
+    "qwen"
+  ],
+  "baseline_training_started": false,
+  "remote_execution_queue_started": false
+}

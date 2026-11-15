@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "classes": 200,
+  "wnids_order_matches": true,
+  "all_cached_display_names_match_official_first_synonym": true,
+  "official_files_sha256": {
+    "wnids.txt": "a36eb4b603007f1985cdfbfc5987166a2710b3c6f0f6d3e29636fc129bba527b",
+    "words.txt": "55df3c6ee75859de344e2834ef65d88d61cec389d57e787be59e942c9b73e9aa"
+  }
+}

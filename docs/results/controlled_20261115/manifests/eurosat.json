@@ -1,0 +1,60 @@
+{
+  "dataset": "eurosat",
+  "cache": "/root/autodl-tmp/dataset/processed/eurosat_clip_vit-l-14_embeddings.pt",
+  "cache_sha256": "247b5e61e946157f9358a3ea72bed42476a5b2f9383f5c6903df4fb63ac67a5d",
+  "manifest_sha256": "4ce1e28d69c1b2f42f67c1c64785b97c059f8dc09422f9a3c30c449ff195fa86",
+  "class_names_sha256": "79b6fd7b00a5f9a936fa7b3ca25873ec677ac2185373af0bd674e6629f4ecfc1",
+  "original_class_names": [
+    "AnnualCrop",
+    "Forest",
+    "HerbaceousVegetation",
+    "Highway",
+    "Industrial",
+    "Pasture",
+    "PermanentCrop",
+    "Residential",
+    "River",
+    "SeaLake"
+  ],
+  "display_class_names": [
+    "AnnualCrop",
+    "Forest",
+    "HerbaceousVegetation",
+    "Highway",
+    "Industrial",
+    "Pasture",
+    "PermanentCrop",
+    "Residential",
+    "River",
+    "SeaLake"
+  ],
+  "split_counts": {
+    "train": 21600,
+    "val": 2700,
+    "test": 2700
+  },
+  "order": "exact cache order in every split",
+  "identity_recovery": {
+    "method": "original_torchvision_loader_and_saved_split_indices",
+    "torchvision": "0.20.1+cu124",
+    "split_index_sha256": {
+      "train": "2f0d49762d3ac4b2b519f12a7145ba0ffa98166210533d1aa6d522aef03fd27e",
+      "val": "2836769cbf7f5088d9cfcd066875dc6612b1b68288d8a30b982fcf4713854568",
+      "test": "bc8ae57fff01edcfe297dc7fcd1295a643bac69d144066f926be94189fbf3846"
+    },
+    "class_order_and_all_labels_verified": true,
+    "historical_features_reencoded": false,
+    "extraction_records": {
+      "/root/autodl-tmp/dataset/raw/eurosat/.fcl_extraction.json": {
+        "sha256": "dea6e0c88c7531d2e9744f6d22cf3d824d7fc1d4f6719a00d3f41eadcd2e6e29",
+        "content": {
+          "archive_sha256": "8ebea626349354c5328b142b96d0430e647051f26efc2dc974c843f25ecf70bd",
+          "zip_files": 27000,
+          "dataset": "eurosat"
+        }
+      }
+    }
+  },
+  "legacy_cache_order_verified": true,
+  "ground_truth_in_manifest": false
+}

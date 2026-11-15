@@ -1,0 +1,16 @@
+{
+  "pid": 71441,
+  "launched_at_utc": "2026-11-15T17:33:36.011881+00:00",
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/.autodl/paper_baseline_followup.py",
+    "--root",
+    "/root/autodl-tmp",
+    "--execute",
+    "--resume"
+  ],
+  "git_commit": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+  "wrapper_sha256": "e367bae3a82ea07127d934c806a5d13c5993311023f6d0fc8f9ee71ba9fe1a5a",
+  "status_file": "/root/autodl-tmp/outputs/paper_baseline_recheck/followup_status.json",
+  "dependency": "All seven controlled core datasets must complete before any baseline job starts"
+}

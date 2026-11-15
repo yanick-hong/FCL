@@ -1,0 +1,57 @@
+{
+  "status": "running",
+  "pid": 67266,
+  "started_at": "2026-11-15T15:42:27.109833+00:00",
+  "git_commit": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+  "dataset_order": [
+    "dtd",
+    "caltech101",
+    "stanfordcars",
+    "eurosat",
+    "cifar100",
+    "food101",
+    "tinyimagenet200"
+  ],
+  "datasets": {
+    "dtd": {
+      "qwen": "completed",
+      "controlled_suite": "completed"
+    },
+    "caltech101": {
+      "qwen": "completed",
+      "controlled_suite": "completed"
+    },
+    "stanfordcars": {
+      "qwen": "running",
+      "controlled_suite": "pending"
+    },
+    "eurosat": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    },
+    "cifar100": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    },
+    "food101": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    },
+    "tinyimagenet200": {
+      "qwen": "pending",
+      "controlled_suite": "pending"
+    }
+  },
+  "current_dataset": "stanfordcars",
+  "current_phase": "qwen",
+  "current_command": [
+    "/root/autodl-tmp/.autodl/qwen-venv/bin/python",
+    "/root/autodl-tmp/scripts/run_qwen_campaign.py",
+    "--datasets",
+    "stanfordcars",
+    "--model-path",
+    "dataset/weights/Qwen2.5-VL-7B-Instruct",
+    "--resume"
+  ],
+  "updated_at": "2026-11-15T16:24:03.008150+00:00"
+}

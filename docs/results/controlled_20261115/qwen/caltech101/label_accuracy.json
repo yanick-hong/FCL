@@ -1,0 +1,35 @@
+{
+  "status": "completed",
+  "splits": {
+    "train": {
+      "annotated": 2945,
+      "expected": 2945,
+      "correct": 1910,
+      "accuracy": 0.6485568881034851,
+      "annotations_sha256": "8cf1ad9880b9cf0a8ac145aa43c762269e84a896addfef5f5b6d6555ef5b5499",
+      "status": "completed"
+    },
+    "val": {
+      "annotated": 901,
+      "expected": 901,
+      "correct": 620,
+      "accuracy": 0.6881242990493774,
+      "annotations_sha256": "c4a2493dd013456b7e430efba3211f29de02942d6299def963195be3a58a57ce",
+      "status": "completed"
+    },
+    "test": {
+      "annotated": 4831,
+      "expected": 4831,
+      "correct": 3514,
+      "accuracy": 0.7273856401443481,
+      "annotations_sha256": "4a84c853089f45ed881098a8ae89492e837a0d2b7ac6e1b88d0dabe682ad75f2",
+      "status": "completed"
+    }
+  },
+  "prompt_sha256": "019ab4db763c83d76f765f8f6bf8356ec2c4cb924831f705bcd4952708deadb1",
+  "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+  "source_model": "Qwen/Qwen2.5-VL-7B-Instruct",
+  "decoding": "greedy_legal_class_id_token_trie",
+  "derived_cache": "/root/autodl-tmp/outputs/controlled_correction_20261115/qwen/caltech101/caltech101_qwen_through-test.pt",
+  "derived_cache_sha256": "9bfd626a2537c5f12ca792f7192046fde71e74ef0897054b8bd5b8fbdbbd843c"
+}

@@ -1,0 +1,73 @@
+{
+  "dataset": "stanfordcars",
+  "started_utc": "2026-11-15T13:49:53.813101+00:00",
+  "archive": "/root/autodl-tmp/dataset/archives/stanfordCars.zip",
+  "raw_root": "/root/autodl-tmp/dataset/raw/stanfordCars",
+  "cache": "/root/autodl-tmp/dataset/processed/stanfordcars_clip_vit-l-14_embeddings.pt",
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/src/utils/extract/extract_CLIP_stanford_cars.py",
+    "--data_root",
+    "/root/autodl-tmp/dataset/raw/stanfordCars",
+    "--cache",
+    "/root/autodl-tmp/dataset/processed/stanfordcars_clip_vit-l-14_embeddings.pt",
+    "--batch_size",
+    "128",
+    "--workers",
+    "4",
+    "--seed",
+    "42",
+    "--probability-logit-scale",
+    "1.0"
+  ],
+  "source_git_head": "baa3efb0ee98b67d518800ee2f1b2c262ff293cc",
+  "seed": 42,
+  "split": "Official train/official labeled test; 10% per-class train held out for validation",
+  "probability_logit_scale": 1.0,
+  "status": "complete",
+  "archive_sha256": "bd9ab0afcce26e11e10c14a91696a4835df21d7ebc6d0744fa6586b3519f3ca1",
+  "cache_sha256": "5773148817a0ec9e0f9c8d9040375eb817049e979a405fb9e756432c4bee22af",
+  "splits": {
+    "train": {
+      "samples": 7356,
+      "clip_correct": 5634,
+      "clip_accuracy": 0.765905383360522
+    },
+    "val": {
+      "samples": 788,
+      "clip_correct": 609,
+      "clip_accuracy": 0.7728426395939086
+    },
+    "test": {
+      "samples": 8041,
+      "clip_correct": 6168,
+      "clip_accuracy": 0.7670687725407288
+    }
+  },
+  "classnames_first5": [
+    "AM General Hummer SUV 2000",
+    "Acura RL Sedan 2012",
+    "Acura TL Sedan 2012",
+    "Acura TL Type-S 2008",
+    "Acura TSX Sedan 2012"
+  ],
+  "classnames_last5": [
+    "Volkswagen Beetle Hatchback 2012",
+    "Volvo C30 Hatchback 2012",
+    "Volvo 240 Sedan 1993",
+    "Volvo XC90 SUV 2007",
+    "smart fortwo Convertible 2012"
+  ],
+  "cache_meta": {
+    "dataset": "Stanford Cars",
+    "split_seed": 42,
+    "source": "/root/autodl-tmp/dataset/raw/stanfordCars",
+    "probability_logit_scale": 1.0,
+    "logit_scale": 1.0,
+    "protocol": "openai_clip_legacy_scale",
+    "normalization": "CLIP_default",
+    "preprocess": "Compose(\n    Resize(size=224, interpolation=bicubic, max_size=None, antialias=True)\n    CenterCrop(size=(224, 224))\n    <function _convert_image_to_rgb at 0x7f2d068b5da0>\n    ToTensor()\n    Normalize(mean=(0.48145466, 0.4578275, 0.40821073), std=(0.26862954, 0.26130258, 0.27577711))\n)",
+    "test_annotations": "/root/autodl-tmp/dataset/raw/stanfordCars/cars_test_annos_withlabels.mat"
+  },
+  "completed_utc": "2026-11-15T13:51:12.530562+00:00"
+}

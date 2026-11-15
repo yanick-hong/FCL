@@ -1,0 +1,41 @@
+{
+  "archive": "/root/autodl-tmp/dataset/archives/stanfordCars.zip",
+  "archive_bytes": 1958859084,
+  "crc_failure": null,
+  "files": 16195,
+  "uncompressed_bytes": 1990218610,
+  "annotation_files": [
+    "stanfordCars/cars_test_annos_withlabels.mat",
+    "stanfordCars/devkit/cars_meta.mat",
+    "stanfordCars/devkit/cars_test_annos.mat",
+    "stanfordCars/devkit/cars_train_annos.mat",
+    "stanfordCars/devkit/README.txt",
+    "stanfordCars/devkit/train_perfect_preds.txt"
+  ],
+  "first_names": [
+    "stanfordCars/cars_test/",
+    "stanfordCars/cars_test/00001.jpg",
+    "stanfordCars/cars_test/00002.jpg",
+    "stanfordCars/cars_test/00003.jpg",
+    "stanfordCars/cars_test/00004.jpg",
+    "stanfordCars/cars_test/00005.jpg",
+    "stanfordCars/cars_test/00006.jpg",
+    "stanfordCars/cars_test/00007.jpg",
+    "stanfordCars/cars_test/00008.jpg",
+    "stanfordCars/cars_test/00009.jpg",
+    "stanfordCars/cars_test/00010.jpg",
+    "stanfordCars/cars_test/00011.jpg",
+    "stanfordCars/cars_test/00012.jpg",
+    "stanfordCars/cars_test/00013.jpg",
+    "stanfordCars/cars_test/00014.jpg",
+    "stanfordCars/cars_test/00015.jpg",
+    "stanfordCars/cars_test/00016.jpg",
+    "stanfordCars/cars_test/00017.jpg",
+    "stanfordCars/cars_test/00018.jpg",
+    "stanfordCars/cars_test/00019.jpg"
+  ],
+  "mtime_unix": 1794750383.9913363,
+  "status": "validated",
+  "sha256": "bd9ab0afcce26e11e10c14a91696a4835df21d7ebc6d0744fa6586b3519f3ca1",
+  "verified_unix": 1794750478.4858646
+}

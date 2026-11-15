@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "dataset": "dtd",
+  "label_source": "qwen",
+  "prompt": "C",
+  "from_cache": "/root/autodl-tmp/outputs/controlled_correction_20261115/qwen/dtd/dtd_qwen_through-test.pt",
+  "cache_sha256": "97f5632c5a738c5df6542eabe5851aa60ba582822a2894a15306e1f30ae85b45",
+  "sample_order_sha256": "16c4808c91a295110bca230464e913821c1da27690cff729bd9cf951272aabd8",
+  "sample_order_kind": "sample_id",
+  "N": 1880,
+  "top_outlier_pct": 0.3,
+  "requested_rho": 0.3,
+  "source_probability_field": "clip_probs_train",
+  "mask_sha256_format": "torch_dtype + tuple_shape + contiguous_numpy_bytes",
+  "correction": "oracle simulation using dataset ground truth only at selected indices",
+  "selection_uses_ground_truth": false,
+  "script_sha256": "21ba5ff22e74bb948a25c3ecd94c66eb1d5fc8d7878a031ace67042197bda8c4",
+  "created_at": "2026-11-15T15:53:42.791320+00:00",
+  "source_metrics": {
+    "train": {
+      "accuracy": 0.602127659574468,
+      "samples": 1880,
+      "errors": 748,
+      "prediction_field": "clip_probs_train"
+    },
+    "val": {
+      "accuracy": 0.5893617021276596,
+      "samples": 1880,
+      "errors": 772,
+      "prediction_field": "clip_probs_val"
+    },
+    "test": {
+      "accuracy": 0.5856382978723405,
+      "samples": 1880,
+      "errors": 779,
+      "prediction_field": "clip_probs_test"
+    }
+  },
+  "omitted_source_splits": {},
+  "random_selection_seeds": [
+    42,
+    43,
+    44
+  ],
+  "prototype_actual_budget": 583,
+  "random_global_exact_budget": 564,
+  "global_requested_ratio_is_exactly_representable": true,
+  "budget_explanation": "Random global_exact fixes floor(rho*N+.5) rows; when rho*N is not an integer the requested fraction is rounded to the nearest row. Prototype uses ceil per predicted class. random_matched_prototype matches its actual count and is a separate comparison.",
+  "fixed_prototype_observed": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/dtd/qwen/prototype.pt",
+  "controlled_use": {
+    "ce_vs_soft_ce": "Reuse prototype.pt unchanged for both objectives",
+    "random_auc_c": "Use random_global_exact_seed-<seed>.pt; selection_seed and training seed are separate settings"
+  },
+  "conditions": [
+    {
+      "method": "prototype",
+      "selection_seed": null,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/dtd/qwen/prototype.pt",
+      "budget_rule": "sum_over_predicted_classes(ceil(rho*n_class))",
+      "mask_sha256": "544b0794a93ac982a86eb7404021552f7b980683ee84943a778795e0e89fea46",
+      "source_accuracy": 0.602127659574468,
+      "corrected_label_accuracy": 0.7920212765957446,
+      "corrected_count": 583,
+      "corrected_ratio": 0.3101063829787234,
+      "source_errors": 748,
+      "selected_errors": 357,
+      "selected_error_precision": 0.6123499142367067,
+      "selected_error_recall": 0.4772727272727273,
+      "uncorrected_error_rate": 0.30146491904394757
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/dtd/qwen/random_global_exact_seed-42.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "3ec8dae40a5b78cefdf58e19d019e46128fe425c8fb72cd014b2809c3a0759a2",
+      "source_accuracy": 0.602127659574468,
+      "corrected_label_accuracy": 0.7175531914893617,
+      "corrected_count": 564,
+      "corrected_ratio": 0.3,
+      "source_errors": 748,
+      "selected_errors": 217,
+      "selected_error_precision": 0.38475177304964536,
+      "selected_error_recall": 0.29010695187165775,
+      "uncorrected_error_rate": 0.4034954407294833
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/dtd/qwen/random_matched_prototype_seed-42.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "7a574d3e65f60b94a87fcb9ff5cbcae00aa7d5b6ba33a54b8aa5ec2ca29233d7",
+      "source_accuracy": 0.602127659574468,
+      "corrected_label_accuracy": 0.7212765957446808,
+      "corrected_count": 583,
+      "corrected_ratio": 0.3101063829787234,
+      "source_errors": 748,
+      "selected_errors": 224,
+      "selected_error_precision": 0.38421955403087477,
+      "selected_error_recall": 0.2994652406417112,
+      "uncorrected_error_rate": 0.40400925212027755
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/dtd/qwen/random_global_exact_seed-43.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "e63134a50ea4ea46db79ca97cea262c5c333ef786f92a21fe452b5e5757e93ba",
+      "source_accuracy": 0.602127659574468,
+      "corrected_label_accuracy": 0.725,
+      "corrected_count": 564,
+      "corrected_ratio": 0.3,
+      "source_errors": 748,
+      "selected_errors": 231,
+      "selected_error_precision": 0.4095744680851064,
+      "selected_error_recall": 0.3088235294117647,
+      "uncorrected_error_rate": 0.39285714285714285
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/dtd/qwen/random_matched_prototype_seed-43.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "8be4de2024be9ddb91e13de711e3a592b30e7a44cbf1c3834f78172875ab394e",
+      "source_accuracy": 0.602127659574468,
+      "corrected_label_accuracy": 0.7281914893617021,
+      "corrected_count": 583,
+      "corrected_ratio": 0.3101063829787234,
+      "source_errors": 748,
+      "selected_errors": 237,
+      "selected_error_precision": 0.4065180102915952,
+      "selected_error_recall": 0.31684491978609625,
+      "uncorrected_error_rate": 0.39398612181958365
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/dtd/qwen/random_global_exact_seed-44.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "399cb218049e0ea46ba0d95d050a1bfafaf190a8457364e309b5beff5235a5ff",
+      "source_accuracy": 0.602127659574468,
+      "corrected_label_accuracy": 0.725531914893617,
+      "corrected_count": 564,
+      "corrected_ratio": 0.3,
+      "source_errors": 748,
+      "selected_errors": 232,
+      "selected_error_precision": 0.41134751773049644,
+      "selected_error_recall": 0.31016042780748665,
+      "uncorrected_error_rate": 0.39209726443769
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/dtd/qwen/random_matched_prototype_seed-44.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "90ddde0e96a02cddf7d8763bc9027e12de2ab7eee4b454f1013c1f152c8f376d",
+      "source_accuracy": 0.602127659574468,
+      "corrected_label_accuracy": 0.7313829787234043,
+      "corrected_count": 583,
+      "corrected_ratio": 0.3101063829787234,
+      "source_errors": 748,
+      "selected_errors": 243,
+      "selected_error_precision": 0.41680960548885077,
+      "selected_error_recall": 0.32486631016042783,
+      "uncorrected_error_rate": 0.38936006168080184
+    }
+  ],
+  "random_aggregates": {
+    "random_global_exact": {
+      "corrected_label_accuracy": {
+        "mean": 0.7226950354609929,
+        "sample_std": 0.004460902704045784,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.4018912529550827,
+        "sample_std": 0.014869675680152641,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.30303030303030304,
+        "sample_std": 0.01121189449679959,
+        "seeds": 3
+      }
+    },
+    "random_matched_prototype": {
+      "corrected_label_accuracy": {
+        "mean": 0.7269503546099291,
+        "sample_std": 0.005166241944799121,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.4025157232704402,
+        "sample_std": 0.01665957951324582,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.3137254901960784,
+        "sample_std": 0.012984672267676908,
+        "seeds": 3
+      }
+    }
+  }
+}

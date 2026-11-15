@@ -1,0 +1,25 @@
+{
+  "observed_at_utc": "2026-11-15T17:34:51.074438+00:00",
+  "git_commit": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+  "git_status": "",
+  "core_pid": 67266,
+  "core_pid_alive": true,
+  "core_status": "running",
+  "current_dataset": "stanfordcars",
+  "current_phase": "qwen",
+  "last_qwen_progress": "[QWEN] stanfordcars/test 1440/8041 elapsed=637.1s",
+  "disk_bytes": {
+    "total": 53687091200,
+    "used": 43504795648,
+    "free": 10182295552
+  },
+  "gpu": "NVIDIA GeForce RTX 4090, 23015 MiB, 100 %",
+  "baseline_followup": {
+    "pid": 71441,
+    "status": "pending_core",
+    "core_gate": "pending",
+    "training_started": false,
+    "current_job": null,
+    "pid_alive": true
+  }
+}

@@ -1,0 +1,2 @@
+# Evidence files retain their exact bytes for recorded SHA256 verification.
+docs/results/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

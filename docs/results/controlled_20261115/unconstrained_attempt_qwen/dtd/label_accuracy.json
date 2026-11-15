@@ -1,0 +1,16 @@
+{
+  "status": "running",
+  "splits": {
+    "train": {
+      "annotated": 1880,
+      "expected": 1880,
+      "correct": 1132,
+      "accuracy": 0.6021276712417603,
+      "annotations_sha256": "7748e4f8823358b881db04f5a2cd37b9c33d551f1dfdfc3c7b960c0a4f904d5f",
+      "status": "completed"
+    }
+  },
+  "prompt_sha256": "f165c49ebf772bf86d9c112ca785e3d954d907180a59c817429c8c21ea74ba1c",
+  "cache_sha256": "15fb695aa8635a73812c3dc21b517fec12bb9e3fe937d80549270663fb704acc",
+  "source_model": "Qwen/Qwen2.5-VL-7B-Instruct"
+}

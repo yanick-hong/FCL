@@ -2,6 +2,8 @@
 
 这里区分三个层次：论文记录的目标、旧代码可恢复的实现、实际执行得到的结果。`configs/paper_targets.yaml` 只是已发表稿件中的参考百分比，运行器不会把它们复制成实验结果。只有真实运行产生的 `metrics.json` 才能作为复现结果。
 
+本轮新增的随机校正、同 mask 损失对照与三种子矩阵采用独立的 [受控实验协议](controlled_experiments.md)，执行证据见 [台账](results/controlled_20261115/README.md)。该入口转写已核对的附录 Prompt C，并明确使用合法类别编号约束解码；下文通用 annotation CLI 的 A/B/C 模板与其分别记录，不能混用结果。
+
 ## 覆盖范围
 
 主实验为 CIFAR-100、Caltech-101、Stanford Cars、EuroSAT、Food-101、Tiny-ImageNet 六个数据集，分别使用 CLIP 与 Qwen 标签来源。对应论文表 2/3 的方法如下。
@@ -70,7 +72,7 @@ python scripts/run_paper_experiments.py --suite prompts --methods zero_shot fcl 
 python scripts/run_paper_experiments.py --suite epochs --prepare-labels --execute
 ```
 
-结果写入 `outputs/paper/<suite>/<source>/<dataset>/<method>/<setting>/seed-<seed>/<timestamp>/`，保留命令、配置、日志、校正缓存路径及结果。路径根遵循 `DATA_ROOT/OUTPUT_ROOT`。不同入口的历史记录字段略有差异，但都保留逐 epoch 验证记录；图 2 的测试曲线若需严格还原，应另存各 epoch checkpoint 再离线评估，不用测试精度选模型。失败运行不会被标成已复现。
+结果写入 `outputs/paper/<suite>/<source>/<dataset>/<method>/<setting>/seed-<seed>/<timestamp>/`，保留命令、配置、日志、校正缓存路径及结果。路径根遵循 `DATA_ROOT/OUTPUT_ROOT`。不同入口的历史记录字段略有差异，但都保留逐 epoch 验证记录。论文图 2 的图注没有明确 accuracy 曲线对应验证集还是测试集，不能直接认定当前验证曲线与其指标语义相同；如另行报告逐 epoch 测试曲线，应另存各 epoch checkpoint 再离线评估，不用测试精度选模型。失败运行不会被标成已复现。
 
 ## 已发现的论文/旧代码差异
 
@@ -90,6 +92,10 @@ python scripts/run_paper_experiments.py --suite epochs --prepare-labels --execut
 | 指标冲突 | Table1 Cars zero-shot 70.17，Table2 为71.16；xlsx部分Qwen Food/Tiny基线复用了CLIP行而最终论文不同。参考配置以最终论文表为主并记录冲突，不把旧表当作新测量。 |
 
 预检通过只说明输入可以运行。是否接近论文仍取决于恢复到的权重、样本顺序、预处理、prompt 与训练协议，必须比较实际日志及 checkpoint。
+
+逐表、逐图的覆盖范围和剩余实验见 [论文实验覆盖清单](results/controlled_20261115/paper_coverage_inventory.md)。正文两个主表共 78 个单元，通用入口的 96 项还包含 18 个额外 Qwen CE 控制。Figure 3 的 lambda 原图只有 0、1、2、5、10、20，配置中的 50/100 是扩展；附录 EuroSAT 四种骨干的比较尚无正式套件，底层提取器可复用，但另三种骨干还缺独立缓存和 12 次训练。Prompt B 未公开历史全文和语言，现有通用模板不能冒充原实验。当前协议保留正文与附录的划分冲突；代码可执行不表示全部图表已复现。
+
+本轮其余主表方法在 `outputs/paper_baseline_recheck/` 另设有限跟进队列：六主数据集 × 两来源 × 七种非 FCL 方法，共 84 项（12 个 zero-shot、72 次 seed42/100-epoch 训练）。它先等待七数据集核心队列全部成功，再使用核心同一缓存和原型掩码，逐项做 CPU 输入预检、真实执行和产物独立核验。FCL 继续引用核心的三种子结果。计划、当前状态和最终版包装器验证均保存在 [本轮台账](results/controlled_20261115/README.md)；当前为等待依赖的队列，不能记为已经跑完主表。
 
 ### Repeated runs and result summaries
 

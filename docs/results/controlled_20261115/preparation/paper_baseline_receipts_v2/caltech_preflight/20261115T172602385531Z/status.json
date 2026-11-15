@@ -1,0 +1,132 @@
+{
+  "mode": "cpu_preflight_only",
+  "status": "passed",
+  "training_performed": false,
+  "started_at": "2026-11-15T17:26:02.385571+00:00",
+  "git_commit": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+  "steps": [
+    {
+      "dataset": "caltech101",
+      "source": "clip",
+      "status": "passed",
+      "command": [
+        "/root/miniconda3/bin/python",
+        "/root/autodl-tmp/scripts/run_paper_experiments.py",
+        "--config",
+        "/root/autodl-tmp/configs/paper_reproduction.yaml",
+        "--suite",
+        "main",
+        "--datasets",
+        "caltech101",
+        "--methods",
+        "zero_shot",
+        "fl_c",
+        "nl_c",
+        "fs_c",
+        "l2b",
+        "dld",
+        "csgn",
+        "--label-source",
+        "clip",
+        "--prompt",
+        "C",
+        "--seeds",
+        "42",
+        "--epochs",
+        "100",
+        "--num-workers",
+        "0",
+        "--cache-template",
+        "/root/autodl-tmp/dataset/processed/caltech101_clip_vit-l-14_embeddings.pt",
+        "--obs-template",
+        "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/caltech101/clip/prototype.pt",
+        "--output-root",
+        "/root/autodl-tmp/outputs/paper_baseline_recheck",
+        "--preflight"
+      ],
+      "log": "/root/autodl-tmp/outputs/paper_baseline_recheck/preflight/20261115T172602385531Z/caltech101_clip.log",
+      "started_at": "2026-11-15T17:26:02.417093+00:00",
+      "fixed_core_inputs": {
+        "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+        "obs_sha256": "e769ad3bb697c62c4b20588d329e4c57764fb5e983831ccbe0f1bed9b799406b",
+        "core_prototype_fcl_seeds": {
+          "42": {
+            "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/prototype/fcl_auc/seed-42/metrics.json",
+            "metrics_sha256": "7845ad0b2099ad36d52dee51b005d1babf26e3cafbb9c3203a809545d38a4e74"
+          },
+          "43": {
+            "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/prototype/fcl_auc/seed-43/metrics.json",
+            "metrics_sha256": "966b8268106077fd30b2e8bcf25fd4f82fcc3c4082972c1d64a4a50549e9ca36"
+          },
+          "44": {
+            "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/clip/prototype/fcl_auc/seed-44/metrics.json",
+            "metrics_sha256": "a1d36dda00ea2d527df7700cf04aa966de9ab58f64a3b5669edfc29c80b07f5f"
+          }
+        }
+      },
+      "completed_at": "2026-11-15T17:26:06.177777+00:00"
+    },
+    {
+      "dataset": "caltech101",
+      "source": "qwen",
+      "status": "passed",
+      "command": [
+        "/root/miniconda3/bin/python",
+        "/root/autodl-tmp/scripts/run_paper_experiments.py",
+        "--config",
+        "/root/autodl-tmp/configs/paper_reproduction.yaml",
+        "--suite",
+        "main",
+        "--datasets",
+        "caltech101",
+        "--methods",
+        "zero_shot",
+        "fl_c",
+        "nl_c",
+        "fs_c",
+        "l2b",
+        "dld",
+        "csgn",
+        "--label-source",
+        "qwen",
+        "--prompt",
+        "C",
+        "--seeds",
+        "42",
+        "--epochs",
+        "100",
+        "--num-workers",
+        "0",
+        "--cache-template",
+        "/root/autodl-tmp/outputs/controlled_correction_20261115/qwen/caltech101/caltech101_qwen_through-test.pt",
+        "--obs-template",
+        "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/caltech101/qwen/prototype.pt",
+        "--output-root",
+        "/root/autodl-tmp/outputs/paper_baseline_recheck",
+        "--preflight"
+      ],
+      "log": "/root/autodl-tmp/outputs/paper_baseline_recheck/preflight/20261115T172602385531Z/caltech101_qwen.log",
+      "started_at": "2026-11-15T17:26:06.204151+00:00",
+      "fixed_core_inputs": {
+        "cache_sha256": "9bfd626a2537c5f12ca792f7192046fde71e74ef0897054b8bd5b8fbdbbd843c",
+        "obs_sha256": "bfd2159585c7d997410709e9961fbb24125cb948b5663615036238efc187c811",
+        "core_prototype_fcl_seeds": {
+          "42": {
+            "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/qwen/prototype/fcl_auc/seed-42/metrics.json",
+            "metrics_sha256": "7aaed7c771da871c0cb1c6ac8e90ae8007ac2c4ddc5edae10f932df2ea62972b"
+          },
+          "43": {
+            "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/qwen/prototype/fcl_auc/seed-43/metrics.json",
+            "metrics_sha256": "e6dcd74b86502b48ea44371f6a76e4962b01b6a90b7dab70e41bc221de272357"
+          },
+          "44": {
+            "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/caltech101/qwen/prototype/fcl_auc/seed-44/metrics.json",
+            "metrics_sha256": "ad959ec7d38b824b3d330b6c7d3f775ee1f8544b468abd2f0b23b85fe2e7db34"
+          }
+        }
+      },
+      "completed_at": "2026-11-15T17:26:10.420630+00:00"
+    }
+  ],
+  "ended_at": "2026-11-15T17:26:10.446807+00:00"
+}

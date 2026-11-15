@@ -1,0 +1,23 @@
+{
+  "mode": "cpu_preflight_only",
+  "training_performed": false,
+  "returncode": 0,
+  "head_before": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+  "head_after": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+  "head_unchanged": true,
+  "evidence": "F:\\CodeProjects\\FCL2\\docs\\results\\controlled_20261115\\preparation\\paper_baseline_preflight_caltech101",
+  "remote_evidence": "/root/autodl-tmp/outputs/paper_baseline_recheck/preflight/20261115T165250370374Z",
+  "status": "passed",
+  "steps": [
+    {
+      "dataset": "caltech101",
+      "source": "clip",
+      "status": "passed"
+    },
+    {
+      "dataset": "caltech101",
+      "source": "qwen",
+      "status": "passed"
+    }
+  ]
+}

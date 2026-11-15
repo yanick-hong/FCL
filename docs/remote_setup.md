@@ -1,5 +1,9 @@
 # AutoDL 与 VLM 标签管线
 
+当前受控运行已固定使用用户确认的 `Qwen/Qwen2.5-VL-7B-Instruct`，官方 revision 为 `cc594898137f460bfe9f0759e9844b3ce807cfb5`，独立环境依赖见 `requirements-qwen.txt`。Cars 官方带标签测试输入与 CLIP 缓存现已齐全。下文保留早期准备记录；本轮的实际状态、配置与证据以 [运行台账](results/controlled_20261115/README.md) 和 [受控协议](controlled_experiments.md) 为准。
+
+本轮实验源码固定在 `1fec7c895c11a80493f0153e6ec2870ffa322bed`。活动队列核验 HEAD、源码、模型和配置指纹；运行期间远端保留该提交，不执行 `git pull` 或修改源码。之后提交到 GitHub 的文档/结果快照不会自动切换远端运行版本，实验记录继续明确引用实际源码提交。
+
 2026-11-15 已通过 SSH 只读核查：远端 `/root/autodl-tmp` 是现有 Git 项目，origin 为 `https://github.com/yanick-hong/FCL.git`，当时 HEAD 为 `42072ed`。GPU 为 RTX 4090 24 GB，驱动 550.100；base 环境在 `/root/miniconda3`。数据盘约有 47 GB 空余。`dataset/processed` 已有 CIFAR-100、Tiny-ImageNet、Caltech-101、EuroSAT、DTD 的特征与标签缓存；Food-101、Stanford Cars 仍需准备。这些是现场检查结果，不代表之后环境未改变。
 
 ```powershell
@@ -7,9 +11,9 @@ ssh -p 32132 root@connect.westb.seetacloud.com
 python scripts/remote_diagnose.py --interactive-password --output outputs/remote_diagnostic.json
 ```
 
-## 后续只读核查（2026-11-15）
+## 历史快照：受控运行之前（2026-11-15）
 
-AutoDL 的 Food-101 分片下载、gzip 校验、解压、CLIP 特征/观察标签准备以及八个主套件任务均已完成；实测结果记录在 `docs/remote_clip_results_seed42.md`。Stanford Cars 仍因缺少官方带标签测试文件而未纳入完整表。远端 `reproduction/recover-fcl` 分支保持恢复提交，当前没有运行中的 Food 下载或实验进程；`dataset/`、`outputs/` 和远端 `.Trash-0/` 仍属于运行时状态，不纳入版本控制。
+该次核查时，AutoDL 的 Food-101 分片下载、gzip 校验、解压、CLIP 特征/观察标签准备以及八个主套件任务均已完成；实测结果记录在 `docs/remote_clip_results_seed42.md`。当时 Stanford Cars 缺少官方带标签测试文件，尚未纳入完整表；这项输入缺口现已补齐。当时也没有运行中的 Food 下载或实验进程；本轮队列状态以文首链接为准。`dataset/`、`outputs/` 和远端 `.Trash-0/` 属于运行时状态，不纳入版本控制。
 
 密码仅在 OpenSSH 提示时交互输入，不写入脚本、命令参数或 Git。诊断脚本只读取主机、GPU、依赖版本、Git 和缓存清单，连接失败会重试一次。已有密钥可使用 `--identity-file`。连接中断后先检查 AutoDL 实例是否开机、端口是否改变以及本机网络。
 
