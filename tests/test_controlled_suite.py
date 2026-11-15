@@ -58,7 +58,7 @@ def tiny_campaign(tmp_path, monkeypatch):
     class Predictor:
         def __init__(self, *_):
             self.metadata = {"resolved_commit": "fixed-test-commit", "packages": {"mocked": "1"}}
-        def __call__(self, paths, *_):
+        def __call__(self, paths, *_, classes=None):
             return [str(int(Path(path).stem.rsplit("-", 1)[1]) % 2) for path in paths]
     monkeypatch.setattr(qwen_batch, "BatchedQwenPredictor", Predictor)
     qwen_args = argparse.Namespace(config=config_path, datasets=None, splits=None, processed_root=processed,

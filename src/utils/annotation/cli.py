@@ -241,6 +241,8 @@ def export_cache(args):
         "probability_sources": sorted({row["probability_source"] for row in labels}),
         "prompt_variant": annotation_settings.get("prompt_variant"),
         "prompt_sha256": annotation_settings.get("prompt_sha256"),
+        "decoding": annotation_settings.get("decoding"),
+        "model_environment_sha256": annotation_settings.get("model_environment_sha256"),
         "legacy_cache_order_confirmed": identity is None and path_identity is None,
         "replaced_clip_fields": args.replace_clip_fields}
     output = Path(args.output)

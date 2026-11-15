@@ -44,7 +44,7 @@ def test_qwen_campaign_records_predictions_accuracy_and_resume_provenance(tmp_pa
         metadata = {"resolved_commit": "fixed-mock-revision"}
         def __init__(self, *_):
             pass
-        def __call__(self, paths, prompt, max_new_tokens):
+        def __call__(self, paths, prompt, max_new_tokens, classes=None):
             assert "Reply with ONLY the integer id" in prompt
             return ["0", "1"]
     monkeypatch.setattr(qwen_batch, "BatchedQwenPredictor", Predictor)
@@ -96,7 +96,7 @@ def test_duplicate_tiny_class_names_are_disambiguated_without_changing_ids(tmp_p
         metadata = {"resolved_commit": "fixed"}
         def __init__(self, *_):
             pass
-        def __call__(self, paths, prompt, max_new_tokens):
+        def __call__(self, paths, prompt, max_new_tokens, classes=None):
             assert "0: crane (n1)" in prompt and "1: crane (n2)" in prompt
             return ["0", "1"]
     monkeypatch.setattr(qwen_batch, "BatchedQwenPredictor", Predictor)
@@ -112,7 +112,7 @@ def test_partial_resume_rejects_mixed_inference_environments(tmp_path, monkeypat
         packages = "first-version"
         def __init__(self, *_):
             self.metadata = {"resolved_commit": "fixed", "packages": self.packages}
-        def __call__(self, paths, *_):
+        def __call__(self, paths, *_, classes=None):
             return ["0"] * len(paths)
     monkeypatch.setattr(qwen_batch, "BatchedQwenPredictor", Predictor)
     run(args)

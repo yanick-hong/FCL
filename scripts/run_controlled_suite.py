@@ -159,7 +159,8 @@ def verify_qwen(args, config, dataset):
         expected_settings = {key: config["labeling"][key] for key in
                              ("seed", "min_pixels", "max_pixels", "dtype", "attention", "max_new_tokens", "batch_size")}
         expected_settings.update(requested_revision=config["labeling"]["revision"], do_sample=False,
-                                 mode="qwen", backend="qwen2.5-vl", prompt_variant="C")
+                                 mode="qwen", backend="qwen2.5-vl", prompt_variant="C",
+                                 decoding=config["labeling"]["decoding"])
         if (settings.get("model_environment_sha256") != fingerprint(environment)
                 or settings.get("cache_sha256") != base_hash or settings.get("prompt_sha256") != prompt_hash
                 or any(settings.get(key) != value for key, value in expected_settings.items())):

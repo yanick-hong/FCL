@@ -50,6 +50,8 @@ def labeling_source_fingerprint():
 def run(args):
     config = yaml.safe_load(args.config.read_text(encoding="utf-8"))
     settings = config["labeling"]
+    if settings.get("decoding") != "greedy_legal_class_id_token_trie":
+        raise ValueError("The controlled campaign requires explicit legal-class-ID constrained decoding")
     datasets = args.datasets or config["datasets"]
     splits = args.splits or settings["splits"]
     report = {"started_at": dt.datetime.now(dt.timezone.utc).isoformat(), "config": config,
@@ -107,7 +109,8 @@ def run(args):
             raise ValueError("Existing prompt changed; choose a new campaign output directory")
         prompt_path.write_text(prompt, encoding="utf-8")
         dataset_report = {"status": "running", "splits": {}, "prompt_sha256": fingerprint(prompt),
-                          "cache_sha256": manifest_meta["cache_sha256"], "source_model": settings["model"]}
+                          "cache_sha256": manifest_meta["cache_sha256"], "source_model": settings["model"],
+                          "decoding": settings["decoding"]}
         report["datasets"][dataset] = dataset_report
         cache_for_overlay = cache_path
         import torch
@@ -126,6 +129,10 @@ def run(args):
                 "max_pixels": settings["max_pixels"], "dtype": settings["dtype"],
                 "attention": settings["attention"], "max_new_tokens": settings["max_new_tokens"],
                 "do_sample": False, "batch_size": settings["batch_size"],
+                "decoding": settings["decoding"],
+                "allowed_class_count": len(classes),
+                "effective_generation": {"num_beams": 1, "num_return_sequences": 1, "min_length": 0,
+                    "min_new_tokens": 0, "repetition_penalty": 1.0, "no_repeat_ngram_size": 0, "use_cache": True},
                 "cache_sha256": manifest_meta["cache_sha256"],
                 "model_environment_sha256": fingerprint(pinned_environment)}
             store = AnnotationStore(progress, manifest, classes, settings["model"], annotation_settings,
@@ -138,7 +145,7 @@ def run(args):
             started = time.monotonic()
             for start in range(0, len(todo), settings["batch_size"]):
                 batch = todo[start:start + settings["batch_size"]]
-                raw_outputs = predictor([row["path"] for row in batch], prompt, settings["max_new_tokens"])
+                raw_outputs = predictor([row["path"] for row in batch], prompt, settings["max_new_tokens"], classes=classes)
                 if len(raw_outputs) != len(batch):
                     raise ValueError("Qwen returned an unexpected batch length")
                 rejected = []

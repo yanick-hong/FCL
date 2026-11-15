@@ -32,7 +32,7 @@
 | 模型与后端 | `Qwen/Qwen2.5-VL-7B-Instruct`、`qwen2.5-vl` | 配置、模型环境、实际解析的 revision 或本地权重文件 SHA |
 | 提示词 | `run_qwen_campaign.py` 中依据附录 C 转写的 `appendix_prompt()`，逐数据集插入有序类别表 | 每个数据集保存 `prompt.txt` 和 `prompt_sha256` |
 | 输出 | 仅一个零起始类别编号；严格解析 | 保存每张图的原始输出，非法输出写错误文件并中止，不猜测或回退到 CLIP |
-| 生成 | `do_sample=false`、`max_new_tokens=16`、标注种子 42 | JSONL sidecar 和运行配置 |
+| 生成 | `do_sample=false`、单 beam、`max_new_tokens=16`、标注种子 42；合法类别编号 token trie 约束 | JSONL sidecar 和运行配置 |
 | 图像预算 | `min_pixels=max_pixels=200704=448*448` | 处理器参数与模型环境 |
 | 推理数值与批量 | `bfloat16`、`sdpa`、`batch_size=8` | 模型环境、配置及依赖版本 |
 | 标注范围 | train、val、test | 每个 split 独立 manifest、进度、准确率与 overlay 来源 |
@@ -50,6 +50,8 @@ Reply with ONLY the integer id.
 ```
 
 该模板与通用 `python -m src.utils.annotation qwen --prompt-variant C` 的内置短模板不同，不能只因为都名为 C 就混用。应比较实际 `prompt.txt`、类别顺序和 SHA。代码会保存模型 revision；配置中请求 `main` 不等于一个永久不变的权重版本，恢复运行必须核对首次加载的实际 revision 或本地文件指纹。
+
+当前配置已固定官方 revision `cc594898137f460bfe9f0759e9844b3ce807cfb5`。初次未约束 greedy 尝试在 DTD 验证集输出过越界编号 `48`（有效范围 0–46），严格校验后停止。该失败尝试单独保留；正式矩阵统一重新生成，解码仅允许合法类别 ID 的标准字符串 token 序列及终止符，无前导零、空白或真实标签参与。约束支持多 token 编号和共享前缀，不能把它解释为全类别最大似然打分或校准概率，也不与旧未约束结果合并。
 
 Qwen 当前输出离散类别，导出时对应概率行是 one-hot，并标注 `one_hot_from_label`。它表示硬标签，不能被解释为模型校准后的置信分布。Qwen overlay 保留原 CLIP 概率为 `original_clip_probs_*`，供需要 CLIP 软标签的对照读取。
 
