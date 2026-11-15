@@ -6,9 +6,13 @@ import csv
 import io
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from paths import OUTPUT_ROOT
 
 METHOD_ORDER = (
     "fcl_auc_ce", "nlprompt", "dcd", "ido", "dld",
@@ -30,11 +34,13 @@ METHOD_NAMES = {
 
 def parse_args() -> argparse.Namespace:
     project_root = Path(__file__).resolve().parents[1]
-    default_outputs = Path(os.environ.get("OUTPUT_ROOT", str(project_root / "outputs")))
+    default_outputs = OUTPUT_ROOT
     parser = argparse.ArgumentParser()
     parser.add_argument("--outputs-root", type=Path, default=default_outputs)
     parser.add_argument("--format", choices=("markdown", "csv"), default="markdown")
     parser.add_argument("--output", type=Path, default=None)
+    parser.add_argument("--metric", choices=("validation", "test"), default="validation",
+                        help="Explicit metric; legacy default is validation, not test accuracy.")
     return parser.parse_args()
 
 
@@ -43,11 +49,20 @@ def latest_metrics_file(method_dir: Path) -> Path | None:
     return max(files, key=lambda path: (path.parent.name, path.stat().st_mtime_ns)) if files else None
 
 
-def read_accuracy(metrics_file: Path) -> float | None:
+def read_accuracy(metrics_file: Path, metric: str = "validation") -> float | None:
     try:
         metrics: dict[str, Any] = json.loads(metrics_file.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return None
+    if metrics.get("status") in {"failed", "running"}:
+        return None
+    if metric == "test":
+        if metrics.get("test_accuracy") is not None:
+            return float(metrics["test_accuracy"])
+        block = metrics.get("test")
+        if isinstance(block, dict) and block.get("accuracy") is not None:
+            return float(block["accuracy"])
+        return None  # Never silently substitute validation for test results.
     for key in ("best_val_accuracy", "best_val_acc"):
         if metrics.get(key) is not None:
             return float(metrics[key])
@@ -63,7 +78,7 @@ def read_accuracy(metrics_file: Path) -> float | None:
     return None
 
 
-def collect_rows(outputs_root: Path) -> list[dict[str, str]]:
+def collect_rows(outputs_root: Path, metric: str = "validation") -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     if not outputs_root.is_dir():
         raise FileNotFoundError(outputs_root)
@@ -74,7 +89,7 @@ def collect_rows(outputs_root: Path) -> list[dict[str, str]]:
             metrics_file = latest_metrics_file(dataset_dir / method)
             if metrics_file is None:
                 continue
-            accuracy = read_accuracy(metrics_file)
+            accuracy = read_accuracy(metrics_file, metric)
             rows.append({
                 "method": METHOD_NAMES[method],
                 "dataset": dataset_dir.name,
@@ -100,7 +115,7 @@ def render_csv(rows: list[dict[str, str]]) -> str:
 
 def main() -> None:
     args = parse_args()
-    rows = collect_rows(args.outputs_root.expanduser().resolve())
+    rows = collect_rows(args.outputs_root.expanduser().resolve(), args.metric)
     if not rows:
         raise SystemExit("No metrics.json files found.")
     content = render_markdown(rows) if args.format == "markdown" else render_csv(rows)

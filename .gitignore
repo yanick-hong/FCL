@@ -1,5 +1,6 @@
 # Local data and experiment artifacts. Keep these outside version control.
 data/
+dataset/
 outputs/
 save/
 weights/
@@ -20,3 +21,14 @@ venv/
 
 # Temporary local SSH authentication helper; never commit credentials.
 _ssh_askpass*.cmd
+
+# Recoverable non-experiment archive and temporary maintenance files.
+.experiment_archive/
+tmp/
+texput.log
+_stanford_*.bin
+
+# Ablation code/configuration is tracked; generated data and models are not.
+ablation/**/results/
+ablation/**/smoke/
+ablation/**/runner.log

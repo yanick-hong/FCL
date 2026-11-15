@@ -303,6 +303,9 @@ def build_or_load_clip_cache_eurosat(
 
         # 元信息
         "class_names": class_names,
+        "train_indices": torch.as_tensor(train_idx, dtype=torch.long),
+        "val_indices": torch.as_tensor(val_idx, dtype=torch.long),
+        "test_indices": torch.as_tensor(test_idx, dtype=torch.long),
         "image_size": int(image_size),
         "model_name": model_name,
         "seed": int(seed),

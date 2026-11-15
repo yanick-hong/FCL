@@ -38,7 +38,7 @@ from pathlib import Path
 _SRC_ROOT = Path(__file__).resolve().parents[2]
 if str(_SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(_SRC_ROOT))
-from paths import DATA_ROOT, clip_cache
+from paths import RAW_ROOT, WEIGHTS_ROOT, clip_cache
 
 
 def set_seed(seed: int = 42):
@@ -121,7 +121,7 @@ def encode_image_set(model, preprocess, dataset, index_list: List[int],
         targets = targets.to(device, non_blocking=True)
 
         image_features = model.encode_image(images)
-        image_features = F.normalize(image_features, dim=-1)  # (B,D)
+        image_features = F.normalize(image_features, dim=-1).float()  # (B,D)
 
         logits = logit_scale * image_features @ text_features.t()  # (B,C)
         probs = torch.softmax(logits, dim=-1)
@@ -141,12 +141,14 @@ def encode_image_set(model, preprocess, dataset, index_list: List[int],
 
 def main():
     parser = argparse.ArgumentParser("Extract CLIP (ViT-L/14) cache for Caltech-101")
-    parser.add_argument("--data_root", type=str, default=str(DATA_ROOT))
+    parser.add_argument("--data_root", type=str, default=str(RAW_ROOT))
     parser.add_argument("--out_path", type=str, default=str(clip_cache("caltech101")))
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--pretrained", type=str, default="openai")
+    parser.add_argument("--backend", choices=("openai", "open_clip"), default="openai",
+                        help="OpenAI uses the existing local CLIP weights; split protocol is unchanged.")
     parser.add_argument("--model", type=str, default="ViT-L-14")
     parser.add_argument("--force_rebuild", action="store_true", help="忽略已有缓存并重新提取")
     args = parser.parse_args()
@@ -162,8 +164,16 @@ def main():
     print(f"[Info] device={device} | model={args.model} | weights={args.pretrained}")
 
     # 1) 加载 OpenCLIP
-    model, _, preprocess = open_clip.create_model_and_transforms(args.model, pretrained=args.pretrained, device=device)
-    tokenizer = open_clip.get_tokenizer(args.model)
+    if args.backend == "openai":
+        import clip
+        model, preprocess = clip.load(args.model.replace("ViT-L-14", "ViT-L/14"),
+                                      device=device, download_root=str(WEIGHTS_ROOT))
+        tokenizer = clip.tokenize
+    else:
+        model, _, preprocess = open_clip.create_model_and_transforms(
+            args.model, pretrained=args.pretrained, device=device, cache_dir=str(WEIGHTS_ROOT))
+        tokenizer = open_clip.get_tokenizer(args.model)
+    model.eval()
 
     # 2) 下载并加载 Caltech-101
     print("[Load] Caltech-101 (may download on first run)...")
@@ -268,11 +278,15 @@ def main():
         # meta info
         "class_names": keep_names,
         "prompts": prompts,
+        "train_indices": torch.tensor(train_idx, dtype=torch.long),
+        "val_indices": torch.tensor(val_idx, dtype=torch.long),
+        "test_indices": torch.tensor(test_idx, dtype=torch.long),
         "meta": {
             "dataset": "Caltech-101 (no BACKGROUND_Google)",
             "num_classes": C,
             "model": args.model,
             "pretrained": args.pretrained,
+            "backend": args.backend,
             "feat_dim": int(tr_feats.shape[1]),
             "num_train": int(tr_feats.shape[0]),
             "num_val": int(va_feats.shape[0]),

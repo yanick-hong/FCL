@@ -6,6 +6,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from paths import OUTPUT_ROOT, PROCESSED_ROOT
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -18,7 +21,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def latest_run(root: Path, dataset: str, method: str) -> Path | None:
-    runs = sorted((root / "outputs" / dataset / method).glob("*/metrics.json"))
+    runs = sorted((OUTPUT_ROOT / dataset / method).glob("*/metrics.json"))
     return runs[-1].parent if runs else None
 
 
@@ -30,7 +33,7 @@ def run(command: list[str], root: Path) -> None:
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
-    processed = root / "data" / "processed"
+    processed = PROCESSED_ROOT
     available = sorted(
         path.name.removesuffix("_clip_vit-l-14_embeddings.pt")
         for path in processed.glob("*_clip_vit-l-14_embeddings.pt")

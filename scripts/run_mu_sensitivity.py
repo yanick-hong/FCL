@@ -12,7 +12,7 @@ SRC_ROOT = ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from paths import OUTPUT_ROOT
+from paths import OUTPUT_ROOT, PROCESSED_ROOT
 
 
 def parse_args() -> argparse.Namespace:
@@ -27,7 +27,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     root = ROOT
-    processed = root / "data" / "processed"
+    processed = PROCESSED_ROOT
     for dataset in args.datasets:
         cache = processed / f"{dataset}_clip_vit-l-14_embeddings.pt"
         observed = processed / f"{dataset}_observed_labels.pt"

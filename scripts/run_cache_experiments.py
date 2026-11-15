@@ -8,6 +8,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from paths import OUTPUT_ROOT, PROCESSED_ROOT
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -24,7 +27,7 @@ def slug_from_cache(path: Path) -> str:
 
 
 def latest_run(root: Path, dataset: str, method: str) -> Path | None:
-    runs = sorted((root / "outputs" / dataset / method).glob("*/metrics.json"))
+    runs = sorted((OUTPUT_ROOT / dataset / method).glob("*/metrics.json"))
     return runs[-1].parent if runs else None
 
 
@@ -36,7 +39,7 @@ def run(cmd: list[str], root: Path) -> None:
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
-    processed = root / "data" / "processed"
+    processed = PROCESSED_ROOT
     available = sorted(slug_from_cache(p) for p in processed.glob("*_clip_vit-l-14_embeddings.pt"))
     datasets = args.datasets or available
     env = os.environ.copy()
@@ -49,7 +52,7 @@ def main() -> None:
             continue
         if not args.skip_fcl and latest_run(root, dataset, "fcl_auc_ce") is None:
             stamp = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-            run_dir = root / "outputs" / dataset / "fcl_auc_ce" / stamp
+            run_dir = OUTPUT_ROOT / dataset / "fcl_auc_ce" / stamp
             run_dir.mkdir(parents=True, exist_ok=True)
             run([sys.executable, "src/fcl/train_auc_ce.py", "--cache", str(cache),
                  "--obs_labels_path", str(obs), "--max_epochs", str(args.fcl_epochs),

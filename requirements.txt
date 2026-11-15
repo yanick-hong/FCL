@@ -1,16 +1,15 @@
-numpy==1.19.5
-pandas==1.4.2
-protobuf==3.18.0
-scikit-learn==1.0
-scipy==1.7.1
-tensorflow-addons==0.16.1
-tensorflow-datasets==4.4.0
-tensorflow-estimator==2.6.0
-tensorflow-hub==0.12.0
-tensorflow-metadata==1.2.0
-tensorflow-probability==0.14.1
-robustness-metrics @ git+https://github.com/google-research/robustness_metrics.git@1ee550e0bf4ed5d479be0426956dc2fa758a820e
-edward2 @ git+https://github.com/google/edward2.git@5437837ae94b5a7152d9c25bc4175e3ef732e513
-uncertainty-baselines @ git+https://github.com/google/uncertainty-baselines.git@c53945244566e3e47c8ad2e285925d52f880f3ae
-typing-extensions==3.7.4.3
-PyYAML>=6.0
+# PyTorch cache-only experiment environment. Keep AutoDL CUDA wheels.
+torch>=2.5,<3
+torchvision>=0.20,<1
+numpy>=1.26,<3
+scipy>=1.11,<2
+scikit-learn>=1.5,<2
+matplotlib>=3.8,<4
+PyYAML>=6,<7
+Pillow>=10
+tqdm>=4.66
+ftfy>=6
+regex
+open-clip-torch>=3,<4
+# OpenAI CLIP is already installed on AutoDL. For a fresh environment:
+# python -m pip install git+https://github.com/openai/CLIP.git

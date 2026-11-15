@@ -7,6 +7,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from paths import OUTPUT_ROOT, PROCESSED_ROOT
 
 METHODS = (
     "clip_conf_ce", "random_filter_ce", "clip_zero_ce", "fcl_filter_ce",
@@ -30,7 +33,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def has_completed_seed(root: Path, dataset: str, method: str, seed: int) -> bool:
-    for metrics_file in (root / "outputs" / dataset / method).glob("*/metrics.json"):
+    for metrics_file in (OUTPUT_ROOT / dataset / method).glob("*/metrics.json"):
         try:
             metrics = json.loads(metrics_file.read_text(encoding="utf-8"))
             recorded = metrics.get("selection", {}).get("args", {}).get("seed")
@@ -49,7 +52,7 @@ def run(command: list[str], root: Path) -> None:
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
-    processed = root / "data" / "processed"
+    processed = PROCESSED_ROOT
     available = sorted(path.name.removesuffix("_clip_vit-l-14_embeddings.pt")
                        for path in processed.glob("*_clip_vit-l-14_embeddings.pt"))
     datasets = args.datasets or available

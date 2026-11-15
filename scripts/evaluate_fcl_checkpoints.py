@@ -20,7 +20,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from paths import clip_cache
+from paths import clip_cache, OUTPUT_ROOT
 
 
 def latest_metrics(output_root: Path, dataset: str) -> Path | None:
@@ -55,7 +55,7 @@ def evaluate_checkpoint(checkpoint: Path, cache_path: Path) -> dict[str, float]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--outputs-root", type=Path, default=ROOT / "outputs")
+    parser.add_argument("--outputs-root", type=Path, default=OUTPUT_ROOT)
     parser.add_argument("--datasets", nargs="+", default=None)
     args = parser.parse_args()
     output_root = args.outputs_root.expanduser().resolve()

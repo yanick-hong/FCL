@@ -41,12 +41,12 @@ def _rooted(value: str | Path) -> Path:
     return path if path.is_absolute() else (ROOT / path).resolve()
 
 
-DATA_ROOT = _rooted(os.environ.get("DATA_ROOT", _DEFAULTS.get("data_root", "./data")))
+DATA_ROOT = _rooted(os.environ.get("DATA_ROOT", _DEFAULTS.get("data_root", "./dataset")))
 OUTPUT_ROOT = _rooted(os.environ.get("OUTPUT_ROOT", _DEFAULTS.get("output_root", "./outputs")))
-WEIGHTS_ROOT = _rooted(os.environ.get("WEIGHTS_ROOT", _DEFAULTS.get("weights_root", "./weights")))
+WEIGHTS_ROOT = _rooted(os.environ.get("WEIGHTS_ROOT", _DEFAULTS.get("weights_root", "./dataset/weights")))
 RAW_ROOT = DATA_ROOT / _DEFAULTS.get("raw_dirname", "raw")
 PROCESSED_ROOT = DATA_ROOT / _DEFAULTS.get("processed_dirname", "processed")
-SHARED_CACHE_ROOT = OUTPUT_ROOT / _DEFAULTS.get("shared_cache_dirname", "cache")
+SHARED_CACHE_ROOT = WEIGHTS_ROOT
 
 
 def dataset_root(dataset: str) -> Path:

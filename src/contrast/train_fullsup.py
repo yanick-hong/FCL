@@ -18,6 +18,7 @@ python src/contrast/train_fullsup.py \
 """
 
 import os
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 import csv
 import time
 import argparse
@@ -49,6 +50,9 @@ def set_seed(seed: int = 42):
     import random
     random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
     if torch.cuda.is_available(): torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+    torch.use_deterministic_algorithms(True, warn_only=True)
 
 
 def load_clip_cache_strict(cache_path: str) -> Dict[str, torch.Tensor]:
@@ -230,6 +234,8 @@ def train(
     min_delta: float = 0.0,
     val_dir: str = str(experiment_logs("CIFAR100_fullsup")),
     seed: int = 42,
+    experiment_name: str = "CIFAR100_fullsup",
+    dataset: str = "CIFAR100",
 ):
     set_seed(seed)
 
@@ -247,7 +253,7 @@ def train(
     # 1) DataLoader（用真实标签做均衡）
     train_ds = TensorDataset(train_feats, train_labels)
     batch_sampler = PKBatchSampler(labels=train_labels, P=P, K=K, seed=seed)
-    train_loader = DataLoader(train_ds, batch_sampler=batch_sampler, num_workers=2, pin_memory=True)
+    train_loader = DataLoader(train_ds, batch_sampler=batch_sampler, num_workers=0, pin_memory=True)
 
     # 2) 线性头 + 优化器/调度器
     head = LinearHead(D, C).to(device).float()
@@ -276,6 +282,7 @@ def train(
     print("[TRAIN] Start training (Fully Supervised CE) ...")
 
     best_for_save = float("inf") if early_metric == "loss" else -float("inf")
+    best_epoch = 0
 
     for epoch in range(1, max_epochs + 1):
         head.train()
@@ -319,6 +326,7 @@ def train(
         is_better = (cur_metric < best_for_save) if early_metric == "loss" else (cur_metric > best_for_save)
         if is_better and best_ckpt_path:
             best_for_save = cur_metric
+            best_epoch = epoch
             os.makedirs(os.path.dirname(best_ckpt_path) or ".", exist_ok=True)
             torch.save(head.state_dict(), best_ckpt_path)
             print(f"[CKPT] >>> Best ({early_metric}) saved to {best_ckpt_path}")
@@ -328,6 +336,41 @@ def train(
             print(f"[EARLY STOP] No improvement in {early_metric} for {stopper.patience} epochs. Stop.")
             break
 
+    # Test labels are used only once, after validation-based model selection.
+    test_accuracy = None
+    test_loss = None
+    test_feats = cache.get("test_feats")
+    test_labels = cache.get("test_labels")
+    if best_ckpt_path and os.path.exists(best_ckpt_path) and test_feats is not None and test_labels is not None:
+        state = torch.load(best_ckpt_path, map_location="cpu", weights_only=True)
+        head.load_state_dict(state)
+        test_loss, test_accuracy = evaluate(
+            head, F.normalize(test_feats.to(torch.float32), dim=-1),
+            test_labels.long(), batch_size=2048
+        )
+
+    metrics = {
+        "dataset": dataset, "method": "FSL-C", "selection_metric": early_metric,
+        "best_epoch": int(best_epoch),
+        "best_val_accuracy": float(best_for_save) if early_metric == "acc" else None,
+        "best_val_loss": float(best_for_save) if early_metric == "loss" else None,
+        "test_accuracy": None if test_accuracy is None else float(test_accuracy),
+        "test_loss": None if test_loss is None else float(test_loss),
+        "seed": int(seed), "deterministic": True,
+        "P": int(P), "K": int(K), "lr": float(lr), "lr_max": float(lr_max),
+        "weight_decay": float(weight_decay), "max_epochs": int(max_epochs),
+        "patience": int(patience), "best_ckpt": str(best_ckpt_path),
+        "val_csv": str(csv_path),
+    }
+    metrics_path = os.path.join(os.path.dirname(val_dir), "metrics.json")
+    with open(metrics_path, "w", encoding="utf-8") as f:
+        import json
+        json.dump(metrics, f, indent=2, ensure_ascii=False)
+    if test_accuracy is not None:
+        print(f"[TEST] best-val checkpoint | test_loss={test_loss:.5f} | test_acc={test_accuracy * 100:.2f}%")
+    else:
+        print("[TEST] test split unavailable")
+    print(f"[METRICS] {metrics_path}")
     print("[DONE] Training finished (Fully Supervised CE).")
 
 
@@ -344,26 +387,34 @@ def parse_args():
     p.add_argument("--weight_decay", type=float, default=1e-4)
     p.add_argument("--max_epochs", type=int, default=200)
     p.add_argument("--print_every", type=int, default=20)
-    p.add_argument("--best_ckpt", type=str, default=str(experiment_checkpoint("CIFAR100_fullsup")))
+    p.add_argument("--best_ckpt", type=str, default=None)
     p.add_argument("--early_metric", type=str, default="acc", choices=["loss", "acc"])
     p.add_argument("--patience", type=int, default=10)
     p.add_argument("--min_delta", type=float, default=0.0)
-    p.add_argument("--val_dir", type=str, default=str(experiment_logs("CIFAR100_fullsup")), help="验证日志输出目录（CSV/曲线）")
+    p.add_argument("--val_dir", type=str, default=None, help="验证日志输出目录（CSV/曲线）")
     p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--dataset", type=str, default="CIFAR100")
+    p.add_argument("--experiment_name", type=str, default=None)
     return p.parse_args()
 
 
 if __name__ == "__main__":
-    args = parse_args(); save_experiment_config("CIFAR100_fullsup", args); set_seed(args.seed)
+    args = parse_args()
+    experiment_name = args.experiment_name or f"{args.dataset}/fsl_c"
+    best_ckpt = args.best_ckpt or str(experiment_checkpoint(experiment_name))
+    val_dir = args.val_dir or str(experiment_logs(experiment_name))
+    save_experiment_config(experiment_name, args); set_seed(args.seed)
     train(
         cache_path=args.cache,
         P=args.P, K=args.K,
         lr=args.lr, lr_max=args.lr_max, weight_decay=args.weight_decay,
         max_epochs=args.max_epochs,
         print_every=args.print_every,
-        best_ckpt_path=args.best_ckpt,
+        best_ckpt_path=best_ckpt,
         early_metric=args.early_metric,
         patience=args.patience, min_delta=args.min_delta,
-        val_dir=args.val_dir,
+        val_dir=val_dir,
         seed=args.seed,
+        experiment_name=experiment_name,
+        dataset=args.dataset,
     )

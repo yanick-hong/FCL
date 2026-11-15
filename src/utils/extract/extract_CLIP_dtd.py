@@ -30,6 +30,17 @@ except Exception as e:
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
+class FlatDTD(datasets.DTD):
+    """Use the uploaded raw/dtd/{images,labels} without a duplicate dtd/dtd layer."""
+    def _check_exists(self):
+        flat = Path(self.root) / "dtd"
+        if (flat / "images").is_dir() and (flat / "labels").is_dir():
+            self._data_folder = flat
+            self._meta_folder = flat / "labels"
+            self._images_folder = flat / "images"
+        return super()._check_exists()
+
+
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--data_root", type=str, default=str(RAW_ROOT))
@@ -118,11 +129,11 @@ def main():
     # 某些老版本 torchvision 可能将参数名叫 partition，这里做个兼容
     def load_dtd(split: str):
         try:
-            return datasets.DTD(root=args.data_root, split=split, transform=preprocess,
+            return FlatDTD(root=args.data_root, split=split, transform=preprocess,
                                 download=args.download)
         except TypeError:
             # 兼容：有些版本使用 partition 而不是 split
-            return datasets.DTD(root=args.data_root, partition=split, transform=preprocess,
+            return FlatDTD(root=args.data_root, partition=split, transform=preprocess,
                                 download=args.download)
 
     ds_train = load_dtd("train")
@@ -183,6 +194,11 @@ def main():
         "preprocess": "CLIP_default",
         "logit_scale_exp": float(model.logit_scale.exp().item()),
         "seed": int(args.seed),
+        "partition": 1,
+    }
+    cache["sample_ids"] = {
+        split: [str(path) for path in ds._image_files]
+        for split, ds in (("train", ds_train), ("val", ds_val), ("test", ds_test))
     }
 
     torch.save({**cache, "meta": meta}, args.out)

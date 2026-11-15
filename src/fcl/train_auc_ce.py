@@ -5,7 +5,7 @@ train_auc_ce.py
 - 从缓存读取特征与标签
 - 仅训练线性头；P×K 均衡采样；验证集(CE)早停；保存 val 曲线与最佳 ckpt
 - 目标函数：Loss =  L_CE(trusted) + lam * L_AUC(untrusted)
-  * L_CE(trusted)：交叉熵仅对 s=0 可信样本（标签用 y_true）
+  * L_CE(trusted)：交叉熵仅对 s=0 已校正样本（使用实际可见的 y_obs）
   * L_AUC(untrusted)：OVR pairwise logistic AUC 仅对 s=1 不可信样本（alpha=0.5, tau=0.5）
 """
 
@@ -236,7 +236,7 @@ def train(
     clip_probs_train = cache["clip_probs_train"].to(torch.float32)
 
     N, D = train_feats.shape
-    C = int(max(train_labels.max().item(), val_labels.max().item())) + 1
+    C = int(clip_probs_train.shape[1])
     print(f"[INFO] Ntrain={N}, Nval={val_labels.numel()}, D={D}, C={C} | P={P}, K={K}, batch={P*K}")
     print(f"[OBJECTIVE] Loss = CE(trusted) + lam * AUC(untrusted) | lam={lam:.2f} | mu={mu:.2f} | tau=0.5 | early_metric=acc")
 
@@ -248,7 +248,7 @@ def train(
 
     # 2) DataLoader（用 y_obs 做均衡）
     train_ds = FeatureDataset(train_feats, train_labels, y_obs_after, s_flags, clip_probs_train)
-    batch_sampler = PKBatchSampler(labels_obs=y_obs_after, P=P, K=K, seed=42)
+    batch_sampler = PKBatchSampler(labels_obs=y_obs_after, P=P, K=K, seed=seed)
     train_loader = DataLoader(train_ds, batch_sampler=batch_sampler, num_workers=2, pin_memory=True)
 
     # 3) 线性头 + 优化器/调度器
@@ -277,7 +277,7 @@ def train(
         for ib, batch in enumerate(train_loader, start=1):
             f, y_true, y_obs, s, p_clip = batch
             f = f.to(device, dtype=torch.float32)
-            y_true = y_true.to(device); s = s.to(device)
+            y_obs = y_obs.to(device); s = s.to(device)
             p_clip = p_clip.to(device, dtype=torch.float32)
 
             logits = head(f); B = f.size(0)
@@ -285,7 +285,7 @@ def train(
 
             # CE 仅对可信样本
             if mask_t.any():
-                ce_trusted = ce_criterion(logits[mask_t], y_true[mask_t])
+                ce_trusted = ce_criterion(logits[mask_t], y_obs[mask_t])
             else:
                 ce_trusted = logits.sum()*0.0
 
@@ -323,7 +323,7 @@ def train(
         print(f"[VAL-SAVE] CSV -> {csv_path} | PNG -> {val_dir}/val_acc.png, val_loss.png")
 
         # 仅保存最佳 ckpt（early_metric 固定为 acc）
-        is_best = val_acc >= getattr(stopper, "best", -float('inf'))
+        is_best = val_acc > getattr(stopper, "best", -float('inf')) + min_delta
         if is_best and best_ckpt_path:
             os.makedirs(os.path.dirname(best_ckpt_path) or ".", exist_ok=True)
             torch.save(head.state_dict(), best_ckpt_path)
@@ -336,7 +336,9 @@ def train(
         if stopper.step(val_loss, val_acc):
             print(f"[EARLY STOP] No improvement in acc for {stopper.patience} epochs.")
             break
-    print("[DONE] Training finished.")
+    if best_ckpt_path:
+        head.load_state_dict(torch.load(best_ckpt_path, map_location=device, weights_only=True))
+    print("[DONE] Training finished; best validation checkpoint restored.")
     return head, {
         "best_val_accuracy": float(stopper.best),
         "best_epoch": int(val_epochs[int(np.argmax(val_accs))]) if val_accs else 0,

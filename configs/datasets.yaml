@@ -1,0 +1,31 @@
+# Dataset IDs are cache filename slugs. No split is silently chosen here.
+datasets:
+  cifar100:
+    labels: src/utils/labels/make_obs_labels_cifar100.py
+    extractors: [src/utils/extract/extract_CLIP_CIFAR100.py]
+    split_note: "45k train / 5k validation / 10k official test; verify cached indices."
+  caltech101:
+    labels: src/utils/labels/make_obs_labels_caltech101.py
+    extractors: [src/utils/extract/extract_CLIP_caltech101.py, src/utils/extract/extract_CLIP_imagefolder.py]
+    split_note: "Dedicated 30/10/rest (small-class fallback; backend recorded) and ImageFolder 80/10/10 are NOT interchangeable."
+  eurosat:
+    labels: src/utils/labels/make_obs_labels_eurosat.py
+    extractors: [src/utils/extract/extract_CLIP_eurosat.py, src/utils/extract/extract_CLIP_imagefolder.py]
+    split_note: "Check cached class map, split indices, preprocessing and prompt template."
+  food101:
+    labels: src/utils/labels/make_obs_labels_food101.py
+    extractors: [src/utils/extract/extract_CLIP_food101.py]
+    split_note: "Official train/test, validation sampled from train; default 100 per class."
+  tinyimagenet200:
+    labels: src/utils/labels/make_obs_labels_tinyimagenet.py
+    extractors: [src/utils/extract/extract_CLIP_tinyimagenet_openai.py, src/utils/extract/extract_CLIP_tinyimagenet.py]
+    split_note: "Default 50/class held out from train; labeled official val used as test; backend differs."
+  dtd:
+    labels: src/utils/labels/make_obs_labels_dtd.py
+    extractors: [src/utils/extract/extract_CLIP_dtd.py, src/utils/extract/extract_CLIP_imagefolder.py]
+    split_note: "Dedicated official partition and ImageFolder 80/10/10 are NOT interchangeable."
+  stanfordcars:
+    optional: true
+    labels: src/utils/labels/make_obs_labels_stanford_cars.py
+    extractors: [src/utils/extract/extract_CLIP_stanford_cars.py]
+    split_note: "Require cars_test_annos_withlabels.mat; reject invalid test labels."
