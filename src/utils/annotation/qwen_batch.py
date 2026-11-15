@@ -11,7 +11,7 @@ class BatchedQwenPredictor:
         from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
         self.torch = torch
         self.processor = AutoProcessor.from_pretrained(model_name, revision=revision,
-            min_pixels=min_pixels, max_pixels=max_pixels)
+            min_pixels=min_pixels, max_pixels=max_pixels, use_fast=True)
         self.processor.tokenizer.padding_side = "left"
         self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_name,
             revision=revision, torch_dtype=getattr(torch, dtype), device_map="auto",
@@ -21,6 +21,10 @@ class BatchedQwenPredictor:
                          "resolved_commit": getattr(self.model.config, "_commit_hash", None),
                          "dtype": dtype, "attention": attention,
                          "min_pixels": min_pixels, "max_pixels": max_pixels,
+                         "processor_use_fast": True,
+                         "image_processor_class": type(self.processor.image_processor).__name__,
+                         "image_processor_config": self.processor.image_processor.to_dict(),
+                         "device_map": {key: str(value) for key, value in self.model.hf_device_map.items()},
                          "packages": {name: importlib.metadata.version(name) for name in
                                       ("torch", "transformers", "accelerate", "Pillow")}}
 

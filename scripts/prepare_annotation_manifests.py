@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import pickle
 import sys
 
@@ -157,6 +157,116 @@ def consistent_identity(cache, split, kind, recovered=None):
     return expected
 
 
+def safe_relative_image(root, value):
+    """Resolve a dataset-relative POSIX identity without permitting escapes."""
+    value = str(value)
+    parts = value.split("/")
+    relative = PurePosixPath(value)
+    if (not value or relative.is_absolute() or "\\" in value or ":" in value
+            or any(part in ("", ".", "..") for part in parts)):
+        raise ValueError(f"Unsafe dataset-relative image identity: {value!r}")
+    destination = Path(root).joinpath(*parts).resolve()
+    if not destination.is_relative_to(Path(root).resolve()):
+        raise ValueError(f"Image identity escapes raw dataset root: {value!r}")
+    return destination, tuple(parts)
+
+
+def recover_tiny_images(cache, raw_root, classes):
+    """Use saved row identities, checking WordNet labels without resampling."""
+    base = Path(raw_root) / "tiny-imagenet-200"
+    wnids_file, annotations_file = base / "wnids.txt", base / "val/val_annotations.txt"
+    wnids = [line.strip() for line in wnids_file.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if (not wnids or len(set(wnids)) != len(wnids) or len(wnids) != len(classes)
+            or list(cache.get("wnids", [])) != wnids):
+        raise ValueError("Tiny-ImageNet official/cache WordNet class order differs")
+    lookup = {wnid: index for index, wnid in enumerate(wnids)}
+    annotations = {}
+    for line in annotations_file.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        fields = line.split()
+        if len(fields) < 2 or fields[1] not in lookup:
+            raise ValueError("Invalid Tiny-ImageNet official validation annotation")
+        _, parts = safe_relative_image(base / "val/images", fields[0])
+        if len(parts) != 1 or fields[0] in annotations:
+            raise ValueError("Duplicate/invalid Tiny-ImageNet validation image name")
+        annotations[fields[0]] = fields[1]
+    paths, identities = {}, {}
+    for split in ("train", "val", "test"):
+        ids = consistent_identity(cache, split, "id")
+        if ids is None or len(ids) != len(cache[f"{split}_labels"]):
+            raise ValueError(f"Tiny-ImageNet requires saved row identities: {split}")
+        paths[split], identities[split] = [], ids
+        for sample_id, label in zip(ids, cache[f"{split}_labels"].tolist()):
+            image, parts = safe_relative_image(base, sample_id)
+            if split == "test":
+                if len(parts) != 3 or parts[:2] != ("val", "images") or parts[2] not in annotations:
+                    raise ValueError(f"Tiny-ImageNet test identity lacks an official annotation: {sample_id}")
+                wnid = annotations[parts[2]]
+            else:
+                if len(parts) != 4 or parts[0] != "train" or parts[2] != "images" or parts[1] not in lookup:
+                    raise ValueError(f"Invalid Tiny-ImageNet {split} image identity: {sample_id}")
+                wnid = parts[1]
+            if lookup[wnid] != int(label):
+                raise ValueError(f"Tiny-ImageNet image/WordNet label differs from frozen cache: {split}/{sample_id}")
+            if image.suffix != ".JPEG" or not image.is_file():
+                raise FileNotFoundError(image)
+            paths[split].append(str(image))
+    sources = [wnids_file, annotations_file]
+    if (base / "words.txt").is_file():
+        sources.append(base / "words.txt")
+    return paths, identities, {"method": "saved_relative_sample_ids_and_official_wordnet_labels",
+        "source_files_sha256": {str(path): sha256_file(path) for path in sources},
+        "historical_features_reencoded": False, "class_order_and_all_labels_verified": True}
+
+
+def recover_dtd_images(cache, raw_root, classes):
+    """Replay DTD partition 1's file order and verify every saved absolute ID."""
+    base, images = Path(raw_root) / "dtd", Path(raw_root) / "dtd/images"
+    if cache.get("meta", {}).get("partition", 1) != 1:
+        raise ValueError("DTD identity recovery requires the frozen partition 1")
+    partitions, sources = {}, []
+    all_classes = set()
+    for split in ("train", "val", "test"):
+        source = base / "labels" / f"{split}1.txt"
+        sources.append(source)
+        rows = [line.strip() for line in source.read_text(encoding="utf-8").splitlines() if line.strip()]
+        partitions[split] = []
+        for row in rows:
+            image, parts = safe_relative_image(images, row)
+            if len(parts) != 2:
+                raise ValueError(f"Invalid DTD partition image identity: {row}")
+            all_classes.add(parts[0])
+            partitions[split].append((image, parts[0]))
+    if list(classes) != sorted(all_classes):
+        raise ValueError("DTD official/cache class order differs")
+    lookup = {name: index for index, name in enumerate(classes)}
+    if cache.get("meta", {}).get("class_to_idx", lookup) != lookup:
+        raise ValueError("DTD frozen class_to_idx differs from the official class order")
+    paths, identities = {}, {}
+    for split in ("train", "val", "test"):
+        ids = consistent_identity(cache, split, "id")
+        official = partitions[split]
+        if ids is None or len(ids) != len(official) or len(ids) != len(cache[f"{split}_labels"]):
+            raise ValueError(f"DTD saved identities differ from partition 1 size: {split}")
+        paths[split], identities[split] = [], ids
+        for sample_id, label, (expected_image, class_name) in zip(ids, cache[f"{split}_labels"].tolist(), official):
+            original = Path(sample_id)
+            if not original.is_absolute() or ".." in original.parts:
+                raise ValueError(f"DTD saved image identity must be an absolute safe path: {sample_id}")
+            image = original.resolve()
+            if not image.is_relative_to(images.resolve()) or image != expected_image:
+                raise ValueError(f"DTD saved image order differs from official partition 1: {split}/{sample_id}")
+            if int(label) != lookup[class_name] or image.parent.name != class_name:
+                raise ValueError(f"DTD image class differs from frozen cache label: {split}/{sample_id}")
+            if not image.is_file():
+                raise FileNotFoundError(image)
+            paths[split].append(str(image))
+    return paths, identities, {"method": "saved_absolute_sample_ids_and_official_dtd_partition1_order",
+        "partition": 1, "source_files_sha256": {str(path): sha256_file(path) for path in sources},
+        "historical_features_reencoded": False, "class_order_and_all_labels_verified": True}
+
+
 def prepare(dataset, cache_path, destination, cifar_raw=None, raw_root=None):
     import torch
     cache_path, destination = Path(cache_path), Path(destination)
@@ -198,6 +308,9 @@ def prepare(dataset, cache_path, destination, cifar_raw=None, raw_root=None):
         recovery["extraction_records"] = {str(path): {"sha256": sha256_file(path),
                                                       "content": json.loads(path.read_text(encoding="utf-8"))}
                                            for path in markers}
+    elif dataset in ("tinyimagenet200", "dtd"):
+        recover = recover_tiny_images if dataset == "tinyimagenet200" else recover_dtd_images
+        paths, recovered_ids, recovery = recover(cache, raw_root, classes)
     rows, split_counts = [], {}
     all_ids = set()
     all_paths = set()
@@ -226,7 +339,7 @@ def prepare(dataset, cache_path, destination, cifar_raw=None, raw_root=None):
                 "original_class_names": classes, "display_class_names": display_classes,
                 "split_counts": split_counts, "order": "exact cache order in every split",
                 "identity_recovery": recovery,
-                "legacy_cache_order_verified": bool(recovery),
+                "legacy_cache_order_verified": bool(recovery) and dataset not in ("tinyimagenet200", "dtd"),
                 "ground_truth_in_manifest": False}
     write_immutable(destination / "manifest_metadata.json", json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps(metadata, ensure_ascii=False), flush=True)
