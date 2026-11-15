@@ -37,6 +37,6 @@ This snapshot records measured test accuracy from `/root/autodl-tmp/outputs/pape
 | Tiny-ImageNet-200 | CSGN | 83.30 | 80.42 | complete |
 | Tiny-ImageNet-200 | FCL | 84.07 | 81.30 | complete |
 
-Stanford Cars has no local cache because the official test labels file was unavailable on AutoDL. Food-101 is being downloaded from the official archive with resumable 8-way Range requests; its five training methods will be added after extraction and cache validation.
+Stanford Cars has no local cache because the official test labels file was unavailable on AutoDL. Food-101 is being downloaded from the official archive with resumable 8-way Range requests; its main-suite controls and learners will be added after extraction and cache validation.
 
 The Caltech-101 comparison baselines are substantially below the published values, which is retained as an explicit protocol/result discrepancy rather than silently replacing the measured values.
