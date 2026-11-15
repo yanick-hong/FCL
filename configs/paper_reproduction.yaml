@@ -1,0 +1,88 @@
+version: 1
+description: "Executable recovery protocol; paper values are references, not reproduced results."
+protocol:
+  model: "CLIP ViT-L/14 (frozen, 768 dimensional features)"
+  image_size: 224
+  epochs: 100
+  seeds: [42]
+  lr: 0.001
+  lr_max: 0.005
+  weight_decay: 0.0001
+  lam: 1.0
+  mu: 0.5
+  rho: 0.3
+  pairwise_tau: 0.5
+  batch_size: 1024
+  selection: "maximum validation accuracy; test evaluated after selection"
+  epoch_note: "100 epochs follows Figure 2; the paper does not specify a unique final epoch budget."
+  batch_note: "P/K below are executable recovery choices from available launchers, not fully documented paper constants."
+sources:
+  clip:
+    cache_template: "{processed}/{dataset}_clip_vit-l-14_embeddings.pt"
+    obs_template: "{processed}/paper_labels/{dataset}_clip_rho-{rho}.pt"
+    model: "OpenAI CLIP ViT-L/14"
+  qwen:
+    cache_template: "{processed}/{dataset}_qwen_prompt-{prompt}_embeddings.pt"
+    obs_template: "{processed}/paper_labels/{dataset}_qwen_prompt-{prompt}_rho-{rho}.pt"
+    model: "Qwen/Qwen2.5-VL-7B-Instruct"
+    note: "Requires an explicitly imported/generated derived cache. Never falls back to CLIP labels."
+methods:
+  zero_shot: "Evaluate source pseudo-labels without a trained classifier."
+  fl_c: "CE on corrected samples (s=0), using their observed labels."
+  nl_c: "CE on uncorrected samples (s=1), using source pseudo-labels."
+  fs_c: "CE on every training sample with dataset ground truth (oracle)."
+  l2b: "Existing frozen-feature L2B adaptation."
+  dld: "Existing frozen-feature directional-label-diffusion adaptation."
+  csgn: "Existing frozen-feature CSGN adaptation."
+  fcl: "CE(s=0) + lam * soft pairwise AUC(s=1); detached posterior weights."
+datasets:
+  cifar100:
+    paper_train_samples: 45000
+    paper_classes: 100
+    P: 32
+    K: 32
+    split: "45,000 train / 5,000 validation (50 per class) / 10,000 official test."
+  caltech101:
+    paper_train_samples: 2945
+    paper_classes: 102
+    P: 8
+    K: 8
+    split: "Legacy dedicated split; 30 train / 10 validation / remainder per class with small-class fallback. Includes background as class 102 in the paper."
+  stanfordcars:
+    paper_train_samples: 7410
+    paper_classes: 196
+    P: 16
+    K: 16
+    split: "Official training set minus held-out validation; official labeled test. Verify exact recovered indices."
+  eurosat:
+    paper_train_samples: 21600
+    paper_classes: 10
+    P: 8
+    K: 8
+    split: "21,600 training samples; preserve and audit cached validation/test indices."
+  food101:
+    paper_train_samples: 65650
+    paper_classes: 101
+    P: 32
+    K: 32
+    split: "Official train minus 100 validation samples per class; official test."
+  tinyimagenet200:
+    paper_train_samples: 90000
+    paper_classes: 200
+    P: 16
+    K: 16
+    split: "90,000 train / 10,000 validation (50 per class); official labeled validation used as test."
+ablations:
+  lambda:
+    datasets: [cifar100, food101, tinyimagenet200]
+    values: [0, 1, 2, 5, 10, 20, 50, 100]
+  rho:
+    datasets: [cifar100, stanfordcars, tinyimagenet200]
+    values: [0.1, 0.2, 0.3, 0.4, 0.5]
+  prompts:
+    datasets: [stanfordcars, caltech101, eurosat]
+    values: [A, B, C]
+    source: qwen
+  epochs:
+    datasets: [cifar100, caltech101]
+    epochs: 100

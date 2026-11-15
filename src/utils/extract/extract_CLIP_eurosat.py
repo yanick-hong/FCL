@@ -170,7 +170,7 @@ def stratified_split_by_ratio(labels: np.ndarray,
 # 编码一个 split
 # -----------------------
 @torch.no_grad()
-def encode_split(clip_model, loader, label_embeds, name="train"):
+def encode_split(clip_model, loader, label_embeds, name="train", probability_logit_scale=1.0):
     feats_list, labels_list, probs_list, argmax_list = [], [], [], []
     total = len(loader.dataset)
     seen = 0
@@ -179,7 +179,7 @@ def encode_split(clip_model, loader, label_embeds, name="train"):
         f = clip_model.encode_image(xb)        # (B,D)
         f = f.to(torch.float32)
         f = F.normalize(f, dim=-1)
-        logits_clip = f @ label_embeds.t()     # (B,C)
+        logits_clip = probability_logit_scale * (f @ label_embeds.t())
         probs_clip = F.softmax(logits_clip, dim=-1).to(torch.float32)
         yhat = probs_clip.argmax(dim=-1)
 
@@ -214,14 +214,20 @@ def build_or_load_clip_cache_eurosat(
     test_ratio: float = 0.1,
     seed: int = 42,
     force_rebuild: bool = False,
+    protocol: str = "legacy",
 ) -> Dict[str, torch.Tensor]:
 
-    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+    if protocol not in ("legacy", "clip"):
+        raise ValueError("protocol must be legacy or clip")
+    os.makedirs(os.path.dirname(cache_path) or ".", exist_ok=True)
 
     if (not force_rebuild) and os.path.exists(cache_path):
         try:
             print(f"[CACHE] Loading from: {cache_path}")
             data = torch.load(cache_path, map_location="cpu")
+            cached_protocol = data.get("meta", {}).get("protocol", "legacy")
+            if cached_protocol != protocol:
+                raise FileExistsError(f"Existing cache uses {cached_protocol}; select a new --cache for {protocol}")
             # 统一 dtypes（对齐 CIFAR 版）
             fp32_keys = [
                 "train_feats","val_feats","test_feats",
@@ -241,7 +247,7 @@ def build_or_load_clip_cache_eurosat(
             print("[CACHE] Loaded successfully.")
             return data
         except Exception as e:
-            print(f"[CACHE] Failed to load existing cache ({e}), will rebuild.")
+            raise RuntimeError(f"Existing cache was preserved; use a new output path or explicit --force_rebuild: {e}") from e
 
     t0 = time.time()
     set_seed(seed)
@@ -250,7 +256,10 @@ def build_or_load_clip_cache_eurosat(
     base = torchvision.datasets.EuroSAT(
         root=root, download=True, transform=None  # 先不变换
     )
-    transform = get_transform(image_size=image_size)
+    clip_model, preprocess = clip.load(model_name, device=device)
+    clip_model = clip_model.eval()
+    transform = preprocess if protocol == "clip" else get_transform(image_size=image_size)
+    probability_logit_scale = float(clip_model.logit_scale.exp().item()) if protocol == "clip" else 1.0
     ds = EuroSATWrapper(base, transform)
     labels_all = ds.targets  # (N,)
     class_names = ds.classes
@@ -267,8 +276,6 @@ def build_or_load_clip_cache_eurosat(
     test_set  = Subset(ds, test_idx.tolist())
 
     # 3) 模型与文本标签嵌入
-    clip_model, _ = clip.load(model_name, device=device)
-    clip_model = clip_model.eval()
     print(f"[CLIP] Loaded {model_name} on {device}.")
     label_embeds = build_clip_label_embedding(clip_model, class_names).to(device)  # (C,D)
 
@@ -281,9 +288,9 @@ def build_or_load_clip_cache_eurosat(
                               num_workers=num_workers, pin_memory=True)
 
     # 5) 编码三个 split
-    train_feats, train_labels, clip_probs_train, clip_argmax_train = encode_split(clip_model, train_loader, label_embeds, "train")
-    val_feats,   val_labels,   clip_probs_val,   clip_argmax_val   = encode_split(clip_model, val_loader,   label_embeds, "val")
-    test_feats,  test_labels,  clip_probs_test,  clip_argmax_test  = encode_split(clip_model, test_loader,  label_embeds, "test")
+    train_feats, train_labels, clip_probs_train, clip_argmax_train = encode_split(clip_model, train_loader, label_embeds, "train", probability_logit_scale)
+    val_feats,   val_labels,   clip_probs_val,   clip_argmax_val   = encode_split(clip_model, val_loader,   label_embeds, "val", probability_logit_scale)
+    test_feats,  test_labels,  clip_probs_test,  clip_argmax_test  = encode_split(clip_model, test_loader,  label_embeds, "test", probability_logit_scale)
 
     # 6) 保存（键名与 CIFAR 版保持一致）
     split_note = f"Stratified per-class split with ratios train={1.0-val_ratio-test_ratio:.2f}, val={val_ratio:.2f}, test={test_ratio:.2f} (seed={seed})."
@@ -310,6 +317,19 @@ def build_or_load_clip_cache_eurosat(
         "model_name": model_name,
         "seed": int(seed),
         "split_note": split_note,
+        "sample_ids": {split: [f"eurosat/{int(i):05d}" for i in indices]
+                       for split, indices in (("train", train_idx), ("val", val_idx), ("test", test_idx))},
+        "sample_paths": {split: [str(Path(base.samples[int(i)][0]).resolve()) for i in indices]
+                         for split, indices in (("train", train_idx), ("val", val_idx), ("test", test_idx))},
+        "meta": {
+            "protocol": protocol,
+            "normalization": "CLIP_default" if protocol == "clip" else "ImageNet_mean_std_square_resize",
+            "preprocess": repr(transform),
+            "probability_logit_scale": probability_logit_scale,
+            "logit_scale": probability_logit_scale,
+            "normalization_mean": [0.48145466, 0.4578275, 0.40821073] if protocol == "clip" else [0.485, 0.456, 0.406],
+            "normalization_std": [0.26862954, 0.26130258, 0.27577711] if protocol == "clip" else [0.229, 0.224, 0.225],
+        },
     }
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
     torch.save(data, cache_path)
@@ -332,6 +352,7 @@ def parse_args():
     p.add_argument("--test_ratio", type=float, default=0.10)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--force_rebuild", action="store_true")
+    p.add_argument("--protocol", choices=("legacy", "clip"), default="legacy")
     return p.parse_args()
 
 
@@ -348,4 +369,5 @@ if __name__ == "__main__":
         test_ratio=args.test_ratio,
         seed=args.seed,
         force_rebuild=args.force_rebuild,
+        protocol=args.protocol,
     )

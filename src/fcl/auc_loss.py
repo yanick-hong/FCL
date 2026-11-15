@@ -26,7 +26,7 @@ _cuda_pair_block = torch.compile(_pair_block, dynamic=True, fullgraph=True)
 
 class _PairwiseAUC(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, scores, posterior, tau, chunk_size):
+    def forward(ctx, scores, posterior, tau, chunk_size, eps):
         m, classes = scores.shape
         gradient = torch.zeros_like(scores)
         numerator = scores.new_zeros(())
@@ -40,8 +40,8 @@ class _PairwiseAUC(torch.autograd.Function):
             numerator += num
             denominator += den
             gradient[:, start:stop] = grad.t()
-        # Original denominator is 2*denominator + 1e-12.
-        denominator = denominator + 0.5e-12
+        # Both pair orientations contribute equally in the reference objective.
+        denominator = denominator + 0.5 * eps
         gradient.div_(denominator)
         ctx.save_for_backward(gradient)
         return numerator / denominator
@@ -49,15 +49,17 @@ class _PairwiseAUC(torch.autograd.Function):
     @staticmethod
     def backward(ctx, upstream):
         (gradient,) = ctx.saved_tensors
-        return upstream * gradient, None, None, None
+        return upstream * gradient, None, None, None, None
 
 
-def soft_pairwise_auc(logits, clip_probs, s, mu=0.5, tau=0.5, chunk_size=16):
-    if not 0 <= mu <= 1 or tau <= 0 or chunk_size <= 0:
+def soft_pairwise_auc(logits, clip_probs, s, mu=0.5, tau=0.5, chunk_size=16, eps=1e-12):
+    if not 0 <= mu <= 1 or not 0 < tau < float('inf') or chunk_size <= 0 or not 0 < eps < float('inf'):
         raise ValueError('Invalid AUC parameters')
+    if logits.ndim != 2 or clip_probs.shape != logits.shape or s.shape != logits.shape[:1]:
+        raise ValueError('Expected logits/probabilities (N,C) and selection flags (N,)')
     selected = s.eq(1)
     if int(selected.sum()) < 2:
         return logits.sum() * 0
     scores = logits[selected]
     posterior = mu * scores.softmax(-1).detach() + (1-mu) * clip_probs[selected].detach()
-    return _PairwiseAUC.apply(scores, posterior, tau, chunk_size)
+    return _PairwiseAUC.apply(scores, posterior, tau, int(chunk_size), eps)

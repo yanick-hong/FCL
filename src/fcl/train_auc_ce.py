@@ -28,6 +28,7 @@ if str(_SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(_SRC_ROOT))
 from paths import clip_cache, observed_labels_cache, experiment_checkpoint, experiment_logs, save_experiment_config
 from contrast.cache_experiment import save_run_metadata
+from fcl.auc_loss import soft_pairwise_auc
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -47,6 +48,9 @@ def parse_args():
     p.add_argument("--lam", type=float, default=1)
     p.add_argument("--mu", type=float, default=0.5,
                    help="Weight of the model posterior in q=mu*p_model+(1-mu)*p_clip.")
+    p.add_argument("--tau", type=float, default=0.5,
+                   help="Positive temperature of the pairwise logistic surrogate.")
+    p.add_argument("--num_workers", type=int, default=2)
     p.add_argument("--best_ckpt", type=str, default=str(experiment_checkpoint("CIFAR100_auc_ce")))
     p.add_argument("--val_dir", type=str, default=str(experiment_logs("CIFAR100_auc_ce")))
     p.add_argument("--experiment_name", type=str, default=None,
@@ -54,7 +58,8 @@ def parse_args():
 
 
     p.add_argument("--print_every", type=int, default=20)
-    p.add_argument("--patience", type=int, default=10)
+    p.add_argument("--patience", type=int, default=10,
+                   help="Validation patience; 0 disables early stopping for fixed-epoch runs.")
     p.add_argument("--min_delta", type=float, default=0.0)
     p.add_argument("--seed", type=int, default=42)
     return p.parse_args()
@@ -65,34 +70,80 @@ def set_seed(seed: int = 42):
     random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
     if torch.cuda.is_available(): torch.cuda.manual_seed_all(seed)
 
+
+def _finite_tensor(value, name: str, ndim: int) -> torch.Tensor:
+    if not isinstance(value, torch.Tensor) or value.ndim != ndim:
+        raise ValueError(f"{name} must be a {ndim}-dimensional tensor")
+    if value.numel() == 0 or not torch.isfinite(value).all():
+        raise ValueError(f"{name} must be nonempty and finite")
+    return value
+
+
+def _label_tensor(value, name: str, count=None, classes=None) -> torch.Tensor:
+    value = _finite_tensor(value, name, 1)
+    if value.is_floating_point() and not torch.equal(value, value.round()):
+        raise ValueError(f"{name} must contain integer class labels")
+    if count is not None and len(value) != count:
+        raise ValueError(f"{name} length {len(value)} != expected {count}")
+    if (value < 0).any() or (classes is not None and (value >= classes).any()):
+        raise ValueError(f"{name} labels must be in [0, {classes})" if classes is not None
+                         else f"{name} labels must be nonnegative")
+    return value.long()
+
+
+def _probability_tensor(value, name: str, count: int, classes: int) -> torch.Tensor:
+    value = _finite_tensor(value, name, 2)
+    if value.shape != (count, classes):
+        raise ValueError(f"{name} shape {tuple(value.shape)} != {(count, classes)}")
+    value = value.float()
+    if (value < 0).any() or (value > 1).any():
+        raise ValueError(f"{name} must contain probabilities in [0,1]")
+    if not torch.allclose(value.sum(-1), torch.ones(count), atol=2e-3, rtol=2e-3):
+        raise ValueError(f"{name} probability rows must sum to one")
+    return value
+
+
 def load_clip_cache_strict(cache_path: str) -> Dict[str, torch.Tensor]:
     if not os.path.exists(cache_path):
         raise FileNotFoundError(f"Cache not found: {cache_path}")
     print(f"[CACHE] Loading from: {cache_path}")
-    data = torch.load(cache_path, map_location="cpu")
-    fp32 = ["train_feats","val_feats","test_feats",
-            "clip_probs_train","clip_probs_val","clip_probs_test",
-            "clip_label_embeds"]
-    i64  = ["train_labels","val_labels","test_labels",
-            "clip_argmax_train","clip_argmax_val","clip_argmax_test",
-            "train_idx_from_train50k","val_idx_from_train50k"]
-    for k in fp32:
-        if k in data and isinstance(data[k], torch.Tensor):
-            data[k] = data[k].to(torch.float32)
-    for k in i64:
-        if k in data and isinstance(data[k], torch.Tensor):
-            data[k] = data[k].long()
+    data = torch.load(cache_path, map_location="cpu", weights_only=True)
+    required = [f"{split}_{key}" for split in ("train", "val", "test")
+                for key in ("feats", "labels")] + ["clip_probs_train"]
+    if not isinstance(data, dict) or any(key not in data for key in required):
+        raise ValueError(f"Cache must contain {required}")
+    probabilities = _finite_tensor(data["clip_probs_train"], "clip_probs_train", 2)
+    classes = probabilities.shape[1]
+    feature_dim = None
+    for split in ("train", "val", "test"):
+        key = f"{split}_feats"
+        feats = _finite_tensor(data[key], key, 2).float()
+        if feature_dim is None:
+            feature_dim = feats.shape[1]
+        if feats.shape[1] != feature_dim:
+            raise ValueError(f"{key} feature dimension differs from train_feats")
+        data[key] = feats
+        key = f"{split}_labels"
+        data[key] = _label_tensor(data[key], key, len(feats), classes)
+        key = f"clip_probs_{split}"
+        if key in data:
+            data[key] = _probability_tensor(data[key], key, len(feats), classes)
+        key = f"clip_argmax_{split}"
+        if key in data:
+            data[key] = _label_tensor(data[key], key, len(feats), classes)
+    if "clip_label_embeds" in data:
+        data["clip_label_embeds"] = _finite_tensor(data["clip_label_embeds"], "clip_label_embeds", 2).float()
     print("[CACHE] Loaded successfully.")
     return data
 
-def load_obs_labels(obs_path: str) -> Dict[str, torch.Tensor]:
+def load_obs_labels(obs_path: str, expected_size=None, num_classes=None) -> Dict[str, torch.Tensor]:
     if not os.path.exists(obs_path):
         raise FileNotFoundError(f"Obs labels not found: {obs_path}")
-    data = torch.load(obs_path, map_location="cpu")
-    if not ("y_obs" in data and "s" in data):
-        raise KeyError(f"Obs file must contain 'y_obs' and 's'. Got keys: {list(data.keys())}")
-    y_obs = data["y_obs"].long()
-    s = data["s"].long()
+    data = torch.load(obs_path, map_location="cpu", weights_only=True)
+    if not isinstance(data, dict) or not ("y_obs" in data and "s" in data):
+        raise ValueError("Obs file must contain 'y_obs' and 's'")
+    y_obs = _label_tensor(data["y_obs"], "y_obs", expected_size, num_classes)
+    s = _label_tensor(data["s"], "s", len(y_obs), 2)
     print(f"[OBS] Using obs_path -> y_obs(shape={tuple(y_obs.shape)}), s(shape={tuple(s.shape)})")
     return {"y_obs": y_obs, "s": s}
 
@@ -105,11 +156,18 @@ class FeatureDataset(Dataset):
         return self.f[i], int(self.y_true[i]), int(self.y_obs[i]), int(self.s[i]), self.p_clip[i]
 
 class PKBatchSampler(Sampler[List[int]]):
-    """每个 batch 采样 P 个类别、每类 K 个样本 -> batch_size = P*K；按 y_obs 做类均衡。"""
+    """P×K batches with deterministic, distinct epoch-specific random streams.
+
+    Iteration advances the epoch automatically for historical ablation callers.
+    set_epoch(e) permits replaying a particular epoch without earlier iterations.
+    """
     def __init__(self, labels_obs: torch.Tensor, P: int, K: int, seed: int = 42):
-        super().__init__(None)
-        import random, numpy as np
-        self.labels = labels_obs.cpu().numpy(); self.P=int(P); self.K=int(K); self.seed=int(seed)
+        super().__init__()
+        self.labels = _label_tensor(labels_obs.cpu(), "labels_obs").numpy()
+        self.P=int(P); self.K=int(K); self.seed=int(seed)
+        if self.P <= 0 or self.K <= 0:
+            raise ValueError("P and K must be positive")
+        self.epoch = 0
         self.class_to_indices = {}
         for c in np.unique(self.labels):
             idx = np.where(self.labels == c)[0].tolist()
@@ -118,10 +176,11 @@ class PKBatchSampler(Sampler[List[int]]):
         self.N = len(self.labels); self.batch_size = self.P*self.K
         self.steps_per_epoch = max(1, self.N//self.batch_size)
         self.ptrs = {}
-        for c, idxs in self.class_to_indices.items():
-            rng = random.Random(self.seed + c); rng.shuffle(idxs)
-            self.ptrs[c] = {"idxs": idxs, "p": 0, "rng": rng}
     def __len__(self): return self.steps_per_epoch
+    def set_epoch(self, epoch: int):
+        if int(epoch) != epoch or epoch < 0:
+            raise ValueError("epoch must be a nonnegative integer")
+        self.epoch = int(epoch)
     def _next_k(self, c, K):
         buf=[]; state=self.ptrs[c]; idxs,p,rng=state["idxs"],state["p"],state["rng"]
         for _ in range(K):
@@ -130,7 +189,15 @@ class PKBatchSampler(Sampler[List[int]]):
         state["p"]=p; return buf
     def __iter__(self):
         import random
-        rng = random.Random(self.seed)
+        epoch = self.epoch
+        self.epoch += 1
+        rng = random.Random(self.seed + epoch)
+        self.ptrs = {}
+        for c, original in self.class_to_indices.items():
+            idxs = original.copy()
+            class_rng = random.Random((self.seed + epoch) * 1000003 + c)
+            class_rng.shuffle(idxs)
+            self.ptrs[c] = {"idxs": idxs, "p": 0, "rng": class_rng}
         for _ in range(self.steps_per_epoch):
             chosen = rng.sample(self.classes, self.P) if len(self.classes)>=self.P else [rng.choice(self.classes) for _ in range(self.P)]
             batch_idx=[]
@@ -146,41 +213,16 @@ class LinearHead(nn.Module):
 
 # ----------------------- AUC（仅用于 s=1） -----------------------
 def auc_noise_only_a11_loss(logits, clip_probs, s, alpha=0.5, tau=0.5, eps: float = 1e-12):
-    """
-    OVR pairwise logistic AUC；仅对 s==1 的样本成对。
-    q = 0.5 * p_model + 0.5 * p_clip（alpha=0.5 固定）；tau=0.5 固定。
-    """
-    device = logits.device; C = logits.size(1)
-    idx = torch.nonzero(s == 1, as_tuple=False).squeeze(1); m = idx.numel()
-    if m < 2:
-        return logits.new_tensor(0.0, requires_grad=True)
-    lo = logits[idx]                          # (m, C)
-    p_clip = clip_probs[idx].detach()         # (m, C)
-    p_model = F.softmax(lo, dim=-1).detach()           # (m, C)
-    alpha = float(alpha)
-    if not 0.0 <= alpha <= 1.0:
-        raise ValueError(f"alpha must be in [0, 1], got {alpha}")
-    q = alpha * p_model + (1.0 - alpha) * p_clip
-    offdiag = ~torch.eye(m, dtype=torch.bool, device=device)
-    total_loss = lo.new_tensor(0.0); total_w = lo.new_tensor(0.0)
-    for i in range(C):
-        s_i = lo[:, i]; q_i = q[:, i]
-        diff = s_i[:, None] - s_i[None, :]
-        w_posneg = (q_i[:, None]) * (1.0 - q_i)[None, :]
-        w_negpos = (1.0 - q_i[:, None]) * (q_i)[None, :]
-        ell_posneg = F.softplus(-diff / tau)  # tau=0.5
-        ell_negpos = F.softplus( diff / tau)
-        w_sum = (w_posneg + w_negpos)
-        loss_mat = w_posneg * ell_posneg + w_negpos * ell_negpos
-        total_loss = total_loss + (loss_mat * offdiag).sum()
-        total_w    = total_w    + (w_sum    * offdiag).sum()
-    return total_loss / (total_w + eps)
+    """Compatibility entry point for the detached-posterior pairwise objective."""
+    return soft_pairwise_auc(logits, clip_probs, s, mu=alpha, tau=tau, eps=eps)
 
 # ----------------------- 评估/早停/画图 -----------------------
 @torch.no_grad()
-def evaluate(head: nn.Module, feats: torch.Tensor, labels: torch.Tensor, batch_size: int = 2048) -> Tuple[float, float]:
+def evaluate(head: nn.Module, feats: torch.Tensor, labels: torch.Tensor, batch_size: int = 2048,
+             num_workers: int = 2) -> Tuple[float, float]:
     head.eval(); ds = TensorDataset(feats, labels)
-    dl = DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=True)
+    dl = DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=num_workers,
+                    pin_memory=str(device).startswith("cuda"))
     ce = nn.CrossEntropyLoss(reduction="sum"); total_loss, total_correct, total = 0.0, 0, 0
     for xb, yb in dl:
         xb = xb.to(device, dtype=torch.float32); yb = yb.to(device)
@@ -192,11 +234,17 @@ class EarlyStopping:
     """按 val_acc 早停（和原脚本一致：step(val_loss, val_acc) 接口）"""
     def __init__(self, patience: int = 10, min_delta: float = 0.0):
         self.patience, self.min_delta = int(patience), float(min_delta)
+        if self.patience < 0 or self.min_delta < 0:
+            raise ValueError("patience and min_delta must be nonnegative")
         self.best = -float("inf"); self.num_bad = 0
     def step(self, val_loss: float, val_acc: float) -> bool:
         improved = (val_acc > self.best + self.min_delta)
         if improved: self.best = val_acc; self.num_bad = 0; return False
-        self.num_bad += 1; print(f"早停已用耐心:{self.num_bad}"); return self.num_bad >= self.patience
+        self.num_bad += 1
+        if self.patience == 0:
+            return False
+        print(f"早停已用耐心:{self.num_bad}")
+        return self.num_bad >= self.patience
 
 def _save_val_curves(epochs, losses, accs, save_dir: str):
     os.makedirs(save_dir, exist_ok=True)
@@ -211,7 +259,7 @@ def _save_val_curves(epochs, losses, accs, save_dir: str):
     plt.grid(True, alpha=0.3); plt.tight_layout()
     plt.savefig(os.path.join(save_dir, "val_loss.png"), dpi=150); plt.close()
 
-# ----------------------- 训练（Loss = AUC + lam * CE） -----------------------
+# ----------------------- 训练（Loss = CE + lam * AUC） -----------------------
 def train(
     cache_path: str,
     obs_labels_path: str,
@@ -224,9 +272,15 @@ def train(
     print_every: int,
     best_ckpt_path: str,
     patience: int, min_delta: float,
-    val_dir: str,               
+    val_dir: str,
+    tau: float = 0.5,
+    num_workers: int = 2,
 ):
     set_seed(seed); lam = float(lam)
+    if max_epochs <= 0 or num_workers < 0 or print_every < 0:
+        raise ValueError("max_epochs must be positive; num_workers and print_every must be nonnegative")
+    if not 0 <= mu <= 1 or not 0 < tau < float("inf") or not 0 <= lam < float("inf"):
+        raise ValueError("mu must be in [0,1], tau positive, and lam nonnegative")
 
     # 0) 缓存与标准化
     cache = load_clip_cache_strict(cache_path)
@@ -238,10 +292,10 @@ def train(
     N, D = train_feats.shape
     C = int(clip_probs_train.shape[1])
     print(f"[INFO] Ntrain={N}, Nval={val_labels.numel()}, D={D}, C={C} | P={P}, K={K}, batch={P*K}")
-    print(f"[OBJECTIVE] Loss = CE(trusted) + lam * AUC(untrusted) | lam={lam:.2f} | mu={mu:.2f} | tau=0.5 | early_metric=acc")
+    print(f"[OBJECTIVE] Loss = CE(trusted) + lam * AUC(untrusted) | lam={lam:.2f} | mu={mu:.2f} | tau={tau} | early_metric=acc")
 
     # 1) 读取 obs_path（y_obs, s）
-    obs = load_obs_labels(obs_labels_path)
+    obs = load_obs_labels(obs_labels_path, expected_size=N, num_classes=C)
     y_obs_after, s_flags = obs["y_obs"], obs["s"]
     if y_obs_after.numel() != N or s_flags.numel() != N:
         raise RuntimeError(f"Obs length mismatch: feats N={N}, y_obs={y_obs_after.numel()}, s={s_flags.numel()}")
@@ -249,7 +303,8 @@ def train(
     # 2) DataLoader（用 y_obs 做均衡）
     train_ds = FeatureDataset(train_feats, train_labels, y_obs_after, s_flags, clip_probs_train)
     batch_sampler = PKBatchSampler(labels_obs=y_obs_after, P=P, K=K, seed=seed)
-    train_loader = DataLoader(train_ds, batch_sampler=batch_sampler, num_workers=2, pin_memory=True)
+    train_loader = DataLoader(train_ds, batch_sampler=batch_sampler, num_workers=num_workers,
+                              pin_memory=str(device).startswith("cuda"))
 
     # 3) 线性头 + 优化器/调度器
     head = LinearHead(D, C).to(device).float()
@@ -271,6 +326,7 @@ def train(
 
     print("[TRAIN] Start ...")
     for epoch in range(1, max_epochs + 1):
+        batch_sampler.set_epoch(epoch - 1)
         head.train(); t0 = time.time()
         running = 0.0; seen = 0
 
@@ -291,18 +347,20 @@ def train(
 
             # AUC 仅对不可信样本
             auc_untrusted = auc_noise_only_a11_loss(
-                logits=logits, clip_probs=p_clip, s=s, alpha=mu, tau=0.5
+                logits=logits, clip_probs=p_clip, s=s, alpha=mu, tau=tau
             )
 
             # Loss = CE + lam * AUC 
             loss = ce_trusted + lam * auc_untrusted
+            if not torch.isfinite(loss):
+                raise FloatingPointError(f"Nonfinite training loss at epoch={epoch}, batch={ib}")
 
             opt.zero_grad(set_to_none=True); loss.backward()
             torch.nn.utils.clip_grad_norm_(head.parameters(), max_norm=5.0)
             opt.step(); sched.step()
 
             running += float(loss.item()); seen += B
-            if ib % print_every == 0:
+            if print_every and ib % print_every == 0:
                 print(
                     f"[Epoch {epoch:03d}] {ib:04d}/{len(train_loader):04d} | "
                     f"B={B} Bt={int(mask_t.sum())} | lam={lam:.2f} | "
@@ -314,7 +372,8 @@ def train(
         print(f"[Epoch {epoch:03d}] time={dt:.1f}s | avg_loss={running/max(1,len(train_loader)):.5f}")
 
         # 验证与记录
-        val_loss, val_acc = evaluate(head, val_feats, val_labels, batch_size=2048)
+        val_loss, val_acc = evaluate(head, val_feats, val_labels, batch_size=2048,
+                                     num_workers=num_workers)
         print(f"[VAL] epoch={epoch:03d} | val_loss={val_loss:.5f} | val_acc={val_acc*100:.2f}%")
         val_epochs.append(epoch); val_losses.append(val_loss); val_accs.append(val_acc)
         with open(csv_path, "a", newline="") as f:
@@ -342,6 +401,7 @@ def train(
     return head, {
         "best_val_accuracy": float(stopper.best),
         "best_epoch": int(val_epochs[int(np.argmax(val_accs))]) if val_accs else 0,
+        "epochs_completed": len(val_epochs),
     }
 
 # ----------------------- main -----------------------
@@ -362,6 +422,8 @@ if __name__ == "__main__":
         best_ckpt_path=args.best_ckpt,
         patience=args.patience, min_delta=args.min_delta,
         val_dir=args.val_dir,  
+        tau=args.tau,
+        num_workers=args.num_workers,
     )
     # Keep the same complete result contract as the cache-only comparison methods.
     cache = load_clip_cache_strict(args.cache)
@@ -370,6 +432,7 @@ if __name__ == "__main__":
         F.normalize(cache["test_feats"].to(torch.float32), dim=-1),
         cache["test_labels"].long(),
         batch_size=2048,
+        num_workers=args.num_workers,
     )
     result_path = Path(args.best_ckpt).parent / "metrics.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
@@ -378,6 +441,7 @@ if __name__ == "__main__":
         json.dump({
             "method": "FCL-AUC-CE",
             "mu": float(args.mu),
+            "tau": float(args.tau),
             "cache": args.cache,
             "observed_labels": args.obs_labels_path,
             **train_summary,

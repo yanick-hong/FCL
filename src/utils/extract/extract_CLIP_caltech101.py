@@ -281,6 +281,19 @@ def main():
         "train_indices": torch.tensor(train_idx, dtype=torch.long),
         "val_indices": torch.tensor(val_idx, dtype=torch.long),
         "test_indices": torch.tensor(test_idx, dtype=torch.long),
+        "sample_ids": {
+            "train": [f"caltech101/{int(i):05d}" for i in train_idx],
+            "val": [f"caltech101/{int(i):05d}" for i in val_idx],
+            "test": [f"caltech101/{int(i):05d}" for i in test_idx],
+        },
+        "sample_paths": {
+            "train": [str(Path(full_ds._image_files[ds.kept_idx[int(i)]]).resolve()) for i in train_idx]
+            if hasattr(full_ds, "_image_files") else [],
+            "val": [str(Path(full_ds._image_files[ds.kept_idx[int(i)]]).resolve()) for i in val_idx]
+            if hasattr(full_ds, "_image_files") else [],
+            "test": [str(Path(full_ds._image_files[ds.kept_idx[int(i)]]).resolve()) for i in test_idx]
+            if hasattr(full_ds, "_image_files") else [],
+        },
         "meta": {
             "dataset": "Caltech-101 (no BACKGROUND_Google)",
             "num_classes": C,
@@ -293,6 +306,13 @@ def main():
             "num_test": int(te_feats.shape[0]),
             "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             "seed": args.seed,
+            "protocol": "openai_clip" if args.backend == "openai" else "open_clip",
+            "normalization": "CLIP_default",
+            "preprocess": repr(preprocess),
+            "probability_logit_scale": float(model.logit_scale.exp().item()) if hasattr(model, "logit_scale") else 1.0,
+            "logit_scale": float(model.logit_scale.exp().item()) if hasattr(model, "logit_scale") else 1.0,
+            "paper_num_classes": 102,
+            "class_count_note": "The extracted dataset excludes BACKGROUND_Google and has 101 classes; paper text/table reports 102.",
         },
         # 为了与 CIFAR100 缓存键兼容，这两个键给出 None（Caltech-101 不需要）
         "train_idx_from_train50k": None,

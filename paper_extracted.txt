@@ -1,0 +1,684 @@
+
+===== PAGE 1 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043. CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+Learning from Filter-Corrected Labels
+AnonymousCVPRsubmission
+PaperID5043
+Abstract Unfortunately, these annotation approaches often suffer 038
+fromsubstantialverificationcostwhichneedextramodelto 039
+001 Human–VLMs Collaborative Annotation (HVCA) effec- verify,showninFigure1(b). Forexample,Snorkel[27,28] 040
+002 tively uses Vision–Language Models (VLMs) to generate constructsmultipleheuristiclabelingfunctionsandapplies 041
+003 high-qualitylabels. However, existingHVCAmethodsrely generativemodelingtoestimatetheiraccuraciesbeforepro- 042
+004 oncomplexnoiselabelverification,whichinflatestheanno- ducingaggregatedlabels. ActiveAED[37]trainsanauxil- 043
+005 tationcost. Inthispaper,weproposeanovelsettingcalled iary error detection model that repeatedly flags suspicious 044
+006 Filter-CorrectedLabels(FCLs),whichusesasimpleyetef- annotationsforhumanreview. Thesemethodsimposecon- 045
+007 fectiveprototypetofilternoiselabels,asillustratedinFig- siderable computational cost and complicate the entire an- 046
+008 ure1(b). FCLsrequesthumancorrectiononlyforinstances notationprocess. 047
+009 thatpassaprototype-basedfilter,achievinghigh-qualitysu- To address this limitation, we propose a novel setting 048
+010 pervisionatlowverificationcost. Inaddition,weintroduce calledFilter-CorrectedLabels(FCLs),whichusesasimple 049
+011 theAUC-Consistentmethod,whichutilizethecharacterizer yet effective prototype to turn VLMs prediction into high- 050
+012 of FCLs to reduce the impact of noisy data. Experimen- quality labels with little human effort. The setting consist 051
+013 talresultsshowthatourapproachmitigateslabelnoisein- of low cost label verification (i.e., prototype computation, 052
+014 duced by VLMs and improves classification accuracy over filteringbyprototypedistance)andhumancorrection.Con- 053
+015 competingmethods,achievingstateoftheartperformance cretely,theVLMprovidespseudo-labelsfirst.Foreachcan- 054
+016 undercomparableevaluationsettings. didate class, we then simply compute class prototypes by 055
+averagingthefeaturerepresentationsofinstances, forming 056
+compactdatacentersforeachclass. Thedistancebetween 057
+1.Introduction
+017 instancesandtheirclassprototypedefinesafilterareathat 058
+018 Recent progress in Vision-Language Models (VLMs) has effectivelyidentifiesasubsetofinstancesrequiringhuman 059
+019 shown that they perform strongly on annotation tasks by correction. For example, as illustrated in Figure 1(b), in- 060
+020 aligning image and text representations [26]. These pre- stances located in the yellow filter area are manually cor- 061
+021 trainedmodelscanassignlabelstoimageswithoutanytask rected. Themainadvantageofthismethodisitssimpleyet 062
+022 specifictraining.Severalstudieshavedemonstratedthatus- effective mechanism for producing a high quality labeled 063
+023 ingVLMspredictedlabelsasasubstituteformanualanno- set without relying on complex auxiliary networks that in- 064
+024 tationcansignificantlyreduceannotationeffort[7,29]. creaseadditionaltrainingcost. 065
+025 However,labelsproducedbyVLMsareoftennoisyand In this paper, we further introduce AUC-Consistent 066
+026 may degrade the overall quality of the annotated dataset. method(AUC-C),whichutilizesthecharacterizerofFCLs 067
+027 Modelscanconfusevisuallysimilarcategoriesduetolim- totrainbettermulti-classifiers. Accordingto[40],theAUC 068
+028 ited visual granularity or prompt sensitivity. For example, risk optimized under noisy labels is consistent with the 069
+029 asshowninFigure1(a),themodelassigns“WaterLily”the AUCriskundertruelabels,whichmotivatesustopropose 070
+030 highestconfidencealthoughthegroundtruthis“Lotus”. To the consistent AUC method. AUC-C learn better models 071
+031 mitigate such noise, existing methods typically add verifi- by optimizing ranking between pairwise instances, which 072
+032 cation stages to VLMs generated annotations. Examples mitigate the impact of label noise. Concretely, for un- 073
+033 includehumanverificationofmodelgeneratedlabels[35], corrected instances, we estimate class posteriors from the 074
+034 collaborative systems that integrate human feedback to re- model and the VLM, and then combine them to define an 075
+035 finemachinesuggestions[14],andweaksupervisionframe- AUC-Consistent risk. For corrected instances, we adopt a 076
+036 worksthatverifynoisyprogrammaticlabelsbeforeproduc- standard multiclass risk. This method fully exploits reli- 077
+037 ingthefinalsupervision[28]. able supervision and explores the structure of noisy labels 078
+1
+===== PAGE 2 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043. CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+Candidate Label Set
+1.Accordion 2.Airplanes 3.Anchor 4.Ant 5.Barrel 6.Bass 7.Beaver … 95.Water_lilly 96.Wheelchair ...
+(a) VLM Annotation
+Waterlily 65.59%×
+Lotus 28.07%
+waterlily Ask Label Lobster 3.44%
+Which label in the Binocular 1.89%
+…
+candidate label set best Ewer 0.01%
+lotus Unlabeled Data matches these images? VLM Labeled Data Wrong Label
+(b) Filter-Corrected Labels
+Filter Area
+Labeled Data
+Model Free
+Train
+Corrected Instances Human Correction Low Cost Verification
+Qwen 47.68%
+FCL-Q 67.63%
+CLIP 75.65%
+Image Classifier
+FCL-C 86.95%
+Labeled Data Image Classifier Correct Rate (c) VLM Labels
+Instances Annotate incorrect labels Decision boundary
+Class prototype Filter-Corrected labels Filter boundary
+Figure 1. Comparison between training with VLM-generated labels and training with Filter-Corrected Labels. Zero-shot results are
+obtainedusingCLIPwithViT-L/14.ExampleimagesandcategoriesaretakenfromtheCaltech-101dataset.FCLdeployshumancorrection
+onlyforfilteredinstances,producinghigher-qualitylabelswhilereducingannotationcost.
+079 to mine high quality training process. Experiments across MEGAnno+ [14] reports improved annotation throughput 104
+080 diversedatasetsconfirmtheeffectivenessofthemethod. throughstructuredhuman–modelinteraction. 105
+081 • Weintroduceanewweaklysupervisedsettingwhichper- In contrast, Our work investigates Human-VLMs Col- 106
+082 formsprototype-basedfilteringfollowedbyselectivehu- laborative Annotation (HVCA) which uses the labels gen- 107
+083 mancorrection. Thissettingenableshigh-qualityannota- eratedbyVLMstoderiveclassprototypeswithoutcomplex 108
+084 tionwithlittlehumaneffort. computations or extra model. We utilize the prototypes to 109
+085 • We propose a AUC-Consistent method that uses labels define a filter area that flags instances needing correction, 110
+086 generated by VLMs and fully exploits the FCLs set- enablingasimpleandeffectiveHVCAmethod. 111
+087 ting. Thisarrangementleveragestrustworthysupervision
+2.2.WeaklySupervisedLearning 112
+088 while exploiting the structure of noisy labels to improve
+089 robustnesstolabelnoise. Weaklysupervisedlearningtrainsmodelsfromincomplete 113
+090 • Extensive experiments on standard benchmarks demon- or inaccurate annotations, and this work is primarily con- 114
+091 stratesubstantialimprovementsinclassificationaccuracy nected to semi-supervised learning and noisy labels learn- 115
+092 androbustnessoverexistingweak-supervisionbaselines. ing. Semi-supervised learning enforces stable predictions 116
+underperturbations[11]whileexploitingasmallamountof 117
+093 2.RelatedWork annotateddata.Itmainlyincludesmethodsbasedonpredic- 118
+tion invariance, adversarial smoothing, and augmentation 119
+094 2.1.CollaborativeAnnotation
+drivenregularization[4]. RepresentativemethodsareMean 120
+095 Human–Model Collaborative Annotation reduces labeling Teacher[34],VirtualAdversarialTraining[23],MixMatch 121
+096 cost by pairing model predictions with human verification [2],UnsupervisedDataAugmentation[39],FixMatch[31], 122
+097 [1, 22, 25]. For example, programmatic approaches such and FreeMatch [36]. Noisy labels learning assumes cor- 123
+098 as Snorkel [27, 28] showcased scalable weak supervision ruptedsupervisionandaimstoreducetheimpactofincor- 124
+099 by aggregating heuristic labeling functions, reducing the rect labels through sample selection, relabeling, or robust 125
+100 need for manual annotation. More recently, Human–LLM training objectives. Representative methods are Co teach- 126
+101 Collaborative Annotation [35] shows that combining large ing[9],DivideMix[18],earlylearningregularization[20], 127
+102 language model predictions with selective human verifica- JoCoR [38], error bounded correction [32, 46], and confi- 128
+103 tioncanreduceannotationcostwhilemaintainingaccuracy. dentlearning[24]. 129
+2
+===== PAGE 3 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043. CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+130 Unfortunately, existing semi-supervised learning and riskasfollows. 177
+1 1 3 3 1 2 n O o u i r sy fo l r a m b u e l l a s ti l o e n ar c n o in m g bi o n n e l s y V r L el M ie s s p o r n op h o u sa m ls an wi a th nn t o a t r a g t e io te n d . R AUC (f) = E x,x′∼P(x) (cid:104) q(x) (cid:0) 1−q(x′) (cid:1) ℓ(f,x,x′)
+(2) 178
+133 human correction through FCLs, and proposes an AUC- + q(x′) (cid:0) 1−q(x) (cid:1) ℓ(f,x′,x) (cid:3)
+134 Consistentmethodontheuncorrectedinstances.
+whereℓ(f,x,x′) = I (cid:0) f(x)≤f(x′) (cid:1) + 1I(f(x)=f(x′)) 179
+2
+135 2.3.AUCOptimization iscalledrankingloss. 180
+136 AUCoptimizationdirectlymaximizestheareaunderthere-
+137 ceiveroperatingcharacteristic(ROC)curvetoevaluatethe Multiclass AUC. Let Y = {1,...,K} and let f : X → 181
+138 ranking ability of a classifier, providing a stable objective RKbeamulticlassscorerwithcomponentsf i (x)fori∈Y. 182
+139 under class imbalance and noisy supervision [42]. Classi- For each class i define the class posterior q i (x) = P(y = 183
+140 cal studies reformulate AUC as a pairwise ranking prob- i | x)andformaoneversusrestriskbyreusingthebinary 184
+141 lemanddesignconvexsurrogatestoapproximatethenon- constructionon thecomponentf i (x). Definethe perclass 185
+142 differentiable indicator function. Representative methods multiclassAUCrisk 186
+1 1 4 4 3 4 i g n e c n l c u e de [1 s 3 t ] o , c l h a a r s g t e ic -sc A a U le C de o e p p ti A m U iz C ati m on ax w im it i h za l t i i n o e n ar w c it o h nv su er r - - R m i AUC (f) = E x,x′∼P(x) (cid:104) q i (x) (cid:0) 1−q i (x′) (cid:1) ℓ i (f,x,x′)
+145 rogate losses [45], federated AUC optimization [44], and + q (x′) (cid:0) 1−q (x) (cid:1) ℓ (f,x′,x) (cid:105) ,
+i i i
+146 partialAUCoptimizationinrestrictedfalsepositiveregions
+(3) 187
+1 1 4 4 7 8 [ h 4 e 3 te ]. ro R g e e c n e e n it t y e , x s t u e c n h sio as ns D f R ur A th U e C ra [ d 5 d ] re a s n s d ro A b U u C stn o e p s t s im an iz d a d ti a o t n a w f i i ( t x h ′) ℓ ) i . (f W ,x he , r x e ′) f i ( = x)d I e (cid:0) n f o i ( te x s ) th ≤ ei- f th i ( c x o ′) m (cid:1) p + one 1 2 n I t (f sc i ( o x re ) ro = f 1 1 8 8 9 8
+149 frommultipleunannotateddatasets[41]. themulticlassscorerf,q i (x)denotestheclassposteriorfor 190
+150 However, existing AUC frameworks mainly target fully classi,ℓ i denotestheindicatorbasedpairwiselossapplied 191
+151 supervisedorclean-labelsettingsandoverlooktheinstabil- tothei-thcomponent,andtheexpectationistakenovertwo 192
+152 ity caused by noisy supervision. Our work introduces an independent draws from the input marginal which ensures 193
+153 AUC-Consistent method that applies AUC optimization to unbiasedpairformation. 194
+154 the noisy subset. By incorporating consistency weighting AggregateoverclassestoobtainthemulticlassAUCrisk 195
+155 objective, it stabilizes pairwise rankings under noise and
+156 alignsrankingconsistencywithsupervisionreliability. R mAUC (f) = K 1 (cid:88) K R m i AUC (f). (4) 196
+i=1
+3.Method
+157
+3.2.Filter-CorrectedLabels 197
+158 3.1.Preliminaries WeproposeanewannotationsettingcalledFilter-Corrected 198
+Labels (FCLs) to transform noisy labels generated by 199
+159 Binary AUC. Let X ⊆ Rd be the input space and Y = VLMs into reliable supervision with little human effort. 200
+160 {+1,−1}thelabelspace,where+1representspositivein- UnliketraditionalHuman-ModelCollaborativeAnnotation 201
+161 stances and −1 represents negative instances. Let P be thatrequiressubstantialverificationeffort,FCLsprovidea 202
+162 an unknown distribution over X × Y and let (x,y) and simpleandeffectiveannotationmechanism. Theprocedure 203
+163 (x′,y′) be drawn independently from P. Let P(x) denote consists of label verification (i.e., prototype computation, 204
+164 the marginal of P on X. Let f : X → R be a scoring filteringbyprototypedistance)andhumancorrection. The 205
+165 function and define the posterior q(x) = P(y = +1 | x). specificdetailsareasfollows. 206
+166 TheclassicalAUCoff measurestheprobabilitythataran-
+167 domlydrawnpositiveinstancereceivesahigherscorethan
+PrototypeComputation. Thesettingfirstusesthelabels 207
+168 arandomlydrawnnegativeinstance. Itisdefinedas
+generatedbyVLMstocomputeclassprototypes. Foreach 208
+169 AUC(f)=E(cid:2) I (cid:0) f(x)>f(x′) (cid:1) + 1I (cid:0) f(x)=f(x′) (cid:1)(cid:3) , (1) noisylabelclass,weaverageitsinstancestoobtainaproto- 209
+2 type. Thisprototypeactsasadatacenterthatsupportsare- 210
+170 whereI[·]denotestheindicatorthatreturnsoneiftheargu- liabilitymeasuredefinedbythedistancefrominstancefea- 211
+171 mentistrueandzerootherwise. tures to theclass prototype. The resulting prototype based 212
+172 Thisrankingbasedquantitycanbewrittenasanexpec- criterionissimpleandeffective,anditdoesnotdependon 213
+173 tation of indicator functions and thus admits an equivalent anyspecificdownstreammodelarchitecture. 214
+174 riskminimizationview. OptimizingtheAUCisequivalent
+175 toreducingtheexpectedrisk[8],allowingtheproblemtobe FilteringbyPrototypeDistance. Afterobtainingproto- 215
+176 expressedinarewardformulation. Wedefinetheexpected types, thereliabilityofeachannotationisevaluatedbythe 216
+3
+===== PAGE 4 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043. CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+TrainSamples Classes CLIP UL-ER FL-ER FCLs
+CIFAR100 45,000 100 75.63% 18.46% 38.23% 87.10%
+Tiny-ImageNet 90000 200 70.17% 23.78% 43.88% 83.38%
+Caltech-101 2,945 102 92.39% 4.55% 14.33% 96.88%
+Food-101 65,650 101 89.01% 5.60% 23.53% 96.08%
+EuroSAT 21,600 10 43.00% 53.70% 64.74% 62.42%
+StanfordCars 7410 196 70.17% 25.18% 36.90% 82.66%
+Table1.AnnotationaccuracyandeffectivenessanalysisundertheFCLssettingacrosssixbenchmarks.Columnsshownumberoftraining
+samplesandclasses, accuracyofCLIPlabels, UnfilteredAreaLabelsErrorRate(UL-ER),FilterAreaLabelsErrorRate(FL-ER),and
+finalannotationaccuracyafterprototype-basedfiltercorrection.Allresultsarereportedunderthefilterrateρ=0.3.
+217 distance from the instance to its class prototype. The fil- benchmarks, which confirms that FCLs can effectively re- 256
+218 ter rate ρ controls the per class proportion of largest dis- duceannotationnoiseandobtainhigh-qualitylabels. 257
+219 tanceoutliersroutedtomanualcorrection. Foreachclass,a
+220 thresholdτ c issettotheρquantileofwithinclassdistances. 3.3.AUC-ConsistentMethod 258
+221 Instanceswhosedistancesexceedτ c aremarkedwiths=0 Based on the FCLs setting, we present a new consistent 259
+222 toindicatethatcorrectionisrequired,andtheremainingin- method that couples supervised learning on corrected in- 260
+223 stancesaremarkedwiths = 1toindicatedirectadoption. stanceswithstabilityAUCoptimizationonuncorrectedin- 261
+224 This mechanism yields a data driven confidence partition stances. According to [40], the AUC risk optimized un- 262
+225 withoutadditionalsupervisionorcomplextuning. dernoisylabelsisconsistentwiththeAUCriskundertrue 263
+labels, which motivates the production of our consistent 264
+226 Correction. Instances marked with s = 0 are manually method. Concretely, for corrected instances, a standard 265
+227 corrected to obtain reliable ground truth labels y i ∈ [K]. multiclassriskisused.Foruncorrectedinstances,classpos- 266
+228 Uncorrectedinstanceswiths=1areassignedaweaklabel teriorsareestimatedfromboththeclassifierandtheVLMs 267
+229 distributionP(x, y, s = 1). Aftercorrection,theindicator andarefusedtoconstructanAUC-Consistentriskoverpair- 268
+230 sdenotesthecorrectedsubsetfors=0andtheuncorrected wiserankings,makingitconsistentwithstrongsupervision 269
+231 subset for s = 1. In the subsequent process, pairs used AUC risk (i.e., Eq.(1)). This method takes full advantage 270
+232 by the AUC-C method are drawn from the distribution of oftrustworthylabelswhileleveragingthestructureofnoisy 271
+233 uncorrectedinstances,whichmeansthatx a ,x b aresampled supervisiontoextractstrongertrainingobjective. 272
+234 from p(x | s = 1), while samples used by the supervised
+235 loss are drawn from the distribution of corrected instances
+Corrected Instances. For corrected instances, the ex- 273
+236 with s = 0. Therefore, the FCLs dataset is represented
+pectedsupervisedriskisdefinedas 274
+237 uniformlybytriples(x i ,Y i ,s i ).
+R m (f)=E (x,y)∼P(x,Y,s=0) L (cid:0) (f(x),y (cid:1) . (5) 275
+238 AdvantagesofFCLs. TheadvantagesofFCLsarisefrom
+239 both simplicity and effectiveness. On the one hand, this whereLdenotesthesupervisedlossfunction. 276
+240 designmaintainslowcomputationalcostandstrongrepro- The supervised risk on corrected instances provides a 277
+241 ducibility, makingFCLsanefficientand easilydeployable clean and reliable training process that stabilizes the clas- 278
+242 strategyforweaklysupervisedlearning. Ontheotherhand, sifierandensuresaccurateclassdiscrimination. 279
+243 theeffectivenessofFCLscanbeobservedthroughtheirim-
+244 pactonlabelquality. ToevaluatehowFCLsimprovelabel
+Uncorrected Instances. For uncorrected instances, de- 280
+245 quality, we use CLIP (ViT L/14) for annotation and report
+finetheconditionalprobabilityq i (x)foreachclassi∈[K] 281
+246 the results in Table 1. We compute the error rate of CLIP
+andpairwiseweightsbetweendistinctsamplesx a andx b 282
+247 predictedlabelswithinthefilteredregion(i.e.,FL-ER)and
+248 intheunfilteredregion(i.e.,UL-ER).Althoughthemagni- w i ab =q i (x a ) (cid:0) 1−q i (x b ) (cid:1) , w i ba =q i (x b ) (cid:0) 1−q i (x a ) (cid:1) . 283
+249 tudes differ across datasets, errors are concentrated in the
+250 filteredregion,whereastheunfilteredregionshowsconsis- Theper-classAUC-Consistentexpectedriskis 284
+251 tentlylowerror,indicatingthattheprototypebasedfiltering
+252 metric is a strong indicator of label correctness. Building Ri (f)=E (cid:104) wabϕ (cid:0) f (x )−f (x ) (cid:1)
+253 on this observation, FCLs apply human correction only to
+AUC−C xa,xb∼P(x,Y,s=1) i i a i b
+254 instances in the filter area. As shown in the column FCLs +w i baϕ (cid:0) f i (x b )−f i (x a ) (cid:1)(cid:105) ,
+255 in Table 1, the final labels remain highly accurate across (6) 285
+4
+===== PAGE 5 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043. CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+286 where ϕ denotes a pairwise surrogate loss. The multiclass 3.4.PracticalImplementation 324
+287 extensionaveragesoverallclasses
+Loss Function. Instances in the corrected subset where 325
+K s = 0 are trained with a general supervised loss 326
+288 R AUC−C (f)= K 1 (cid:88) R A i UC−C (f), (7) L (cid:0) f(x i ),y i (cid:1) . Anystandard classificationlosscan beused 327
+i=1 on this subset. Cross Entropy (CE) is chosen in our im- 328
+plementation because corrected labels provide reliable su- 329
+289 The AUC-Consistent risk on uncorrected instances offers
+pervision and CE yields stable gradients and a calibrated 330
+290 robustnessbyemphasizingpairwiseorderinginsteadofre-
+probabilistic interpretation. Instances in the uncorrected 331
+291 lyingonpotentiallynoisylabelsandbyweightinginforma-
+subset where s = 1 are trained with the AUC-C objec- 332
+292 tive pairs through class dependent posteriors, reducing the
+tivethatusesasmoothpairwisesurrogate. Thesurrogateis 333
+293 impactoflabelnoise.
+ϕ(u)=log
+(cid:0) 1+eu(cid:1)
+,whichreplacesthenondifferentiable 334
+294 Theclassificationriskcanbereformulatedas
+indicator while preserving a monotone dependence on the 335
+295 R FCL (f)=R m (f)+λR AUC−C (f). (8) scoremargin. 336
+296 wheref i (x)denotesthei-thlogitcorrespondingtoclassi,
+297 and λ ∈ R + is the weight balancing classification fidelity Conditional Probability Estimation. As introduced in 337
+298 andrankingstability. Eq.(10), minimizing the empirical risk R AUC−C requires 338
+299 Thecombinedriskbalancesthesestrengths,usingtrust- computing the pair weights w i ab and w i ba. That means 339
+300 worthysupervisiontoanchorlearningwhileextractingad- weneedtoestimatetheconditionalprobabilitydistribution 340
+301 ditionalstructurefromuncorrecteddatatoimproverobust- q(x). ToexploitboththepriorknowledgefromVLMsand 341
+302 nessandoverallperformance[30]. thepredictionsfromtheclassifier,weestimateaconditional 342
+distribution that combines these two sources of informa- 343
+tion. Themodelbasedconditionaldistributionp model (x)is 344
+303 EmpiricalApproximation. WearrangetheFCLsdataset obtained by applying the softmax function to the classifier 345
+(cid:83)
+304 asD FCL = D C D UC ,whereD C denotesthecorrected outputlogitsf(x)∈RK: 346
+305 data and D UC denotes the uncorrected data. Given a mini
+306 batchBcontainingcorrectedanduncorrectedinstances. p model (x)=softmax (cid:0) f(x) (cid:1) , (12) 347
+307 Formally,theempiricalapproximationofthesupervised
+308 termonthecorrectedsubsetisgivenby The external distribution p clip (x) is derived from the 348
+CLIPmodelthroughimagetextalignment. Foranimagex, 349
+309 R(cid:98)m (f)= |D 1 ∩B| (cid:88) L (cid:0) (f(x i ),y i (cid:1) , (9) wecomputeitsimageembeddingg I (x)andcompareitwith 350
+C i∈DC∩B a set of pre encoded text embeddings Q T = [q 1 ,...,q K ], 351
+where each q i represents the textual description of class i. 352
+310 where|·|denotesthenumberofcorrectedinstancesinthe
+Thesimilaritybetweenimageandtextembeddingsismea- 353
+311 batch. TheempiricalAUC-Criskiscomputedfromallun-
+sured by cosine similarity and converted into a probability 354
+312 correctedpairswithinthebatch
+distribution via a temperature scaled softmax which is de- 355
+R(cid:98)AUC−C (f)=
+K
+1 (cid:88)
+c
+K
+=1 N
+1
+B P( x x a
+(cid:88)
+,Y ,
+B
+x , b s ∼ =1)
+(cid:104) w
+i
+abϕ (cid:16) f
+i
+(x
+a
+)−f
+i
+(x
+b
+) (cid:17) finedas:
+p clip (x)= (cid:80)K exp
+e
+(cid:0)
+x
+c
+p
+o (cid:0) s
+c
+(cid:0)
+o
+g
+s
+I (cid:0) (
+g
+x)
+(
+,
+x
+q i
+)
+(cid:1)
+,
+/
+q
+τ (cid:1) (cid:1)
+/τ
+(cid:1) , (13)
+3
+3
+5
+5
+6
+7
+(cid:16) (cid:17)(cid:105) j=1 I j
++wbaϕ f (x )−f (x ) ,
+i i b i a
+313 (10) whereτ > 0isthetemperatureparameterthatcontrolsthe 358
+314 where B denotes a mini-batch sampled from the union of distributionsharpness. 359
+315 correctedanduncorrectedinstances,N B denotesthenum- To form the final estimated conditional distribution, we 360
+316 berofpairsin-batch. compute a convex combination of these two distributions 361
+317 The total empirical approximation is the sum of a su- as: 362
+318 pervised term on corrected indices and a AUC-C term on q(x)=µp model (x)+ (cid:0) 1−µ (cid:1) p clip (x). (14) 363
+319 uncorrectedpairs,whichisgivenby:
+whereµ ∈ [0,1]isthemixingcoefficientthatcontrolsthe 364
+320 R(cid:98)FCL (f)=R(cid:98)m (f)+λR(cid:98)AUC−C (f). (11) relative influence of the model prediction and the external 365
+CLIPprior. Thisinterpolationprovidesastablebalancebe- 366
+321 where λ denotes the consistency weight that balances the tweenevolvingmodeloutputsandthepriorknowledgeem- 367
+322 supervisedtermonthecorrectedinstancesandtheAUC-C bedded in the VLM, which is particularly beneficial under 368
+323 termontheuncorrectedpairs. weakornoisysupervision. 369
+5
+===== PAGE 6 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043. CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+CIFAR100 Caltech-101 StanfordCars EuroSAT Food-101 Tiny-ImageNet
+FullySupervisedlearningMethod
+FS-C 85.20 97.29 87.56 96.44 95.07 83.49
+WeaklySupervisedLearningMethods
+Zero-shotCLIP 75.63 92.39 71.16 43.00 89.01 70.17
+FL-C 76.70 91.18 66.66 91.11 93.32 80.11
+NL-C 76.37 87.15 71.22 55.04 92.67 76.37
+L2B 82.51 74.21 75.26 74.15 94.49 79.22
+DLD 82.47 94.93 76.11 75.59 94.42 78.76
+CSGN 82.74 84.87 74.95 79.56 94.44 80.42
+FCL(CLIP) 84.26 95.28 77.10 92.19 94.70 81.30
+Table2. Accuracy(%)ofallcomparedmethodsonsixdatasets. Thehighestvalueforeachdatasetishighlightedinbold. FCL(CLIP)
+denotestheresultsusingFCLsderivedfromCLIP-generatedlabels.
+370 Optimization. We optimize the model using stochastic • FL-C[26]: Trainingonlyonthecorrectedinstances(i.e., 402
+371 gradient descent. Since the classifier and the conditional s=0). Uncorrectedinstancesarediscarded. Thismethod 403
+372 probabilityestimatesarejointlydependent,weadoptanal- isolatesthecontributionofcleansupervisionobtainedby 404
+373 ternatingoptimizationstrategy. Ineachminibatch,wefirst targetedhumancorrection. 405
+374 keeptheprobabilitiesfixedandupdatetheclassifierparam- • NL-C [26]: Training on the uncorrected instances (i.e., 406
+375 eters. We then fix the classifier and recompute the proba- s=1)usingtheirpseudo-labelsthatpredictedbyVLM. 407
+376 bilities. This alternating procedure is performed once per • FS-C [26]: Fully supervised method trained on all sam- 408
+377 batchandyieldsastablejointoptimizationunderweakand ples with ground-truth labels, representing an upper 409
+378 noisysupervision. boundunderperfectsupervision. 410
+• L2B [47]: Meta-reweighting framework that jointly 411
+379 Model. We adopt CLIP with a ViT-L/14 image encoder reweights instances and labels to bootstrap robust mod- 412
+380 [26] as the visual backbone and attach a trainable lin- elsunderlabelnoise. 413
+381 ear classifier on top. The image encoder remains frozen • DLD [12]: Diffusion-based approach that disentangles 414
+382 throughouttrainingandservespurelyasafeatureextractor directional and random diffusion to generate robust su- 415
+383 [33]. The resulting dimension 768 visual embeddings are pervisoryinformationforlearningwithnoisylabels. 416
+384 passed to a learnable linear layer for category prediction. • CSGN [19]: Causal-structure-based method that learns 417
+385 Thissetuppreservestherepresentationalstrengthofalarge latentcausalgraphstoestimateinstance-wisenoisetran- 418
+386 pre-trained VLMs while keeping the classifier lightweight sitionsandimprovelabel-noisemodeling. 419
+387 andefficient. These baselines cover supervision restricted to clean data 420
+(FL-C),supervisionrestrictedtonoisydata(NL-C),anora- 421
+4.Experiments clefullysupervisedupperbound(FS-C)andstate-of-the-art 422
+388
+noisy-label learners (L2B, DLD, CSGN), enabling a com- 423
+389 4.1.ExperimentalSetup prehensivecomparisonwithourFCLssetting. 424
+390 Dataset. We evaluated our method on six multiclass im-
+391 ageclassificationbenchmarksspanningbothcoarseandfine Implementation Details. All experiments are imple- 425
+392 grain regimes across diverse domains: the coarse-grained mented in PyTorch and conducted on vGPU-32GB of a 426
+393 set includes CIFAR-100 [16], Tiny-ImageNet [17], and cloudserverplatform. Weusethefeaturecachesextracted 427
+394 Caltech-101[6],whilethefine-grainedsetcoversFood-101 at 224 × 224 with CLIP preprocessing and keep the en- 428
+395 [3], EuroSAT [10], and Stanford cars [15]. Unless other- coderfixedthroughout,trainingonlythelinearheadontop 429
+396 wise specified, all images are resized to 224 × 224 prior of768-dimfeatures. OptimizationusesAdamW[21]with 430
+397 toinferenceandtraining,andadditionaldatasetdetailsare aninitiallearningrateof1×10−3,weightdecay1×10−4. 431
+398 providedintheAppendixA.1. Batch size varies in different datasets. We fix the random 432
+seedto42toensurereproducibility. Weusethefeaturesof 433
+399 Compared Methods. We evaluate our approach against instancestocomputetheclassprototype. Unlessotherwise 434
+400 thefollowingbaselinesandrecentnoisy-labelmethodsun- specified, the hyperparameter λ is set to 1.0 and the filter 435
+401 derunifiedsplitsandfeatures: rateρissetto0.3bydefault. 436
+6
+===== PAGE 7 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043. CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+85 96
+83 90
+81 84
+)% )%
+(y 79 (y 78
+c a c a
+r u c c A 77 r u c c A 72
+75 66
+73 60
+NL-C L2B DLD CSGN FCL NL-C L2B DLD FCL FL-C
+71 54
+1 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95100 1 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95100
+Epoch Epoch
+(a)CIFAR-100 (b)Caltech-101
+Figure2.Classificationaccuracyovertrainingepochs(1–100)formostmethodson(a)CIFAR100,(b)Caltech-101.
+CIFAR100 Caltech-101 StanfordCars EuroSAT Food-101 Tiny-ImageNet
+Zero-shotQwen 43.32 67.30 53.00 28.71 50.96 28.40
+L2B 74.67 66.65 75.24 76.19 94.19 79.12
+DLD 76.00 83.46 76.47 78.00 94.22 78.06
+CSGN 78.51 78.56 41.96 69.41 94.30 80.08
+FCL(Qwen) 81.29 87.95 77.14 90.67 94.65 81.40
+Table3. Accuracy(%)ofallcomparedmethodsonsixdatasets. Thehighestvalueforeachdatasetishighlightedinbold. FCL(Qwen)
+denotestheresultsusingFCLsderivedfromQwen-generatedlabels.
+437 4.2.ResultsofFCLs By modeling supervision as label distributions, it provides 462
+more expressive supervised information that let the model 463
+438 To assess the proposed FCL approach, we perform an ex- learn nuanced inter-class margins. Hence, FCL is practi- 464
+439 tensiveevaluationonsixstandardbenchmarksunderweak caltodeployforweaklysupervisedimageclassificationin 465
+440 supervision. LabeldistributionsareproducedbyCLIPwith real-worldsettings. 466
+441 aViT-L/14backboneandthedialogue-basedmodelQwen-
+442 VL-7B,withlittlemanualadjustment,areusedwithinFCL 4.3.NumberofTrainingEpoch 467
+443 to train a linear classifier. All runs share identical training
+To analyze the training cost of our method, we compare it 468
+444 settings to enable a fair comparison. The results are sum-
+withotherweaklysupervisedapproachesontheCIFAR100 469
+445 marizedinTable2andTable3.
+and Caltech-101 datasets. As shown in Figure 2, the FCL 470
+446 According to the results, our approach exceeds all method converges rapidly, reaching a stable performance 471
+447 weakly supervised baselines in the evaluated datasets. In profile within only a few epochs. It also attains the high- 472
+448 particular,onthedifficultEuroSATbenchmark,thegainex- estaccuracyearlierthancompetingmethods,indicatingthat 473
+449 ceeds10absolutepercentagepoints. Theseresultssuggest the prototype based filtering and selective correction sub- 474
+450 that traditional weak-supervision data do not fully capital- stantially reduce optimization difficulty and lead to more 475
+451 izeonthepriorknowledgeembeddedinVision–Language efficientutilizationofsupervisionduringtraining. 476
+452 Models(VLMs).BypairingVLMspriorswithselectivehu-
+453 mancorrectionsfocusedonambiguousregions,substantial 4.4.InfluenceofTheHyperparameterλ 477
+454 improvementsareachieved. Moreover, inseveraldatasets, To further investigate the sensitivity of our method to the 478
+455 FCL achieves accuracy close to the fully supervised ceil- balance between classification supervision and regulariza- 479
+456 ing,highlightingHCL’scapacitytonarrowthegapbetween tion of AUC-Consistent method, we analyze the influence 480
+457 weakandfullsupervisionwhilesignificantlycuttinganno- ofthetrade-offhyperparameterλinthetotalobjective. 481
+458 tationcost. We vary λ over a wide range and report accuracy on 482
+459 Insummary,FCLmakeseffectiveuseofthepriorVLMs CIFAR-100,Food-101andTiny-ImageNet. Accuracyrises 483
+460 andintroducestargetedmanualcorrectionsonlywhenwar- from λ = 0 to λ = 1, peaks near λ = 1, then declines 484
+461 ranted, yielding reliable supervision at low labeling cost. as λ grows, which is expected. Small λ underuses infor- 485
+7
+===== PAGE 8 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043. CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+Food-101 CIFAR100 Tiny-imagenet 90
+94.67
+0 84.18
+80.96
+80
+94.70
+r e te
+m
+λ
+2
+1
+81.30
+83
+8
+.
+4
+8
+.
+0
+26
+94.70
+)%
+( y
+c a70
+a r a p r e p 5 8 8 0 1 .9 .1 4 5 82.79 94.69 r u c c A 60 C St I a F n A fo R r 1 d 0 C 0 ars
+y
+H 10 81.54 94.68 Tiny-ImageNet
+80.32
+20 73.95 94.65 50
+79.65 0.1 0.2 0.3 0.4 0.5
+Filter rate ρ
+70 80 90 100
+Accuracy (%) Figure4. Classificationaccuracyunderdifferentfilterratesρ. A
+higherρcorrespondstocorrectingmoreinstances,leadingtoim-
+Figure3.Experimentalresultsontheinfluenceoftheconsistency
+proved overall accuracy and confirming the effectiveness of the
+weighthyperparameterλusingFCLsdata.
+FCLssetting.
+486 mationfromuncorrectedinstances,moderateλregularizes StanfordCars/ Caltech-101/ EuroSAT/
+487 rankingsandimprovesrobustness,largeλoverweightsthe VLM VLM VLM
+488 noisyAUC-Ctermanddriftsfromreliablesupervision.The
+PromptA 77.10/48.16 86.11/68.83 80.22/22.19
+489 sharpdroponCIFAR-100whenλincreasesfrom10to20
+PromptB 77.10/50.49 88.24/77.45 84.11/22.97
+490 isattributedtoitslargenumberoffine-grainedclasses,low-
+PromptC 77.14/53.00 87.95/67.30 90.67/28.71
+491 resolutionfeatures,anddenseprototypeoverlap,whicham-
+492 plifypairwisenoiseintheAUC-Cterm. Table 4. The left data is FCLs classification accuracy (%) and
+therightdataiscorrespondingVLM-generatedlabelaccuracy(%)
+493 4.5.Impactofthefilterrateρ underdifferentpromptsacrossdatasets.
+494 To investigate the effect of the filter rate ρ, we conducted
+495 acontrolledexperimenttoanalyzehowvaryingthepropor- pendixA.2. 519
+496 tion of filtered area influences the overall precision of the AspresentedinTable4,thechoiceofpromptaffectsthe 520
+497 classification. The filter rate ρ determines the percentage qualityofpseudolabelsgeneratedbyVLMtosomeextent. 521
+498 ofinstancesthatneedtobecorrected,measuredbythedis- However, the final classification performance of FCLs re- 522
+499 tance of cosine from the class prototype, that are selected mainsstableacrossdatasets.Thisrobustnessarisesfromthe 523
+500 forhumancorrection. combination of prototype-based filtering and selective hu- 524
+501 AsshowninFigure4,theoverallclassificationaccuracy man correction, which effectively suppresses the propaga- 525
+502 increases steadily as the filter rate ρ increases. This ob- tion of prompt-induced noise. Consequently, the proposed 526
+503 servation aligns well with intuition. A larger ρ introduces FCLs setting reduces the reliance on precise prompt engi- 527
+504 a greater proportion of human-corrected samples into the neeringandallowsgeneral-purposeVLMstobeemployed 528
+505 training set, thereby reducing the influence of noisy labels withoutextensivemanualtuning,highlightingitspractical- 529
+506 intheuncorrectedsubset. Consequently,theclassifierben- ityandadaptabilityinreal-worldannotationscenarios. 530
+507 efits from a higher-quality supervision information, which
+508 improves both training stability and generalization perfor-
+5.Conclusion
+531
+509 mance.
+Inthispaper,weproposeanovelweaklysupervisedlearn- 532
+510 4.6.ImpactofVariousPrompts
+ing setting called Filter-Corrected Labels (FCLs), which 533
+511 To evaluate the sensitivity of the proposed FCLs setting is a prototype-based filtering and correction mechanism 534
+512 to prompt design when generating VLM-based pseudo la- to improve the reliability of noisy labels generated by 535
+513 bels, we perform an analysis using different prompt vari- VLMs. Furthermore, we introduce an AUC-Consistent 536
+514 ants. Specifically, wecomparethreetypesofprompts: (1) methodthatoperatesexclusivelyontheuncorrecteddatato 537
+515 Prompt A and Prompt B, which share the same seman- stabilizepairwiserankings. Extensiveexperimentsonmul- 538
+516 tic content but are written in different languages, and (2) tiplebenchmarksdemonstratethatourmethodsignificantly 539
+517 PromptC,asimplifiedEnglishversionwithconcisephras- improves classification accuracy, confirming the effective- 540
+518 ing. Detailed prompt formulations are provided in Ap- nessandpracticality. 541
+8
+===== PAGE 9 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043.CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+542 References [18] Junnan Li, Richard Socher, and Steven C. H. Hoi. Di- 599
+videmix: Learning with noisy labels as semi-supervised 600
+543 [1] DanielAcuna,HaoyangLing,AmlanKar,andSanjaFidler. learning. InICLR,2020. 2 601
+544 PolygonRNN++:Efficientinteractiveannotationofsegmen-
+[19] YongqiangLin,YimingYao,JieZhang,TongliangLiu,and 602
+545 tationdatasets. InCVPR,pages859–868,2018. 2
+GangNiu. Learningthelatentcausalstructureformodeling 603
+546 [2] DavidBerthelot,NicholasCarlini,IanGoodfellow,Nicolas
+labelnoise. InNeurIPS,2024. 6 604
+547 Papernot, Avital Oliver, and Colin Raffel. Mixmatch: A
+[20] ShengLiu,JustinNilesWeed,NargesRazavian,andCarlos 605
+548 holisticapproachtosemi-supervisedlearning. InNeurIPS,
+Fernandez-Granda. Early-learning regularization prevents 606
+549 pages5049–5059,2019. 2
+memorization of noisy labels. In NeurIPS, pages 20331– 607
+550 [3] Lukas Bossard, Matthieu Guillaumin, and Luc Van Gool.
+20342,2020. 2 608
+551 Food-101: Miningdiscriminativecomponentswithrandom
+[21] IlyaLoshchilovandFrankHutter. Decoupledweightdecay 609
+552 forests. InECCV,pages508–521,2014. 6
+regularization. InICLR,2019. 6 610
+553 [4] TingChen,SimonKornblith,MohammadNorouzi,andGe-
+[22] Konstantinos K. Maninis, Sergi Caelles, Jordi Pont-Tuset, 611
+554 offreyHinton. Asimpleframeworkforcontrastivelearning
+andLucVanGool. Deepextremecut: Fromextremepoints 612
+555 ofvisualrepresentations. pages1597–1607,2020. 2
+toobjectsegmentation. InCVPR,pages616–625,2018. 2 613
+556 [5] ShengchaoDai,QiXu,ZhaoxuanYang,XuCao,andQing-
+[23] Takeru Miyato, Shin-ichi Maeda, Masanori Koyama, and 614
+557 ming Huang. Drauc: An instance-wise distributionally ro-
+558 bustaucoptimizationframework.InNeurIPS,pages21710– Shin Ishii. Virtual adversarial training: A regularization 615
+method for supervised and semi-supervised learning. In 616
+559 21723,2023. 3
+ICLR,2018. 2 617
+560 [6] LiFei-Fei,RobFergus,andPietroPerona. Learninggenera-
+561 tivevisualmodelsfromfewtrainingexamples. InCVPRW, [24] CurtisG.Northcutt,LuJiang,andIsaacL.Chuang. Confi- 618
+562 pages178–178,2004. 6 dentlearning:Estimatinguncertaintyindatasetlabels.Jour- 619
+nalofArtificialIntelligenceResearch,70:1373–1411,2021. 620
+563 [7] SurbhiY.Gadre,GabrielIlharco,MitchellWortsman,etal.
+2 621
+564 Datacomp: In search of the next generation of multimodal
+565 datasets. InNeurIPS,pages27092–27112,2023. 1 [25] DimPapadopoulos,JasperR.R.Uijlings,FrankKeller,and 622
+566 [8] WeiGaoandZhi-HuaZhou. Ontheconsistencyofaucpair- VittorioFerrari. Extremeclickingforefficientobjectanno- 623
+567 wiseoptimization. InIJCAI,pages939–945,2015. 3 tation. InICCV,pages4930–4939,2017. 2 624
+568 [9] BoHan,QuanmingYao,XingruiYu,etal.Co-teaching:Ro- [26] AlecRadford,JongWookKim,ChrisHallacy,etal. Learn- 625
+569 busttrainingofdeepneuralnetworkswithextremelynoisy ingtransferablevisualmodelsfromnaturallanguagesuper- 626
+570 labels. InNeurIPS,pages8527–8537,2018. 2 vision. InICML,pages8748–8763,2021. 1,6 627
+571 [10] Patrick Helber, Benjamin Bischke, Andreas Dengel, and [27] AlexanderJ.Ratner,ChristopherDeSa,SenWu,DanielSel- 628
+572 Damian Borth. Eurosat: A novel dataset for land use and sam,andChristopherRe´.Dataprogramming:Creatinglarge 629
+573 land cover classification. IEEE Journal of Selected Topics trainingsets,quickly. InNeurIPS,pages3567–3575,2016. 630
+574 inAppliedEarthObservationsandRemoteSensing, 12(7): 1,2 631
+575 2217–2226,2019. 6 [28] AlexanderJ.Ratner, StephenH.Bach, ParomaVarma, and 632
+576 [11] Dan Hendrycks, Norman Mu, Ekin Dogus Cubuk, Barret ChristopherRe´. Snorkel: Rapidtrainingdatacreationwith 633
+577 Zoph, Justin Gilmer, and Balaji Lakshminarayanan. Aug- weak supervision. The VLDB Journal, 29(2–3):709–730, 634
+578 mix:Asimpledataprocessingmethodtoimproverobustness 2020. 1,2 635
+579 anduncertainty. InICLR,2020. 2 [29] Christoph Schuhmann, Romain Vencu, Romain Beaumont, 636
+580 [12] SenyuHou,XuanZhang,YiLi,andJianWang. Directional etal.Laion-5b:Anopenlarge-scaledatasetfortrainingnext 637
+581 label diffusion for learning from noisy labels. In CVPR, generation image-text models. In NeurIPS, pages 25278– 638
+582 2025. 6 25301,2022. 1 639
+583 [13] MatthewNatoleJr,YimingYing,andSiweiLyu. Stochastic [30] Ozan Sener and Vladlen Koltun. Multi-task learning as 640
+584 aucoptimizationalgorithmswithlinearconvergence. Fron- multi-objective optimization. In NeurIPS, pages 525–536, 641
+585 tiers in Applied Mathematics and Statistics, 5:1–15, 2019. 2018. 5 642
+586 3 [31] Kihyuk Sohn, David Berthelot, Chun-Liang Li, Zizhao 643
+587 [14] HyunKim,EduardHovy,andYangyangYang.MEGAnno+: Zhang,NicholasCarlini,EkinDogusCubuk,AlexKurakin, 644
+588 Ahuman–LLMcollaborativeannotationsystem. InEACL, HanZhang,andColinRaffel. Fixmatch: Simplifyingsemi- 645
+589 pages1–6,2024. 1,2 supervised learning with consistency and confidence. In 646
+590 [15] JonathanKrause,MichaelStark,JiaDeng,andLiFei-Fei.3d NeurIPS,pages596–608,2020. 2 647
+591 objectrepresentationsforfine-grainedcategorization. pages [32] Hwanjun Song, Minseok Kim, Dongmin Park, Youngjoon 648
+592 554–561,2013. 6 Shin,andJaegulChoo.Learningfromnoisylabelswithdeep 649
+593 [16] Alex Krizhevsky and Geoffrey Hinton. Learning multiple neural networks: A survey. IEEE Transactions on Neural 650
+594 layersoffeaturesfromtinyimages. Technicalreport, Uni- Networks and Learning Systems, 34(11):8135–8153, 2023. 651
+595 versityofToronto,2009. 6 2 652
+596 [17] Ya Le and Xuan Yang. Tiny imagenet visual recognition [33] Mingxing Tan and Quoc V. Le. Efficientnet: Rethinking 653
+597 challenge. Technicalreport,CS231NCourseProject,2015. model scaling for convolutional neural networks. pages 654
+598 6 6105–6114,2019. 6 655
+9
+===== PAGE 10 =====
+CVPR CVPR
+#5043 #5043
+CVPR2026Submission#5043. CONFIDENTIALREVIEWCOPY.DONOTDISTRIBUTE.
+656 [34] AnttiTarvainenandHarriValpola. Meanteachersarebetter
+657 role models: Weight-averaged consistency targets improve
+658 semi-supervised deep learning results. In NeurIPS, pages
+659 1195–1204,2017. 2
+660 [35] Xiaoyu Wang, Yuchen Zhang, Jian Zhang, et al. Human–
+661 llmcollaborativeannotationthrougheffectiveverificationof
+662 LLMlabels. InCHI,pages1–15,2024. 1,2
+663 [36] YidongWang,HaoChen,QiHeng,etal. Freematch: Self-
+664 adaptivethresholdingforsemi-supervisedlearning.InICLR,
+665 pages1–18,2023. 2
+666 [37] Leon Weber and Barbara Plank. Activeaed: A human in
+667 theloopimprovesannotationerrordetection. InACL,pages
+668 8823–8845,2023. 1
+669 [38] HongxinWei,LeiFeng,XinyuChen,andBoAn.Combating
+670 noisylabelsbyagreement: Ajointtrainingmethodwithco-
+671 regularization. InCVPR,pages13726–13735,2020. 2
+672 [39] QizheXie, ZihangDai, EduardHovy, Minh-ThangLuong,
+673 andQuocV.Le. Unsuperviseddataaugmentationforcon-
+674 sistencytraining. InNeurIPS,pages6256–6268,2020. 2
+675 [40] ZhiweiXie,YifanLiu,Hong-YuHe,MingLi,andZhi-Hua
+676 Zhou.Weaklysupervisedaucoptimization:Aunifiedpartial
+677 aucapproach. IEEETPAMI,46(7):4780–4795,2024. 1,4
+678 [41] ZhiweiXie,WeiWang,ShimingXia,andGangNiu.Aucop-
+679 timizationfrommultipleunlabeleddatasets. InAAAI,pages
+680 15412–15420,2024. 3
+681 [42] Tianbao Yang and Yiming Ying. Auc maximization in the
+682 eraofbigdataandAI:Asurvey. ACMComputingSurveys,
+683 55(8):1–37,2022. 3
+684 [43] YunfengYao,QianLin,andTianbaoYang. Largescaleop-
+685 timizationofpartialaucinarangeoffalsepositiverates. In
+686 NeurIPS,pages35221–35236,2022. 3
+687 [44] ZiyuYuan,ZhengyanGuo,YunchengXu,YimingYing,and
+688 TianbaoYang. Federateddeepaucmaximizationforhetero-
+689 geneousdata. pages12219–12229,2021. 3
+690 [45] Ziyu Yuan, Yanan Yan, Milan Sonka, and Tianbao Yang.
+691 Large-scalerobustdeepaucmaximization. InICCV,pages
+692 3040–3050,2021. 3
+693 [46] ShuaiZheng,FengLiu,VienNguyen,andGeneveraI.Allen.
+694 Error-bounded correction of noisy labels. In ICML, pages
+695 11447–11457,2020. 2
+696 [47] YiyouZhou, XinyuLi, FangchengLiu, etal. L2b: Learn-
+697 ingtobootstraprobustmodelsforcombatinglabelnoise. In
+698 CVPR,2024. 6
+10

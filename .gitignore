@@ -18,6 +18,8 @@ venv/
 .env
 .ipynb_checkpoints/
 .autodl/
+upstream_extract/
+upstream.zip
 
 # Temporary local SSH authentication helper; never commit credentials.
 _ssh_askpass*.cmd

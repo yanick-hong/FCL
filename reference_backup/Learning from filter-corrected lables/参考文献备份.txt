@@ -1,0 +1,242 @@
+
+\begin{thebibliography}{99}
+\bibitem{xie2024wsauc}
+Z. Xie, Y. Liu, H.-Y. He, M. Li, and Z.-H. Zhou.
+Weakly Supervised AUC Optimization, A Unified Partial AUC Approach.
+IEEE Transactions on Pattern Analysis and Machine Intelligence, 46(7), 4780–4795, 2024.
+
+\bibitem{papadopoulos2017extreme}
+D. P. Papadopoulos, J. R. R. Uijlings, F. Keller, and V. Ferrari.
+Extreme Clicking for Efficient Object Annotation.
+In Proceedings of the IEEE International Conference on Computer Vision, 4930-4939, 2017.
+
+\bibitem{maninis2018dextr}
+K. K. Maninis, S. Caelles, J. Pont Tuset, and L. Van Gool.
+Deep Extreme Cut, From Extreme Points to Object Segmentation.
+In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 616-625, 2018.
+
+\bibitem{acuna2018polyrnnpp}
+D. Acuna, H. Ling, A. Kar, and S. Fidler.
+Polygon RNN++, Efficient Interactive Annotation of Segmentation Datasets.
+In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 859-868, 2018.
+
+\bibitem{ratner2016dataprog}
+A. J. Ratner, C. De Sa, S. Wu, D. Selsam, and C. Re.
+Data Programming, Creating Large Training Sets, Quickly.
+In Advances in Neural Information Processing Systems, 3567-3575, 2016.
+
+\bibitem{ratner2020snorkel}
+A. J. Ratner, S. H. Bach, P. Varma, and C. Re.
+Snorkel, Rapid Training Data Creation with Weak Supervision.
+The VLDB Journal, 29(2-3), 709-730, 2020.
+
+\bibitem{weber2023activeaed}
+L. Weber and B. Plank.
+ActiveAED, A Human in the Loop Improves Annotation Error Detection.
+In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics, 8823-8845, 2023.
+
+\bibitem{radford2021clip}
+A. Radford, J. W. Kim, C. Hallacy, et al.
+Learning Transferable Visual Models from Natural Language Supervision.
+Proceedings of the 38th International Conference on Machine Learning, PMLR 139, 8748-8763, 2021.
+
+\bibitem{schuhmann2022laion5b}
+C. Schuhmann, R. Vencu, R. Beaumont, et al.
+LAION 5B, An Open Large Scale Dataset for Training Next Generation Image Text Models.
+In Advances in Neural Information Processing Systems Datasets and Benchmarks Track, 25278-25301, 2022.
+
+\bibitem{gadre2023datacomp}
+S. Y. Gadre, G. Ilharco, M. Wortsman, et al.
+DataComp, In Search of the Next Generation of Multimodal Datasets.
+In Advances in Neural Information Processing Systems, 27092-27112, 2023.
+
+\bibitem{wang2024humanllm}
+X. Wang, Y. Zhang, J. Zhang, et al.
+Human LLM Collaborative Annotation Through Effective Verification of LLM Labels.
+In Proceedings of the ACM CHI Conference on Human Factors in Computing Systems, 1-15, 2024.
+
+\bibitem{kim2024meganno}
+H. Kim, E. H. Hovy, and Y. Yang.
+MEGAnno plus, A Human LLM Collaborative Annotation System.
+In Proceedings of the 18th Conference of the European Chapter of the Association for Computational Linguistics System Demonstrations, 1-6, 2024.
+
+\bibitem{tarvainen2017meanteacher}
+A. Tarvainen and H. Valpola.
+Mean Teachers are Better Role Models, Weight Averaged Consistency Targets Improve Semi Supervised Deep Learning Results.
+In Advances in Neural Information Processing Systems, 1195-1204, 2017.
+
+\bibitem{miyato2018vat}
+T. Miyato, S. I. Maeda, M. Koyama, and S. Ishii.
+Virtual Adversarial Training, A Regularization Method for Supervised and Semi Supervised Learning.
+In International Conference on Learning Representations, 1-15, 2018.
+
+\bibitem{berthelot2019mixmatch}
+D. Berthelot, N. Carlini, I. Goodfellow, N. Papernot, A. Oliver, and C. Raffel.
+MixMatch, A Holistic Approach to Semi Supervised Learning.
+In Advances in Neural Information Processing Systems, 5049-5059, 2019.
+
+\bibitem{xie2020uda}
+Q. Xie, Z. Dai, E. Hovy, M. T. Luong, and Q. V. Le.
+Unsupervised Data Augmentation for Consistency Training.
+In Advances in Neural Information Processing Systems, 6256-6268, 2020.
+
+\bibitem{sohn2020fixmatch}
+K. Sohn, D. Berthelot, C. L. Li, Z. Zhang, N. Carlini, E. D. Cubuk, A. Kurakin, H. Zhang, and C. Raffel.
+FixMatch, Simplifying Semi Supervised Learning with Consistency and Confidence.
+In Advances in Neural Information Processing Systems, 596-608, 2020.
+
+\bibitem{wang2023freematch}
+Y. Wang, H. Chen, Q. Heng, W. Hou, Y. Fan, Z. Wu, J. Wang, M. Savvides, T. Shinozaki, B. Raj, B. Schiele, and X. Xie.
+FreeMatch, Self Adaptive Thresholding for Semi Supervised Learning.
+In International Conference on Learning Representations, 1-18, 2023.
+
+\bibitem{han2018coteaching}
+B. Han, Q. Yao, X. Yu, G. Niu, M. Xu, W. Hu, I. Tsang, and M. Sugiyama.
+Co teaching, Robust Training of Deep Neural Networks with Extremely Noisy Labels.
+In Advances in Neural Information Processing Systems, 8527-8537,2018.
+
+\bibitem{li2020dividemix}
+J. Li, R. Socher, and S. C. H. Hoi.
+DivideMix, Learning with Noisy Labels as Semi Supervised Learning.
+In International Conference on Learning Representations, 1-18, 2020.
+
+\bibitem{liu2020elr}
+S. Liu, J. Niles Weed, N. Razavian, and C. Fernandez Granda.
+Early Learning Regularization Prevents Memorization of Noisy Labels.
+In Advances in Neural Information Processing Systems, 20331-20342, 2020.
+
+\bibitem{wei2020jocor}
+H. Wei, L. Feng, X. Chen, and B. An.
+Combating Noisy Labels by Agreement, A Joint Training Method with Co Regularization.
+In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 13726-13735, 2020.
+
+\bibitem{gao2015consistency}
+W. Gao and Z.-H. Zhou.
+On the Consistency of AUC Pairwise Optimization.
+In Proceedings of the Twenty-Fourth International Joint Conference on Artificial Intelligence, 939-945, 2015.
+
+
+\bibitem{zheng2020ebc}
+S. Zheng, F. Liu, V. Nguyen, and G. I. Allen.
+Error Bounded Correction of Noisy Labels.
+In Proceedings of the 37th International Conference on Machine Learning, PMLR 119, 11447-11457, 2020.
+
+\bibitem{northcutt2021cl}
+C. G. Northcutt, L. Jiang, and I. L. Chuang.
+Confident Learning, Estimating Uncertainty in Dataset Labels.
+Journal of Artificial Intelligence Research, 70, 1373-1411, 2021.
+
+\bibitem{yang2022survey}
+T. Yang and Y. Ying.
+AUC Maximization in the Era of Big Data and AI, A Survey.
+ACM Computing Surveys, 55(8), 1-37, 2022.
+
+\bibitem{yuan2021deepauc}
+Z. Yuan, Y. Yan, M. Sonka, and T. Yang.
+Large Scale Robust Deep AUC Maximization, A New Surrogate Loss and Empirical Studies on Medical Image Classification.
+In Proceedings of the IEEE International Conference on Computer Vision, 3040-3050, 2021.
+
+\bibitem{yuan2021fdam}
+Z. Yuan, Z. Guo, Y. Xu, Y. Ying, and T. Yang.
+Federated Deep AUC Maximization for Heterogeneous Data with a Constant Communication Complexity.
+In Proceedings of the 38th International Conference on Machine Learning, PMLR 139, 12219-12229, 2021.
+
+\bibitem{yao2022partialauc}
+Y. Yao, Q. Lin, and T. Yang.
+Large Scale Optimization of Partial AUC in a Range of False Positive Rates.
+In Advances in Neural Information Processing Systems, 35221-35236, 2022.
+
+\bibitem{dai2023drauc}
+S. Dai, Q. Xu, Z. Yang, X. Cao, and Q. Huang.
+DRAUC, An Instance wise Distributionally Robust AUC Optimization Framework.
+In Advances in Neural Information Processing Systems, 21710-21723, 2023.
+
+\bibitem{xie2024umlauc}
+Z. Xie, W. Wang, S. Xia, and G. Niu.
+AUC Optimization from Multiple Unlabeled Datasets.
+In Proceedings of the AAAI Conference on Artificial Intelligence, 15412-15420, 2024.
+
+\bibitem{natole2019stochauc}
+M. Natole Jr, Y. Ying, and S. Lyu.
+Stochastic AUC Optimization Algorithms with Linear Convergence.
+Frontiers in Applied Mathematics and Statistics, 5, 1-15, 2019.
+
+\bibitem{krizhevsky2009cifar100}
+A. Krizhevsky and G. Hinton.
+Learning Multiple Layers of Features from Tiny Images.
+Technical Report, University of Toronto, 1-60, 2009.
+
+\bibitem{le2015tinyimagenet}
+Y. Le and X. Yang.
+Tiny ImageNet Visual Recognition Challenge.
+CS231N Course Project Report, 1-8, 2015.
+
+\bibitem{fei2004caltech101}
+L. Fei Fei, R. Fergus, and P. Perona.
+Learning Generative Visual Models from Few Training Examples, An Incremental Bayesian Approach Tested on 101 Object Categories.
+In Proceedings of the IEEE Computer Society Conference on Computer Vision and Pattern Recognition Workshops, 178-178, 2004.
+
+\bibitem{bossard2014food101}
+L. Bossard, M. Guillaumin, and L. Van Gool.
+Food 101, Mining Discriminative Components with Random Forests.
+In Proceedings of the European Conference on Computer Vision, 508-521, 2014.
+
+\bibitem{helber2019eurosat}
+P. Helber, B. Bischke, A. Dengel, and D. Borth.
+EuroSAT, A Novel Dataset and Deep Learning Benchmark for Land Use and Land Cover Classification.
+IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, 12(7), 2217-2226, 2019.
+
+\bibitem{krause2013cars}
+J. Krause, M. Stark, J. Deng, and L. Fei Fei.
+3D Object Representations for Fine Grained Categorization.
+In Proceedings of the IEEE International Conference on Computer Vision Workshops, 554-561, 2013.
+
+\bibitem{zhou2024l2b}
+Y. Zhou, X. Li, F. Liu, Q. Wei, X. Chen, L. Yu, C. Xie, M. P. Lungren, and L. Xing.
+L2B, Learning to Bootstrap Robust Models for Combating Label Noise.
+In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2024.
+
+\bibitem{hou2025dld}
+S. Hou, X. Zhang, Y. Li, and J. Wang.
+Directional Label Diffusion Model for Learning from Noisy Labels.
+In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2025.
+
+\bibitem{lin2024csgn}
+Y. Lin, Y. Yao, J. Zhang, T. Liu, and G. Niu.
+Learning the Latent Causal Structure for Modeling Label Noise.
+In Advances in Neural Information Processing Systems, 2024.
+
+\bibitem{loshchilov2019adamw}
+I. Loshchilov and F. Hutter.
+Decoupled Weight Decay Regularization.
+In International Conference on Learning Representations, 2019.
+
+\bibitem{chen2020simclr}
+T. Chen, S. Kornblith, M. Norouzi, and G. Hinton.
+A Simple Framework for Contrastive Learning of Visual Representations.
+In Proceedings of the 37th International Conference on Machine Learning, PMLR 119, 1597-1607, 2020.
+
+\bibitem{hendrycks2020augmix}
+D. Hendrycks, N. Mu, E. D. Cubuk, B. Zoph, J. Gilmer, and B. Lakshminarayanan.
+AugMix, A Simple Data Processing Method to Improve Robustness and Uncertainty.
+In ICLR, 2020.
+
+\bibitem{song2023noisysurvey}
+H. Song, M. Kim, D. Park, Y. Shin, and J. G. Lee.
+Learning From Noisy Labels With Deep Neural Networks, A Survey.
+IEEE Transactions on Neural Networks and Learning Systems, 34(11), 8135-8153, 2023.
+
+\bibitem{tan2019efficientnet}
+M. Tan and Q. V. Le.
+EfficientNet, Rethinking Model Scaling for Convolutional Neural Networks.
+In Proceedings of the 36th International Conference on Machine Learning, PMLR 97, 6105-6114, 2019.
+
+\bibitem{sener2018multitask}
+O. Sener and V. Koltun.
+Multi-Task Learning as Multi-Objective Optimization.
+In Advances in Neural Information Processing Systems, 525-536, 2018.
+
+
+\end{thebibliography}
+\end{document}
+

@@ -176,7 +176,7 @@ class CIFARArrayDataset(Dataset):
 # 特征编码
 # -----------------------
 @torch.no_grad()
-def encode_split(clip_model, loader, label_embeds, name="train"):
+def encode_split(clip_model, loader, label_embeds, name="train", probability_logit_scale=1.0):
     feats_list, labels_list, probs_list, argmax_list = [], [], [], []
     total = len(loader.dataset)
     seen = 0
@@ -185,7 +185,7 @@ def encode_split(clip_model, loader, label_embeds, name="train"):
         f = clip_model.encode_image(xb)          # (B,D)
         f = f.to(torch.float32)
         f = F.normalize(f, dim=-1)
-        logits_clip = f @ label_embeds.t()       # (B,C)
+        logits_clip = probability_logit_scale * (f @ label_embeds.t())
         probs_clip = F.softmax(logits_clip, dim=-1).to(torch.float32)
         yhat = probs_clip.argmax(dim=-1)
 
@@ -217,13 +217,19 @@ def build_or_load_clip_cache_strict_split(
     seed: int = 42,
     num_workers: int = 2,
     force_rebuild: bool = False,
+    protocol: str = "legacy",
 ) -> Dict[str, torch.Tensor]:
-    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+    if protocol not in ("legacy", "clip"):
+        raise ValueError("protocol must be legacy or clip")
+    os.makedirs(os.path.dirname(cache_path) or ".", exist_ok=True)
 
     if (not force_rebuild) and os.path.exists(cache_path):
         try:
             print(f"[CACHE] Loading from: {cache_path}")
             data = torch.load(cache_path, map_location="cpu")
+            cached_protocol = data.get("meta", {}).get("protocol", "legacy")
+            if cached_protocol != protocol:
+                raise FileExistsError(f"Existing cache uses {cached_protocol}; select a new --cache for {protocol}")
             # 统一 dtypes（向后兼容）
             tensor_fp32_keys = [
                 "train_feats", "val_feats", "test_feats",
@@ -244,7 +250,7 @@ def build_or_load_clip_cache_strict_split(
             print("[CACHE] Loaded successfully.")
             return data
         except Exception as e:
-            print(f"[CACHE] Failed to load cache ({e}). Rebuilding...")
+            raise RuntimeError(f"Existing cache was preserved; use a new output path or explicit --force_rebuild: {e}") from e
 
     print("[CACHE] Building CLIP features with strict 45k/5k/10k split...")
     t0 = time.time()
@@ -263,9 +269,10 @@ def build_or_load_clip_cache_strict_split(
     val_label = train_label_all[val_idx]
 
     # 变换 & 模型
-    transform = get_transform(image_size=image_size)
-    clip_model, _ = clip.load(model_name, device=device)
+    clip_model, preprocess = clip.load(model_name, device=device)
     clip_model = clip_model.eval()
+    transform = preprocess if protocol == "clip" else get_transform(image_size=image_size)
+    probability_logit_scale = float(clip_model.logit_scale.exp().item()) if protocol == "clip" else 1.0
     print(f"[CLIP] Loaded {model_name} on {device}.")
 
     # 文本标签嵌入（按 meta 顺序）
@@ -280,9 +287,9 @@ def build_or_load_clip_cache_strict_split(
                               batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
 
     # 编码三份
-    train_feats, train_labels, clip_probs_train, clip_argmax_train = encode_split(clip_model, train_loader, label_embeds, "train")
-    val_feats,   val_labels,   clip_probs_val,   clip_argmax_val   = encode_split(clip_model, val_loader,   label_embeds, "val")
-    test_feats,  test_labels,  clip_probs_test,  clip_argmax_test  = encode_split(clip_model, test_loader,  label_embeds, "test")
+    train_feats, train_labels, clip_probs_train, clip_argmax_train = encode_split(clip_model, train_loader, label_embeds, "train", probability_logit_scale)
+    val_feats,   val_labels,   clip_probs_val,   clip_argmax_val   = encode_split(clip_model, val_loader,   label_embeds, "val", probability_logit_scale)
+    test_feats,  test_labels,  clip_probs_test,  clip_argmax_test  = encode_split(clip_model, test_loader,  label_embeds, "test", probability_logit_scale)
 
     # 校验数量与均衡
     def _check_counts(name, labels_t, expect_per_class):
@@ -324,6 +331,20 @@ def build_or_load_clip_cache_strict_split(
         "image_size": int(image_size),
         "model_name": model_name,
         "split_note": "Strict per-class split: train=450, val=50 per class (from the 50k training set). Test=10k official.",
+        "sample_ids": {
+            "train": [f"train50k/{int(i):05d}" for i in train_idx],
+            "val": [f"train50k/{int(i):05d}" for i in val_idx],
+            "test": [f"test10k/{i:05d}" for i in range(len(test_labels))],
+        },
+        "meta": {
+            "protocol": protocol,
+            "normalization": "CLIP_default" if protocol == "clip" else "ImageNet_mean_std_square_resize",
+            "preprocess": repr(transform),
+            "probability_logit_scale": probability_logit_scale,
+            "logit_scale": probability_logit_scale,
+            "normalization_mean": [0.48145466, 0.4578275, 0.40821073] if protocol == "clip" else [0.485, 0.456, 0.406],
+            "normalization_std": [0.26862954, 0.26130258, 0.27577711] if protocol == "clip" else [0.229, 0.224, 0.225],
+        },
     }
     torch.save(data, cache_path)
     dt = time.time() - t0
@@ -344,6 +365,7 @@ def parse_args():
     p.add_argument("--model_name", type=str, default="ViT-L/14")
     p.add_argument("--num_workers", type=int, default=2)
     p.add_argument("--force_rebuild", action="store_true")
+    p.add_argument("--protocol", choices=("legacy", "clip"), default="legacy")
     return p.parse_args()
 
 
@@ -359,4 +381,5 @@ if __name__ == "__main__":
         seed=args.seed,
         num_workers=args.num_workers,
         force_rebuild=args.force_rebuild,
+        protocol=args.protocol,
     )

@@ -200,6 +200,13 @@ def main():
         split: [str(path) for path in ds._image_files]
         for split, ds in (("train", ds_train), ("val", ds_val), ("test", ds_test))
     }
+    cache["sample_paths"] = {
+        split: [str((Path(ds._image_files[i]).resolve())) for i in range(len(ds._image_files))]
+        for split, ds in (("train", ds_train), ("val", ds_val), ("test", ds_test))
+    }
+    meta.update({"protocol": "openai_clip_legacy_scale", "normalization": "CLIP_default",
+                 "probability_logit_scale": float(model.logit_scale.exp().item()),
+                 "logit_scale": float(model.logit_scale.exp().item())})
 
     torch.save({**cache, "meta": meta}, args.out)
     print(f"[SAVE] Done -> {args.out}")

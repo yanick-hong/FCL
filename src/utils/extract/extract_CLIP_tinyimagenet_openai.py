@@ -50,12 +50,12 @@ def test_records(base, wnids):
 
 
 @torch.no_grad()
-def encode(model, loader, text_features, device):
+def encode(model, loader, text_features, device, probability_logit_scale=1.0):
     fs, ys, ps, aa = [], [], [], []
     for images, labels in loader:
         images = images.to(device, non_blocking=True)
         f = F.normalize(model.encode_image(images).float(), dim=-1)
-        p = (f @ text_features.t()).softmax(dim=-1)
+        p = (probability_logit_scale * (f @ text_features.t())).softmax(dim=-1)
         fs.append(f.cpu()); ys.append(labels.long()); ps.append(p.cpu()); aa.append(p.argmax(dim=-1).cpu())
     return tuple(torch.cat(x) for x in (fs, ys, ps, aa))
 
@@ -64,7 +64,12 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--data_root", required=True); p.add_argument("--cache", required=True)
     p.add_argument("--batch_size", type=int, default=256); p.add_argument("--workers", type=int, default=8)
-    p.add_argument("--seed", type=int, default=42); a = p.parse_args()
+    p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--probability-logit-scale", type=float, default=1.0,
+                   help="Legacy caches use 1.0; use 100 to study sharp CLIP probabilities in a new cache.")
+    a = p.parse_args()
+    if not 0 < a.probability_logit_scale < float("inf"):
+        p.error("--probability-logit-scale must be positive and finite")
     if Path(a.cache).exists(): print(f"[CACHE] Reusing {a.cache}"); return
     base, wnids, names = read_classes(a.data_root)
     train, val = train_records(base, wnids, 50, a.seed); test = test_records(base, wnids)
@@ -74,13 +79,18 @@ def main():
     with torch.no_grad():
         text_features = F.normalize(model.encode_text(tokens).float(), dim=-1)
     def loader(records): return DataLoader(TinyDataset(records, preprocess), batch_size=a.batch_size, shuffle=False, num_workers=a.workers, pin_memory=True)
-    tr_f, tr_y, tr_p, tr_a = encode(model, loader(train), text_features, device)
-    va_f, va_y, va_p, va_a = encode(model, loader(val), text_features, device)
-    te_f, te_y, te_p, te_a = encode(model, loader(test), text_features, device)
+    tr_f, tr_y, tr_p, tr_a = encode(model, loader(train), text_features, device, a.probability_logit_scale)
+    va_f, va_y, va_p, va_a = encode(model, loader(val), text_features, device, a.probability_logit_scale)
+    te_f, te_y, te_p, te_a = encode(model, loader(test), text_features, device, a.probability_logit_scale)
     out = {"train_feats": tr_f, "train_labels": tr_y, "val_feats": va_f, "val_labels": va_y, "test_feats": te_f, "test_labels": te_y, "clip_probs_train": tr_p, "clip_argmax_train": tr_a, "clip_probs_val": va_p, "clip_argmax_val": va_a, "clip_probs_test": te_p, "clip_argmax_test": te_a, "clip_label_embeds": text_features.cpu(), "classnames": names, "wnids": wnids, "meta": {"dataset": "Tiny-ImageNet-200", "source": str(base.resolve()), "split_seed": a.seed}}
     out["sample_ids"] = {split: [str(Path(path).relative_to(base)) for path, _ in records]
                          for split, records in (("train", train), ("val", val), ("test", test))}
-    out["meta"].update({"probability_logit_scale": 1.0,
+    out["sample_paths"] = {split: [str(Path(path).resolve()) for path, _ in records]
+                           for split, records in (("train", train), ("val", val), ("test", test))}
+    out["meta"].update({"probability_logit_scale": a.probability_logit_scale,
+                        "logit_scale": a.probability_logit_scale,
+                        "protocol": "openai_clip_legacy_scale" if a.probability_logit_scale == 1 else "openai_clip_custom_scale",
+                        "normalization": "CLIP_default", "preprocess": repr(preprocess),
                         "split_note": "90k train / 10k held-out train validation / 10k official labeled val as test"})
     Path(a.cache).parent.mkdir(parents=True, exist_ok=True); torch.save(out, a.cache)
     print(f"[DONE] Tiny-ImageNet: train={len(tr_y)} val={len(va_y)} test={len(te_y)} -> {a.cache}")

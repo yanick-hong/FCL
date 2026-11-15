@@ -185,6 +185,15 @@ def main():
     clip_argmax_test  = clip_probs_test.argmax(dim=-1).long()
 
     # 8) 保存缓存（统一 fp32 / int64）
+    def sample_path(dataset, index):
+        if hasattr(dataset, "_image_files"):
+            return Path(dataset._image_files[index])
+        if hasattr(dataset, "_image_paths"):
+            return Path(dataset._image_paths[index])
+        if hasattr(dataset, "samples"):
+            return Path(dataset.samples[index][0])
+        raise RuntimeError("Food101 dataset does not expose stable image paths")
+
     cache = {
         "train_feats": train_feats.float(),
         "val_feats":   val_feats.float(),
@@ -205,11 +214,26 @@ def main():
         "clip_label_embeds": text_embeds.cpu().float(),
 
         "classnames": classnames,
+        "sample_ids": {
+            "train": [str(sample_path(ds_train, i).resolve().relative_to(data_root.resolve())) for i in train_idx],
+            "val": [str(sample_path(ds_train, i).resolve().relative_to(data_root.resolve())) for i in val_idx],
+            "test": [str(sample_path(ds_test, i).resolve().relative_to(data_root.resolve())) for i in range(len(ds_test))],
+        },
+        "sample_paths": {
+            "train": [str(sample_path(ds_train, i).resolve()) for i in train_idx],
+            "val": [str(sample_path(ds_train, i).resolve()) for i in val_idx],
+            "test": [str(sample_path(ds_test, i).resolve()) for i in range(len(ds_test))],
+        },
         "meta": {
             "dataset": "Food-101",
             "model": args.model,
             "val_per_class": args.val_per_class,
             "created_time": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "protocol": "openai_clip_legacy_scale",
+            "normalization": "CLIP_default",
+            "preprocess": repr(preprocess),
+            "probability_logit_scale": 100.0,
+            "logit_scale": 100.0,
         }
     }
 

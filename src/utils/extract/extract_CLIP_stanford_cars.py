@@ -37,11 +37,12 @@ def read_records(annotation_file, image_dir):
     records = []
     for annotation in annotations.ravel():
         filename = str(scalar(annotation.fname))
-        # The official test annotation file contains filenames/bounding boxes
-        # but intentionally omits class labels.  Test labels are not needed
-        # for the noisy-label training run, so retain -1 for that split.
         class_value = getattr(annotation, "class", None)
-        label = -1 if class_value is None else int(scalar(class_value)) - 1
+        if class_value is None:
+            raise ValueError(f"{annotation_file} has no class labels; provide cars_test_annos_withlabels.mat before extraction")
+        label = int(scalar(class_value)) - 1
+        if not 0 <= label < 196:
+            raise ValueError(f"Invalid Stanford Cars class label: {label + 1}")
         records.append((str(Path(image_dir) / filename), label))
     return records
 
@@ -62,12 +63,12 @@ def split_train(records, seed=42):
 
 
 @torch.no_grad()
-def encode(model, loader, text_features, device):
+def encode(model, loader, text_features, device, probability_logit_scale=1.0):
     features, labels, probs, argmax = [], [], [], []
     for images, targets in loader:
         images = images.to(device, non_blocking=True)
         image_features = F.normalize(model.encode_image(images).float(), dim=-1)
-        probabilities = (image_features @ text_features.t()).softmax(dim=-1)
+        probabilities = (probability_logit_scale * (image_features @ text_features.t())).softmax(dim=-1)
         features.append(image_features.cpu()); labels.append(targets.long())
         probs.append(probabilities.cpu()); argmax.append(probabilities.argmax(dim=-1).cpu())
     return tuple(torch.cat(values) for values in (features, labels, probs, argmax))
@@ -80,18 +81,24 @@ def main():
     parser.add_argument("--batch_size", type=int, default=256)
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--probability-logit-scale", type=float, default=1.0)
     args = parser.parse_args()
+    if not 0 < args.probability_logit_scale < float("inf"):
+        parser.error("--probability-logit-scale must be positive and finite")
     if os.path.exists(args.cache):
+        cached = torch.load(args.cache, map_location="cpu", weights_only=True)
+        test_labels = cached.get("test_labels")
+        if not isinstance(test_labels, torch.Tensor) or test_labels.numel() == 0 or (test_labels < 0).any():
+            raise ValueError("Existing Stanford Cars cache has no labeled test split; provide cars_test_annos_withlabels.mat and rebuild into a new cache")
         print(f"[CACHE] Reusing {args.cache}"); return
     root = Path(args.data_root)
     devkit = root / "devkit"
     train_records = read_records(devkit / "cars_train_annos.mat", root / "cars_train")
-    # Prefer the public annotation file that includes test classes when it is
-    # available.  The official ``cars_test_annos.mat`` intentionally omits
-    # classes, so fall back to it only for feature extraction without labels.
     test_annotation = devkit / "cars_test_annos_withlabels.mat"
     if not test_annotation.exists():
-        test_annotation = devkit / "cars_test_annos.mat"
+        test_annotation = root / "cars_test_annos_withlabels.mat"
+    if not test_annotation.exists():
+        raise FileNotFoundError("Stanford Cars evaluation requires cars_test_annos_withlabels.mat in the dataset root or devkit/")
     test_records = read_records(test_annotation, root / "cars_test")
     names_raw = loadmat(devkit / "cars_meta.mat", squeeze_me=True)["class_names"]
     class_names = [str(scalar(name)) for name in names_raw.ravel()]
@@ -99,20 +106,30 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model, preprocess = clip.load("ViT-L/14", device=device); model.eval()
     text = clip.tokenize([f"a photo of a {name}." for name in class_names]).to(device)
-    text_features = F.normalize(model.encode_text(text).float(), dim=-1)
+    with torch.no_grad():
+        text_features = F.normalize(model.encode_text(text).float(), dim=-1)
 
     def load(records):
         ds = CarDataset(records, preprocess)
         return DataLoader(ds, batch_size=args.batch_size, shuffle=False, num_workers=args.workers, pin_memory=True)
-    tr_f, tr_y, tr_p, tr_a = encode(model, load(train_records), text_features, device)
-    va_f, va_y, va_p, va_a = encode(model, load(val_records), text_features, device)
-    te_f, te_y, te_p, te_a = encode(model, load(test_records), text_features, device)
+    tr_f, tr_y, tr_p, tr_a = encode(model, load(train_records), text_features, device, args.probability_logit_scale)
+    va_f, va_y, va_p, va_a = encode(model, load(val_records), text_features, device, args.probability_logit_scale)
+    te_f, te_y, te_p, te_a = encode(model, load(test_records), text_features, device, args.probability_logit_scale)
     output = {
         "train_feats": tr_f.float(), "train_labels": tr_y.long(), "val_feats": va_f.float(), "val_labels": va_y.long(),
         "test_feats": te_f.float(), "test_labels": te_y.long(), "clip_probs_train": tr_p.float(), "clip_argmax_train": tr_a.long(),
         "clip_probs_val": va_p.float(), "clip_argmax_val": va_a.long(), "clip_probs_test": te_p.float(), "clip_argmax_test": te_a.long(),
         "clip_label_embeds": text_features.cpu(), "class_names": class_names,
-        "meta": {"dataset": "Stanford Cars", "split_seed": args.seed, "source": str(root.resolve())},
+        "meta": {"dataset": "Stanford Cars", "split_seed": args.seed, "source": str(root.resolve()),
+                 "probability_logit_scale": args.probability_logit_scale,
+                 "logit_scale": args.probability_logit_scale,
+                 "protocol": "openai_clip_legacy_scale" if args.probability_logit_scale == 1 else "openai_clip_custom_scale",
+                 "normalization": "CLIP_default", "preprocess": repr(preprocess),
+                 "test_annotations": str(test_annotation.resolve())},
+        "sample_ids": {split: [str(Path(path).resolve().relative_to(root.resolve())) for path, _ in records]
+                       for split, records in (("train", train_records), ("val", val_records), ("test", test_records))},
+        "sample_paths": {split: [str(Path(path).resolve()) for path, _ in records]
+                         for split, records in (("train", train_records), ("val", val_records), ("test", test_records))},
     }
     Path(args.cache).parent.mkdir(parents=True, exist_ok=True); torch.save(output, args.cache)
     print(f"[DONE] Stanford Cars: train={len(tr_y)} val={len(va_y)} test={len(te_y)} -> {args.cache}")
