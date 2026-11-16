@@ -86,9 +86,6 @@ ablations. All methods use the same frozen-feature protocol described in
 Additional Baseline Comparison. The highest and second-highest results in
 each dataset column are shown in bold and underlined, respectively.}
 \label{tab:supp-additional-baselines}
-
-
-
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
@@ -97,6 +94,7 @@ each dataset column are shown in bold and underlined, respectively.}
 Method & \textbf{CIFAR-100} & \textbf{Caltech-101} & \textbf{EuroSAT} & \textbf{Food-101} & \textbf{Tiny-ImageNet} \\
 \midrule
 CLIP-Zero-CE~\cite{radford2021clip} & 78.44 & 87.90 & 45.19 & 90.57 & 77.78 \\
+CLIP-Conf-CE~\cite{radford2021clip} & 82.40 & 94.70 & 64.07 & 92.35 & 83.41 \\
 Xie-Trim-AUC~\cite{xie2024wsauc} & 75.90 & 81.68 & 37.41 & 88.34 & 75.50 \\
 FixMatch*~\cite{sohn2020fixmatch} & 83.58 & 87.44 & 90.11 & 92.01 & 83.52 \\
 SoftMatch*~\cite{chen2023softmatch} & 62.66 & 16.13 & 70.52 & 92.04 & 82.63 \\
@@ -158,6 +156,11 @@ CLIP RN50 & 11.11 & 78.00 & 29.59 & \textbf{87.52} \\
     \item \textbf{CLIP-Zero-CE \cite{radford2021clip}.} This control uses CLIP's top-1 pseudo-label for
     every training image. A linear classifier is optimized with cross-entropy
     without human correction.
+
+    \item \textbf{CLIP-Conf-CE \cite{radford2021clip}.} This baseline selects
+    low-confidence CLIP predictions for correction and trains the classifier
+    with cross-entropy. It uses confidence-based selection rather than the
+    prototype-distance mask used by FCL.
 
     \item \textbf{Xie-Trim-AUC \cite{xie2024wsauc}.} This is a cache-level adaptation inspired by
     the weakly supervised AUC formulation of Xie et al.~\cite{xie2024wsauc}.

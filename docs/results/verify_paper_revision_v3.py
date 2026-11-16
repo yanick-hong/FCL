@@ -42,6 +42,7 @@ def main() -> None:
     assert "Random + AUC-C" in additional
     assert "FCL+soft CE" in additional
     assert "FCL-CE" in additional
+    assert "CLIP-Conf-CE" in additional
     assert "CLIP-Margin-CE" not in additional
     assert "Prototype + AUC-C" not in additional
     assert "Tiny-ImageNet" in additional
@@ -50,7 +51,7 @@ def main() -> None:
     assert "\\pm" not in additional
     compared_start = supp_tex.index("\\paragraph{Compared methods.}")
     compared = supp_tex[compared_start : supp_tex.index("Table~\\ref{tab:supp-additional-baselines}", compared_start)]
-    for method in ("CLIP-Zero-CE", "Xie-Trim-AUC", "FixMatch*", "SoftMatch*", "Random-Filter-CE", "FCL-CE", "FCL+soft CE", "Random + AUC-C", "FCL (ours)"):
+    for method in ("CLIP-Zero-CE", "CLIP-Conf-CE", "Xie-Trim-AUC", "FixMatch*", "SoftMatch*", "Random-Filter-CE", "FCL-CE", "FCL+soft CE", "Random + AUC-C", "FCL (ours)"):
         assert method in compared, method
     method_table = main_tex[main_tex.index("\\label{tab:method-compare-clip}") : main_tex.index("\\end{table*}", main_tex.index("\\label{tab:method-compare-clip}"))]
     assert "Random-Filter-CE" in method_table and "FCL-CE" in method_table
