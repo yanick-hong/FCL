@@ -43,9 +43,9 @@ def main() -> None:
     assert "Random + AUC-C" in additional
     assert "Prototype + CLIP soft-CE" in additional
     assert "Tiny-ImageNet" in additional
-    assert "Prototype + AUC-C & 83.420 & 95.688 & 92.852 & 94.779 & 84.070" in additional
-    assert "Random + AUC-C & 83.633 & 92.610 & 94.062 & 94.672 & 83.840" in additional
-    assert "Prototype + CLIP soft-CE & 82.463 & 96.322 & 86.901 & 94.595 & 80.660" in additional
+    assert "Prototype + AUC-C & 83.420 & 95.688 & 92.852" in additional and "94.779" in additional and "84.070" in additional
+    assert "Random + AUC-C" in additional and "83.633" in additional and "94.062" in additional and "83.840" in additional
+    assert "Prototype + CLIP soft-CE" in additional and "82.463" in additional and "96.322" in additional and "80.660" in additional
     assert "\\pm" not in additional
     method_table = main_tex[main_tex.index("\\label{tab:method-compare-clip}") : main_tex.index("\\end{table*}", main_tex.index("\\label{tab:method-compare-clip}"))]
     assert "Random-Filter-CE" in method_table and "FCL-Filter-CE" in method_table

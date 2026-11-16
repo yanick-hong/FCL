@@ -83,8 +83,8 @@ CLIP generates hard pseudo-labels and supplies normalized image features, class-
 \begin{table*}[t]
 \caption{Test accuracy (\%) of the additional baselines and controlled
 ablations. All methods use the same frozen-feature protocol described in
-Additional Baseline Comparison. The best and second-best results among the
-additional baselines are shown in bold and underlined, respectively.}
+Additional Baseline Comparison. The highest and second-highest results in
+each dataset column are shown in bold and underlined, respectively.}
 \label{tab:supp-additional-baselines}
 
 
@@ -99,14 +99,14 @@ Method & \textbf{CIFAR-100} & \textbf{Caltech-101} & \textbf{EuroSAT} & \textbf{
 CLIP-Zero-CE~\cite{radford2021clip} & 78.44 & 87.90 & 45.19 & 90.57 & 77.78 \\
 CLIP-Margin-CE & 78.44 & 87.90 & 45.19 & 90.54 & 77.78 \\
 Xie-Trim-AUC~\cite{xie2024wsauc} & 75.90 & 81.68 & 37.41 & 88.34 & 75.50 \\
-FixMatch*~\cite{sohn2020fixmatch} & \underline{83.58} & 87.44 & \underline{90.11} & 92.01 & \underline{83.52} \\
-SoftMatch*~\cite{chen2023softmatch} & 62.66 & 16.13 & 70.52 & \underline{92.04} & 82.63 \\
+FixMatch*~\cite{sohn2020fixmatch} & 83.58 & 87.44 & 90.11 & 92.01 & 83.52 \\
+SoftMatch*~\cite{chen2023softmatch} & 62.66 & 16.13 & 70.52 & 92.04 & 82.63 \\
 Random-Filter-CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
-FCL-Filter-CE & 81.94 & \underline{89.40} & 58.41 & 91.75 & 82.16 \\
-Prototype + CLIP soft-CE & 82.463 & 96.322 & 86.901 & 94.595 & 80.660 \\
-Random + AUC-C & 83.633 & 92.610 & 94.062 & 94.672 & 83.840 \\
-Prototype + AUC-C & 83.420 & 95.688 & 92.852 & 94.779 & 84.070 \\
-FCL (ours) & \textbf{85.02} & \textbf{96.20} & \textbf{93.44} & \textbf{94.78} & \textbf{84.23} \\
+FCL-Filter-CE & 81.94 & 89.40 & 58.41 & 91.75 & 82.16 \\
+Prototype + CLIP soft-CE & 82.463 & \textbf{96.322} & 86.901 & 94.595 & 80.660 \\
+Random + AUC-C & \underline{83.633} & 92.610 & \textbf{94.062} & 94.672 & 83.840 \\
+Prototype + AUC-C & 83.420 & 95.688 & 92.852 & \underline{94.779} & \underline{84.070} \\
+FCL (ours) & \textbf{85.02} & \underline{96.20} & \underline{93.44} & \textbf{94.78} & \textbf{84.23} \\
 \bottomrule
 \end{tabular*}
 
