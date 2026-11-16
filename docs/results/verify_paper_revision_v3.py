@@ -34,6 +34,15 @@ def main() -> None:
     table1 = main_tex[main_tex.index("\\label{tab:fcls-annotation}") : main_tex.index("\\end{table*}", main_tex.index("\\label{tab:fcls-annotation}"))]
     qwen = supp_tex[supp_tex.index("\\label{tab:supp-qwen-labels}") : supp_tex.index("\\end{table*}", supp_tex.index("\\label{tab:supp-qwen-labels}"))]
     assert "count" not in table1.lower() and "queries count" not in qwen.lower()
+    assert "Train Samples & Classes & Qwen & UL-ER & FL-ER & Random-30 & Random-M & FCL-Q & Gain" in qwen
+    assert "Caltech-101 & 2,945 & 102" in qwen
+    assert "tab:component-controls" not in main_tex
+    method_table = main_tex[main_tex.index("\\label{tab:method-compare-clip}") : main_tex.index("\\end{table*}", main_tex.index("\\label{tab:method-compare-clip}"))]
+    assert "Random-Filter-CE" in method_table and "FCL-Filter-CE" in method_table
+    seed_table_start = supp_tex.index("\\label{tab:supp-controlled-training-seeds}")
+    seed_table = supp_tex[supp_tex.rfind("\\begin{table}[t]", 0, seed_table_start) : supp_tex.index("\\end{table}", seed_table_start)]
+    assert "Mean $\\pm$ SD" in seed_table and "95\\% CI" in seed_table
+    assert "Seed 42" not in seed_table and "Seed 43" not in seed_table and "Seed 44" not in seed_table
 
     unchanged = []
     changed = []
@@ -58,6 +67,9 @@ def main() -> None:
             "query_count_columns_removed": True,
             "caltech_102_class": True,
             "dagger_footnotes_absent": True,
+            "component_controls_merged": True,
+            "qwen_table_ten_columns": True,
+            "seed_columns_removed": True,
         },
     }
     out = ROOT / "docs" / "results" / "paper_revision_verification_v3.json"

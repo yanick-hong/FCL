@@ -11,6 +11,9 @@
     "table1_unified": true,
     "query_count_columns_removed": true,
     "caltech_102_class": true,
-    "dagger_footnotes_absent": true
+    "dagger_footnotes_absent": true,
+    "component_controls_merged": true,
+    "qwen_table_ten_columns": true,
+    "seed_columns_removed": true
   }
 }

@@ -1,0 +1,16 @@
+{
+  "status": "source_compiled_successfully",
+  "compiled_by": "Codex desktop LaTeX compiler",
+  "source_root": "paper/FCL_CVPR2027",
+  "documents": ["main.tex", "supplement.tex"],
+  "changes": [
+    "Merged Random-Filter-CE and FCL-Filter-CE into the main test-accuracy comparison table.",
+    "Converted the three-seed stability table to a single-column table without individual seed columns.",
+    "Reformatted the Qwen label-quality table to the ten-column training-sample/class layout with single-seed Random-30 and Random-M values."
+  ],
+  "notes": [
+    "Both main.tex and supplement.tex compiled successfully after these edits.",
+    "Existing output PDFs from the previous revision are retained as historical artifacts; the source files are the current authoritative version.",
+    "No new multi-seed experiment was run for this revision."
+  ]
+}

@@ -303,6 +303,11 @@ DivideMix \cite{li2020dividemix} & 78.70 & 66.94 & 44.70 & 90.69 & 78.62 \\
 DCD \cite{mu2025dcd} & 80.44 & 90.55 & 54.30 & 91.41 & 81.07 \\
 IDO \cite{zhang2025ido} & 78.34 & 65.09 & 43.85 & 89.53 & 79.56 \\
 DLD \cite{hou2025dld} & \underline{84.04} & 92.05 & 74.63 & 91.74 & 83.16 \\
+\midrule
+& \multicolumn{5}{c}{\textit{Selection and loss ablations}} \\
+\cmidrule(lr){2-6}
+Random-Filter-CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
+FCL-Filter-CE & 81.94 & 89.40 & 58.41 & 91.75 & 82.16 \\
 FCL (ours)        & \textbf{85.02} & \textbf{96.20} & \textbf{93.44} & \textbf{94.78} & \textbf{84.23} \\
 \bottomrule
 \end{tabular*}
@@ -349,8 +354,12 @@ We compare FCL with the following representative baselines:
     \item DivideMix \cite{li2020dividemix}: Clean/noisy sample separation and consistency training.
     \item DCD \cite{mu2025dcd} and IDO \cite{zhang2025ido}: Center-distance mining and instance-difficulty modeling for noisy labels, respectively.
     \item DLD \cite{hou2025dld}: Diffusion-based label denoising.
+    \item Random-Filter-CE and FCL-Filter-CE: selection and loss controls
+    that use mixed corrected and uncorrected hard targets. The former uses a
+    uniform correction mask, while the latter uses the prototype-distance
+    mask; both are trained with cross-entropy.
 \end{itemize}
-DivideMix, DCD, IDO, and DLD are cache-level adaptations with linear classifiers. They share FCL's CLIP-based observed labels, corrected labels, correction masks, annotation budget, data partitions, and frozen CLIP features, while retaining method-specific sampling and optimization. The comparison concerns these implementations rather than the original full-model training pipelines. Additional baselines and ablations are reported in the supplementary material.
+DivideMix, DCD, IDO, and DLD are cache-level adaptations with linear classifiers. They share FCL's CLIP-based observed labels, corrected labels, correction masks, annotation budget, data partitions, and frozen CLIP features, while retaining method-specific sampling and optimization. The comparison concerns these implementations rather than the original full-model training pipelines. Additional baselines and the controlled AUC-C and soft-label objective ablations are reported in the supplementary material.
 
 % VERIFY V2: verify reported hyperparameters/sampler against CLIP run configurations.
 \paragraph{Implementation Details.}
@@ -364,7 +373,7 @@ Experiments use PyTorch on a vGPU-32GB server. CLIP generates hard pseudo-labels
 \end{figure}
 
 \subsection{Results of FCL-C}
-Table~\ref{tab:method-compare-clip} compares FCL with the weakly supervised baselines on five benchmarks and includes FSL-C as a fully supervised reference.
+Table~\ref{tab:method-compare-clip} compares FCL with the weakly supervised baselines on five benchmarks and includes FSL-C as a fully supervised reference. The final block reports the selection and loss ablations using the same test protocol.
 
 FCL achieves higher accuracy than the compared weakly supervised baselines on all five datasets. On EuroSAT, the gain over the strongest weakly supervised baseline in Table~\ref{tab:method-compare-clip} is $12.77$ percentage points; the gain over the additional FixMatch-style control is $3.33$ points. FCL also approaches the fully supervised reference on several datasets while correcting only a subset of training labels.
 
@@ -375,29 +384,6 @@ FCL achieves higher accuracy than the compared weakly supervised baselines on al
   \label{fig:rho}
 \end{figure}
 
-
-\subsection{Selection and Loss Controls}
-The supplementary controls separate two design choices. Replacing random selection with prototype selection under CE increases accuracy by $0.11$--$3.08$ percentage points across the five datasets. With the prototype filter retained, FCL exceeds mixed-label CE by $2.07$--$35.03$ points. Table~\ref{tab:component-controls} brings these existing controls together. These comparisons motivate the selection and ranking components, but isolating their interaction also requires a random-selection version of AUC-C and matched sampling and learning-rate schedules.
-
-\begin{table*}[t]
-\caption{Existing selection and loss controls, reported as test accuracy (\%). Both CE controls use mixed corrected and uncorrected hard targets. FCL uses CE on corrected samples and AUC-C on uncorrected samples. These controls do not by themselves isolate differences in sampling or optimization.}
-\label{tab:component-controls}
-
-
-
-\centering
-\small
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrr}
-\toprule
-Method & CIFAR-100 & Caltech-101 & EuroSAT & Food-101 & Tiny-ImageNet \\
-\midrule
-Random-Filter-CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
-FCL-Filter-CE & 81.94 & 89.40 & 58.41 & 91.75 & 82.16 \\
-FCL (ours) & 85.02 & 96.20 & 93.44 & 94.78 & 84.23 \\
-\bottomrule
-\end{tabular*}
-
-\end{table*}
 
 \subsection{Influence of Hyperparameter \texorpdfstring{$\lambda$}{lambda}}
 We examine $\lambda$, which balances corrected-sample cross-entropy and AUC-C, on CIFAR-100, Food-101, and Tiny-ImageNet while fixing all other training settings.
