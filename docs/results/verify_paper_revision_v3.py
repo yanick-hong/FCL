@@ -22,7 +22,7 @@ def sha256(path: Path) -> str:
 def main() -> None:
     main_tex = (PAPER / "main.tex").read_text(encoding="utf-8")
     supp_tex = (PAPER / "supplement.tex").read_text(encoding="utf-8")
-    assert "Selection and Objective Ablations" in supp_tex
+    assert "Controlled selection and objective ablations" in supp_tex
     assert "Stability across Training Seeds" in supp_tex
     assert "Filter-Corrected Qwen Labels" in supp_tex
     assert "Random-30" in main_tex and "Random-M" in main_tex
@@ -37,6 +37,11 @@ def main() -> None:
     assert "Train Samples & Classes & Qwen & UL-ER & FL-ER & Random-30 & Random-M & FCL-Q & Gain" in qwen
     assert "Caltech-101 & 2,945 & 102" in qwen
     assert "tab:component-controls" not in main_tex
+    assert "tab:supp-controlled-selection-objective" not in supp_tex
+    additional = supp_tex[supp_tex.index("\\label{tab:supp-additional-baselines}") : supp_tex.index("\\end{table*}", supp_tex.index("\\label{tab:supp-additional-baselines}"))]
+    assert "Prototype + AUC-C" in additional
+    assert "Random + AUC-C" in additional
+    assert "Prototype + CLIP soft-CE" in additional
     method_table = main_tex[main_tex.index("\\label{tab:method-compare-clip}") : main_tex.index("\\end{table*}", main_tex.index("\\label{tab:method-compare-clip}"))]
     assert "Random-Filter-CE" in method_table and "FCL-Filter-CE" in method_table
     seed_table_start = supp_tex.index("\\label{tab:supp-controlled-training-seeds}")
@@ -61,7 +66,8 @@ def main() -> None:
         "changed_files": changed,
         "unchanged_original_files": len(unchanged),
         "checks": {
-            "two_ablation_sections": True,
+            "controlled_ablation_block_in_supp_table1": True,
+            "standalone_supp_table3_removed": True,
             "qwen_section": True,
             "table1_unified": True,
             "query_count_columns_removed": True,

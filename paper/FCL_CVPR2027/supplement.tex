@@ -81,9 +81,12 @@ test set is never used for model selection.
 CLIP generates hard pseudo-labels and supplies normalized image features, class-text embeddings, and class posteriors. To construct the FCL split, we group training images by the maximum-probability CLIP class and average their features within each group. The farthest instances are selected for simulated correction at nominal rate $\rho=0.3$. The observed-label cache stores $y_{\mathrm{obs}}$ and $s$: benchmark labels replace the selected labels when $s=0$, while the original CLIP labels are retained when $s=1$. AUC-C uses the CLIP posterior and detached classifier posterior for its pair weights.
 
 \begin{table*}[t]
-\caption{Test accuracy (\%) of the additional baselines on five datasets. Implementation details are given in Additional Baseline Comparison.
-The best and second-best results within this table are shown in bold and
-underlined, respectively.}
+\caption{Test accuracy (\%) of the additional baselines and controlled
+ablations. The first block reports methods evaluated on all five datasets;
+the final block reports the controlled selection and objective ablations.
+Implementation details are given in Additional Baseline Comparison. The
+best and second-best results within the baseline block are shown in bold and
+underlined, respectively. A dash denotes an unavailable controlled run.}
 \label{tab:supp-additional-baselines}
 
 
@@ -103,6 +106,12 @@ FixMatch*~\cite{sohn2020fixmatch} & \underline{83.58} & 87.44 & \underline{90.11
 SoftMatch*~\cite{chen2023softmatch} & 62.66 & 16.13 & 70.52 & \underline{92.04} & 82.63 \\
 CLIP-Margin-CE & 78.44 & 87.90 & 45.19 & 90.54 & 77.78 \\
 FCL (ours) & \textbf{85.02} & \textbf{96.20} & \textbf{93.44} & \textbf{94.78} & \textbf{84.23} \\
+\midrule
+\multicolumn{6}{l}{\textit{Controlled selection and objective ablations}} \\
+\midrule
+Prototype + AUC-C & $83.420\pm0.010$ & $95.688\pm0.012$ & $92.852\pm0.037$ & $94.779\pm0.008$ & -- \\
+Random + AUC-C & $83.633\pm0.032$ & $92.610\pm0.108$ & $94.062\pm0.093$ & $94.672\pm0.026$ & -- \\
+Prototype + CLIP soft-CE & $82.463\pm0.055$ & $96.322\pm0.104$ & $86.901\pm0.057$ & $94.595\pm0.025$ & -- \\
 \bottomrule
 \end{tabular*}
 
@@ -166,6 +175,19 @@ CLIP RN50 & 11.11 & 78.00 & 29.59 & \textbf{87.52} \\
     filter and the same corrected labels as FCL, but replaces AUC-C with
     ordinary cross-entropy on the resulting mixed targets. It compares the complete training rules under a common selection mask; loss-specific attribution additionally requires matched sampling and optimization.
 
+    \item \textbf{Prototype + AUC-C.} This controlled rerun uses the
+    prototype correction mask and trains corrected instances with CE and
+    uncorrected instances with AUC-C. It is the matched controlled version of
+    the FCL objective reported in the final block of Table~\ref{tab:supp-additional-baselines}.
+
+    \item \textbf{Random + AUC-C.} This ablation replaces the prototype mask
+    with a uniform random correction mask at the same nominal rate, while
+    retaining the corrected-sample CE and uncorrected-sample AUC-C losses.
+
+    \item \textbf{Prototype + CLIP soft-CE.} This ablation keeps the prototype
+    correction mask, uses CE on corrected instances, and uses CE against the
+    fixed CLIP class distribution on uncorrected instances.
+
     \item \textbf{Xie-Trim-AUC \cite{xie2024wsauc}.} This is a cache-level adaptation inspired by
     the weakly supervised AUC formulation of Xie et al.~\cite{xie2024wsauc}.
     It keeps a fixed CLIP posterior, computes pairwise AUC losses, and trims
@@ -182,9 +204,11 @@ CLIP RN50 & 11.11 & 78.00 & 29.59 & \textbf{87.52} \\
 \end{itemize}
 
 Table~\ref{tab:supp-additional-baselines} reports the corresponding test
-accuracies. FCL (ours) achieves the best result in every dataset among the
-methods shown here. The SSL-style methods are competitive on some datasets,
-while their performance varies substantially across domains. The FCL-specific controls compare selection under CE and the complete FCL training rule under prototype selection. The results favor prototype selection and FCL in these implementations; they do not establish why mixed-label CE is weaker or isolate sampler effects.
+accuracies. The baseline block provides the common five-dataset comparison,
+while the final block places the controlled selection and objective results
+under the same table for direct reference. The SSL-style methods are
+competitive on some datasets, while their performance varies substantially
+across domains.
 
 \section{Impact of Different Feature Extractors}
 The filtering step depends on the geometry of the feature space, so the
@@ -217,87 +241,11 @@ All methods train linear classifiers on frozen features without updating the
 visual encoder.
 
 
-\section{Selection and Objective Ablations}
-\label{sec:supp-controlled-selection-objective}
-We conduct additional controlled reruns to separate the correction strategy
-from the objective used on uncorrected instances. Within each dataset, all
-conditions use the same frozen CLIP ViT-L/14 feature cache and data partitions.
-These reruns are reported separately from the historical main-table results.
-The Caltech-101 records include the background category and therefore use the 102-class label space of the main text.
-
-\paragraph{Controlled protocol.}
-We train a linear classifier for 100 epochs using AdamW with weight decay
-$10^{-4}$ and $\lambda=1$, $\mu=0.5$, and $\tau=0.5$.
-OneCycleLR sets the effective initial learning rate to $5\times10^{-4}$,
-increases it to $5\times10^{-3}$ over the first $15\%$ of the updates, and
-then decreases it with cosine annealing to approximately $5\times10^{-5}$.
-Both the initial and final division factors are 10. Class-balanced batches
-contain 32 sampled classes with 32 instances per class on CIFAR-100 and
-Food-101, and eight classes with eight instances per class on Caltech-101
-and EuroSAT. We run training seeds
-42, 43, and 44 without early stopping, select the first checkpoint attaining
-the highest validation accuracy, and evaluate that checkpoint on the test set.
-
-\paragraph{Selection and loss controls.}
-Random-AUC corrects a uniformly sampled subset of
-$\lfloor0.3N+0.5\rfloor$ training images and then applies the same
-corrected-sample CE and uncorrected-sample AUC-C objective as FCL. The random
-selection seed is fixed at 42 for all three training seeds. Prototype
-selection instead corrects $\lceil0.3n_c\rceil$ instances within each
-pseudo-labeled class, so its total query count is slightly higher.
-Consequently, this comparison fixes the nominal rate rather than the exact
-number of corrections; both counts are reported below.
-The second control retains the exact prototype correction mask and uses CE
-on corrected instances, but replaces AUC-C on uncorrected instances with
-soft-label CE against the original fixed CLIP class distribution. The two
-subset losses are averaged separately and added with $\lambda=1$.
-For this objective comparison, each paired seed shares the observed labels,
-mask, classifier initialization, optimizer settings, and actual sampling
-stream. The random-selection condition has different observed labels and
-is not claimed to share the same sampling stream.
-
-\begin{table*}[t]
-\caption{Test accuracy (\%) in additional controlled selection and objective
-reruns. Results are mean $\pm$ sample standard deviation over training seeds
-42, 43, and 44. Query counts are shown as prototype/random. The soft-CE
-condition uses the same prototype mask as FCL. Caltech includes the
-background category and uses the 102-class label space of the main text.}
-\label{tab:supp-controlled-selection-objective}
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrr}
-\toprule
-Dataset & \shortstack{Queries\\prototype/random} &
-\shortstack{Prototype + AUC-C\\FCL} & Random + AUC-C &
-\shortstack{Prototype +\\CLIP soft-CE} \\
-\midrule
-CIFAR-100 & 13,546/13,500 & $83.420\pm0.010$ & $83.633\pm0.032$ & $82.463\pm0.055$ \\
-Caltech-101 & 914/884 & $95.688\pm0.012$ & $92.610\pm0.108$ & $96.322\pm0.104$ \\
-EuroSAT & 6,485/6,480 & $92.852\pm0.037$ & $94.062\pm0.093$ & $86.901\pm0.057$ \\
-Food-101 & 19,738/19,695 & $94.779\pm0.008$ & $94.672\pm0.026$ & $94.595\pm0.025$ \\
-\bottomrule
-\end{tabular*}
-\end{table*}
-
-Table~\ref{tab:supp-controlled-selection-objective} shows that the effect of
-selection depends on the dataset. Random-AUC exceeds prototype-based FCL
-by 0.213 and 1.210 percentage points on CIFAR-100 and EuroSAT, respectively.
-Prototype-based FCL is higher by 3.077 points on the 102-class Caltech
-protocol and by 0.107 points on Food-101. Under the same prototype mask,
-AUC-C exceeds soft-label CE by 0.957, 5.951, and 0.183 points on CIFAR-100,
-EuroSAT, and Food-101, respectively, whereas soft-label CE is higher by
-0.635 points on Caltech-101. Thus, concentrating annotation errors in the
-filtered subset does not imply a uniform downstream advantage for
-prototype selection, and AUC-C does not outperform this soft-label control
-on every dataset. These comparisons concern the specified rerun protocol
-and do not revise the numerical results of the historical main tables.
-
 \section{Stability across Training Seeds}
 \label{sec:supp-controlled-training-seeds}
 To examine training variability, we repeat the CLIP-based prototype FCL
-condition with three independent training seeds under the protocol in
-Section~\ref{sec:supp-controlled-selection-objective}. The feature cache,
+condition with three independent training seeds under the fixed controlled
+protocol described in Compared methods. The feature cache,
 data partitions, CLIP labels, and prototype correction mask are held fixed;
 the seeds change the classifier initialization and sampling randomness.
 The test set is evaluated after validation-based checkpoint selection in

@@ -6,7 +6,8 @@
   ],
   "unchanged_original_files": 15,
   "checks": {
-    "two_ablation_sections": true,
+    "controlled_ablation_block_in_supp_table1": true,
+    "standalone_supp_table3_removed": true,
     "qwen_section": true,
     "table1_unified": true,
     "query_count_columns_removed": true,
