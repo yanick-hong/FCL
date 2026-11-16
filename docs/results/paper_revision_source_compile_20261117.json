@@ -4,7 +4,7 @@
   "source_root": "paper/FCL_CVPR2027",
   "documents": ["main.tex", "supplement.tex"],
   "changes": [
-    "Merged Random-Filter-CE and FCL-Filter-CE into the main test-accuracy comparison table.",
+    "Merged Random+CE and FCL-CE into the main test-accuracy comparison table.",
     "Merged the supplementary controlled selection/objective ablations into supplementary Table 1 and removed the standalone supplementary Table 3.",
     "Converted the three-seed stability table to a single-column table without individual seed columns.",
     "Reformatted the Qwen label-quality table to the ten-column training-sample/class layout with single-seed Random-30 and Random-M values."

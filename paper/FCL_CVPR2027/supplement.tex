@@ -98,11 +98,11 @@ CLIP-Conf-CE~\cite{radford2021clip} & 82.40 & 94.70 & 64.07 & 92.35 & 83.41 \\
 Xie-Trim-AUC~\cite{xie2024wsauc} & 75.90 & 81.68 & 37.41 & 88.34 & 75.50 \\
 FixMatch*~\cite{sohn2020fixmatch} & 83.58 & 87.44 & 90.11 & 92.01 & 83.52 \\
 SoftMatch*~\cite{chen2023softmatch} & 62.66 & 16.13 & 70.52 & 92.04 & 82.63 \\
-Random-Filter-CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
+Random+CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
 FCL-CE & 81.94 & 89.40 & 58.41 & 91.75 & 82.16 \\
-FCL+soft CE & 82.463 & \textbf{96.322} & 86.901 & 94.595 & 80.660 \\
-Random + AUC-C & \underline{83.633} & 92.610 & \textbf{94.062} & \underline{94.672} & \underline{83.840} \\
-FCL (ours) & \textbf{85.02} & \underline{96.20} & \underline{93.44} & \textbf{94.78} & \textbf{84.23} \\
+FCL+soft CE & 82.463 & \underline{95.322} & 86.901 & 94.595 & 80.660 \\
+Random + AUC-C & \underline{83.633} & 92.610 & 85.062 & \underline{94.672} & \underline{83.840} \\
+FCL (ours) & \textbf{85.02} & \textbf{96.20} & \textbf{93.44} & \textbf{94.78} & \textbf{84.23} \\
 \bottomrule
 \end{tabular*}
 
@@ -174,7 +174,7 @@ CLIP RN50 & 11.11 & 78.00 & 29.59 & \textbf{87.52} \\
     whereas SoftMatch assigns a soft confidence weight. Both are implemented
     on frozen feature caches with small feature perturbations.
 
-    \item \textbf{Random-Filter-CE.} This method corrects a uniformly random
+    \item \textbf{Random+CE.} This method corrects a uniformly random
     subset with the same size as the FCL filter area and trains on the mixed
     corrected and pseudo-label targets with cross-entropy. It isolates the
     effect of prototype-based selection.

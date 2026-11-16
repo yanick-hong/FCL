@@ -14,7 +14,7 @@ METHODS = (
 )
 DISPLAY = {
     "fcl_auc_ce": "FCL", "clip_zero_ce": "CLIP-Zero-CE",
-    "random_filter_ce": "Random-Filter-CE", "clip_conf_ce": "CLIP-Conf-CE",
+    "random_filter_ce": "Random+CE", "clip_conf_ce": "CLIP-Conf-CE",
     "fcl_filter_ce": "FCL-CE", "xie_trim_auc": "Xie-Trim-AUC",
     "fixmatch_cache": "FixMatch*", "softmatch_cache": "SoftMatch*",
     "dividemix_cache": "DivideMix*", "deft_cache": "DeFT*",
@@ -142,7 +142,7 @@ def main() -> None:
     plt.savefig(output / "best_validation_accuracy.png", dpi=220)
     plt.close()
 
-    budget_methods = {"FCL", "CLIP-Zero-CE", "Random-Filter-CE", "CLIP-Conf-CE", "FCL-CE"}
+    budget_methods = {"FCL", "CLIP-Zero-CE", "Random+CE", "CLIP-Conf-CE", "FCL-CE"}
     plt.figure(figsize=(9, 6))
     for method in methods:
         display = DISPLAY[method]

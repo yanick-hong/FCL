@@ -25,7 +25,7 @@ METHOD_NAMES = {
     "fcl_auc_ce": "FCL-AUC-CE", "nlprompt": "NLPrompt", "dcd": "DCD",
     "ido": "IDO", "dld": "DLD", "clip_zero_ce": "CLIP-Zero-CE",
     "fl_c": "FL-C", "nl_c": "NL-C", "l2b": "L2B", "csgn": "CSGN",
-    "random_filter_ce": "Random-Filter-CE", "clip_conf_ce": "CLIP-Conf-CE",
+    "random_filter_ce": "Random+CE", "clip_conf_ce": "CLIP-Conf-CE",
     "fcl_filter_ce": "FCL-CE", "xie_trim_auc": "Xie-Trim-AUC",
     "fixmatch_cache": "FixMatch*", "softmatch_cache": "SoftMatch*",
     "dividemix_cache": "DivideMix*", "deft_cache": "DeFT*",

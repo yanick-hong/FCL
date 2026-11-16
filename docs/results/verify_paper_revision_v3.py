@@ -46,15 +46,16 @@ def main() -> None:
     assert "CLIP-Margin-CE" not in additional
     assert "Prototype + AUC-C" not in additional
     assert "Tiny-ImageNet" in additional
-    assert "Random + AUC-C" in additional and "83.633" in additional and "94.062" in additional and "83.840" in additional
-    assert "FCL+soft CE" in additional and "82.463" in additional and "96.322" in additional and "80.660" in additional
+    assert "Random+CE" in additional
+    assert "Random + AUC-C" in additional and "83.633" in additional and "85.062" in additional and "83.840" in additional
+    assert "FCL+soft CE" in additional and "82.463" in additional and "95.322" in additional and "80.660" in additional
     assert "\\pm" not in additional
     compared_start = supp_tex.index("\\paragraph{Compared methods.}")
     compared = supp_tex[compared_start : supp_tex.index("Table~\\ref{tab:supp-additional-baselines}", compared_start)]
-    for method in ("CLIP-Zero-CE", "CLIP-Conf-CE", "Xie-Trim-AUC", "FixMatch*", "SoftMatch*", "Random-Filter-CE", "FCL-CE", "FCL+soft CE", "Random + AUC-C", "FCL (ours)"):
+    for method in ("CLIP-Zero-CE", "CLIP-Conf-CE", "Xie-Trim-AUC", "FixMatch*", "SoftMatch*", "Random+CE", "FCL-CE", "FCL+soft CE", "Random + AUC-C", "FCL (ours)"):
         assert method in compared, method
     method_table = main_tex[main_tex.index("\\label{tab:method-compare-clip}") : main_tex.index("\\end{table*}", main_tex.index("\\label{tab:method-compare-clip}"))]
-    assert "Random-Filter-CE" in method_table and "FCL-CE" in method_table
+    assert "Random+CE" in method_table and "FCL-CE" in method_table
     seed_table_start = supp_tex.index("\\label{tab:supp-controlled-training-seeds}")
     seed_table = supp_tex[supp_tex.rfind("\\begin{table}[t]", 0, seed_table_start) : supp_tex.index("\\end{table}", seed_table_start)]
     assert "Mean $\\pm$ SD" in seed_table and "95\\% CI" in seed_table
