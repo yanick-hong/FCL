@@ -360,26 +360,37 @@ Table~\ref{tab:method-compare-clip} compares FCL with the weakly supervised base
 
 FCL achieves higher accuracy than the compared weakly supervised baselines on all five datasets. On EuroSAT, the gain over the strongest weakly supervised baseline in Table~\ref{tab:method-compare-clip} is $12.77$ percentage points; the gain over the additional FixMatch-style control is $3.33$ points. FCL also approaches the fully supervised reference on several datasets while correcting only a subset of training labels.
 
-\subsection{Annotation Quality and Budget Interpretation}
-The label-quality measurements provide a direct view of the selection stage,
-whereas the classification table measures the downstream use of the resulting
-labels. Let $a_F=1-\mathrm{FL\text{-}ER}$ and
-$a_U=1-\mathrm{UL\text{-}ER}$ denote the accuracies in the filtered and
-unfiltered regions. Under the per-class selection rule, the post-correction
-label accuracy at rate $\rho$ is approximately
-\[
-a(\rho)=\rho a_F+(1-\rho)a_U,
-\]
-so the gain over retaining all original labels is
-\[
-a(\rho)-a_U=\rho(a_F-a_U).
-\]
-Because the filtered region has higher error on every benchmark, the targeted
-correction budget is more effective than uniform selection at the same rate.
-This relation describes annotation quality rather than a guaranteed linear
-change in classifier accuracy: AUC-C also uses the residual uncorrected
-examples as pairwise evidence, and optimization and class balance affect the
-downstream result.
+\subsection{Stability across Training Seeds}
+We repeat CLIP-based prototype FCL with three training seeds under a fixed
+protocol; the feature cache, partitions, CLIP labels, and correction mask are
+fixed, while initialization and sampling vary. Table~\ref{tab:controlled-training-seeds}
+reports the mean, sample SD, and two-sided 95\% Student-$t$ CI, computed as
+$\bar a\pm4.303s/\sqrt{3}$.
+
+\begin{table}[t]
+\caption{CLIP-based prototype FCL test accuracy (\%) over three seeds with
+data, VLM labels, and correction masks fixed. SD is the sample standard
+deviation and CI is the 95\% interval for the mean; Caltech uses 102 classes.}
+\label{tab:controlled-training-seeds}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrr}
+\toprule
+Dataset & Mean $\pm$ SD & 95\% CI \\
+\midrule
+CIFAR-100 & $85.00\pm0.0107$ & $[84.973, 85.027]$ \\
+Caltech-101 & $96.20\pm0.088$ & $[95.981, 96.419]$ \\
+EuroSAT & $93.42\pm0.0075$ & $[93.401, 93.439]$ \\
+Food-101 & $94.77\pm0.0113$ & $[94.742, 94.798]$ \\
+Tiny-ImageNet & $84.23\pm0.0104$ & $[84.204, 84.256]$ \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+The SDs range from 0.0075 to 0.088 percentage points. These intervals quantify
+repeatability under the fixed protocol and exclude new splits, VLM generations,
+correction masks, and historical single-seed main-table entries.
 
 \begin{figure}[t]
   \centering

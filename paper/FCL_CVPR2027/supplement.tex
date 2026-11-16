@@ -239,42 +239,6 @@ accuracies. FCL (ours) achieves the best result in every dataset among the
 methods shown here. The SSL-style methods are competitive on some datasets,
 while their performance varies substantially across domains. The FCL-specific controls compare selection under CE and the complete FCL training rule under prototype selection. The results favor prototype selection and FCL in these implementations; they do not establish why mixed-label CE is weaker or isolate sampler effects.
 
-\section{Stability across Training Seeds}
-\label{sec:supp-controlled-training-seeds}
-We repeat CLIP-based prototype FCL with three training seeds under the fixed
-controlled protocol. The feature cache, partitions, CLIP labels, and
-correction mask are fixed; only classifier initialization and sampling vary.
-Table~\ref{tab:supp-controlled-training-seeds} reports the mean, sample SD,
-and two-sided 95\% Student-$t$ CI. For three seeds, the interval is
-$\bar a\pm4.303s/\sqrt{3}$.
-
-\begin{table}[t]
-\caption{CLIP-based prototype FCL test accuracy (\%) over three training
-seeds. Data, VLM labels, and correction masks are fixed; SD is the sample
-standard deviation and CI is the 95\% interval for the mean. Caltech uses
-the 102-class label space.}
-\label{tab:supp-controlled-training-seeds}
-\centering
-\scriptsize
-\setlength{\tabcolsep}{2.5pt}
-\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrr}
-\toprule
-Dataset & Mean $\pm$ SD & 95\% CI \\
-\midrule
-CIFAR-100 & $85.00\pm0.0107$ & $[84.973, 85.027]$ \\
-Caltech-101 & $96.20\pm0.088$ & $[95.981, 96.419]$ \\
-EuroSAT & $93.42\pm0.0075$ & $[93.401, 93.439]$ \\
-Food-101 & $94.77\pm0.0113$ & $[94.742, 94.798]$ \\
-Tiny-ImageNet & $84.23\pm0.0104$ & $[84.204, 84.256]$ \\
-\bottomrule
-\end{tabular*}
-\end{table}
-
-The SDs range from 0.0075 to 0.088 percentage points, indicating limited
-variation under this protocol. The intervals quantify repeatability here;
-they do not cover new splits, VLM generations, correction masks, or the
-historical single-seed main-table entries.
-
 \section{Impact of Different Feature Extractors}
 The filtering step depends on the geometry of the feature space, so the
 backbone can affect both prototype quality and the downstream classifier. We
