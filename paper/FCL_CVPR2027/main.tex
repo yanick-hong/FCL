@@ -59,7 +59,7 @@
 % \input{sec/3_finalcopy}
 
 \begin{abstract}
-Vision-language models provide inexpensive image labels, but correcting their errors under a limited annotation budget remains challenging. We study Filter-Corrected Labels (FCL-C), a protocol that selects distant instances within each pseudo-labeled class for correction using frozen CLIP features. The resulting data contain corrected labels and residual noisy annotations with different reliability. We combine cross-entropy on corrected instances with an AUC-based consistency objective on uncorrected instances. Its soft pair weights combine fixed CLIP probabilities with detached classifier predictions, retaining information beyond hard pseudo-labels. On five image-classification benchmarks, FCL improves accuracy over the compared weakly supervised implementations using a nominal correction rate of $30\%$. Additional controls examine prototype selection, the training objective, feature extractors, and synthetic errors in corrected labels. Correction is simulated using benchmark labels; the budget measures queried training labels rather than observed human annotation time.
+Vision-language models provide inexpensive image labels, but correcting their errors under a limited annotation budget remains challenging. We study Filter-Corrected Labels (FCLs), a protocol that selects distant instances within each pseudo-labeled class for correction using frozen CLIP features. The resulting data contain corrected labels and residual noisy annotations with different reliability. We combine cross-entropy on corrected instances with an AUC-based consistency objective on uncorrected instances. Its soft pair weights combine fixed CLIP probabilities with detached classifier predictions, retaining information beyond hard pseudo-labels. On five image-classification benchmarks, FCL improves accuracy over the compared weakly supervised implementations using a nominal correction rate of $30\%$. Additional controls examine prototype selection, the training objective, feature extractors, and synthetic errors in corrected labels. Correction is simulated using benchmark labels; the budget measures queried training labels rather than observed human annotation time.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -69,7 +69,7 @@ However, labels produced by VLMs are often noisy and may degrade the overall qua
 
 Some annotation systems introduce additional modeling or iterative review stages, as illustrated in Figure~\ref{fig:overview}(b). For example, Snorkel \cite{ratner2016dataprog, ratner2017snorkel} constructs multiple heuristic labeling functions and applies generative modeling to estimate their accuracies before producing aggregated labels. ActiveAED \cite{weber2023activeaed} trains an auxiliary error detection model that repeatedly flags suspicious annotations for human review. These stages motivate a complementary approach that reuses frozen visual features for a single round of correction selection.
 
-To address this limitation, we study a budgeted correction protocol called Filter-Corrected Labels (FCL-C), which uses a simple yet effective prototype to turn VLM predictions into high-quality labels with little human effort. The setting consists of low cost label verification based on prototype computation and distance based filtering, followed by human correction. Concretely, the VLM provides pseudo-labels first. For each candidate class, we then compute a class prototype by averaging the feature representations of its instances, forming a compact data center for that class. The distance between each instance and its class prototype defines a filter area that identifies instances requiring human correction. For example, as illustrated in Figure~\ref{fig:overview}(b), instances located in the yellow filter area are manually corrected. The selection step requires class means and within-class distances, without training an auxiliary detector. The resulting partition also defines which samples receive supervised classification loss and which receive a soft pairwise objective. 
+To address this limitation, we study a budgeted correction protocol called Filter-Corrected Labels (FCLs), which uses a simple yet effective prototype to turn VLM predictions into high-quality labels with little human effort. The setting consists of low cost label verification based on prototype computation and distance based filtering, followed by human correction. Concretely, the VLM provides pseudo-labels first. For each candidate class, we then compute a class prototype by averaging the feature representations of its instances, forming a compact data center for that class. The distance between each instance and its class prototype defines a filter area that identifies instances requiring human correction. For example, as illustrated in Figure~\ref{fig:overview}(b), instances located in the yellow filter area are manually corrected. The selection step requires class means and within-class distances, without training an auxiliary detector. The resulting partition also defines which samples receive supervised classification loss and which receive a soft pairwise objective.
 
 In this paper, we further introduce an AUC-based consistency objective (AUC-C). AUC-C assigns soft pairwise weights to uncorrected instances using CLIP probabilities and detached classifier predictions. It combines these probabilities with the classifier posterior to obtain class dependent soft pair weights. In this way, AUC optimization can be extended to samples without reliable labels while retaining useful information from the uncorrected subset. For corrected instances, AUC-C uses a standard multiclass risk to anchor classifier learning. Experiments across diverse datasets confirm the effectiveness of the method.
 
@@ -96,7 +96,7 @@ Our work investigates Human--VLM Collaborative Annotation (HVCA), using VLM labe
 \subsection{Weakly Supervised Learning}
 Weakly supervised learning trains models from incomplete or inaccurate annotations, and this work is  primarily connected to noisy labels learning. Noisy labels learning assumes corrupted supervision and aims to reduce the impact of incorrect labels through sample selection, relabeling, or robust training objectives. Representative methods are Co-Teaching \cite{han2018coteaching}, DivideMix \cite{li2020dividemix}, early learning regularization \cite{liu2020elr}, JoCoR \cite{wei2020jocor}, error bounded correction \cite{zheng2020ebc, song2023noisysurvey}, and confident learning \cite{northcutt2021cl}.
 
-Noisy-label learning can use either human or machine annotations. FCL is also closely related to hybrid human-machine labeling and active label cleaning. Active Learning typically employs iterative sampling strategies to select the most informative instances for human annotation to reduce total labeling effort \cite{jan2014active, qiu2023mcal}. Iterative AL updates the selection strategy as labels become available. In contrast, our FCL-C setting leverages the pre-trained knowledge of Vision-Language Models (VLMs) as a strong prior. It utilizes a simple yet effective prototype-based filter to isolate noisy regions for targeted human correction, without training an auxiliary selection network. Furthermore, we propose an AUC-based consistency objective on the remaining uncorrected instances to use residual uncertain supervision through soft pair weights. FCL is related to active learning because both settings select a subset of instances for human annotation. However, active learning generally selects informative samples for improving the classifier, whereas FCL selects samples that are likely to contain incorrect VLM labels. FCL therefore focuses on annotation-error correction under a fixed verification budget. Active label correction and active label cleaning already study selective correction under resource constraints~\cite{kremer2018ralc,bernhardt2022activecleaning}. FCL instantiates this problem with a single prototype-distance pass on frozen CLIP features. Prototype distances also support pseudo-label refinement in domain adaptation~\cite{zhang2021proda}. Related VLM approaches include active sampling~\cite{bang2024pcb} and noise-robust prompt learning~\cite{wei2024deft,pan2025nlprompt}; FCL keeps the encoder and text prompts fixed.
+Noisy-label learning can use either human or machine annotations. FCL is also closely related to hybrid human-machine labeling and active label cleaning. Active Learning typically employs iterative sampling strategies to select the most informative instances for human annotation to reduce total labeling effort \cite{jan2014active, qiu2023mcal}. Iterative AL updates the selection strategy as labels become available. In contrast, our FCLs setting leverages the pre-trained knowledge of Vision-Language Models (VLMs) as a strong prior. It utilizes a simple yet effective prototype-based filter to isolate noisy regions for targeted human correction, without training an auxiliary selection network. Furthermore, we propose an AUC-based consistency objective on the remaining uncorrected instances to use residual uncertain supervision through soft pair weights. FCL is related to active learning because both settings select a subset of instances for human annotation. However, active learning generally selects informative samples for improving the classifier, whereas FCL selects samples that are likely to contain incorrect VLM labels. FCL therefore focuses on annotation-error correction under a fixed verification budget. Active label correction and active label cleaning already study selective correction under resource constraints~\cite{kremer2018ralc,bernhardt2022activecleaning}. FCL instantiates this problem with a single prototype-distance pass on frozen CLIP features. Prototype distances also support pseudo-label refinement in domain adaptation~\cite{zhang2021proda}. Related VLM approaches include active sampling~\cite{bang2024pcb} and noise-robust prompt learning~\cite{wei2024deft,pan2025nlprompt}; FCL keeps the encoder and text prompts fixed.
 
 \subsection{AUC Optimization}
 AUC optimization directly maximizes the area under the receiver operating characteristic (ROC) curve to evaluate the ranking ability of a classifier, with applications to class-imbalanced and weakly supervised learning \cite{yang2022survey}. Classical studies analyze pairwise ranking and surrogate consistency~\cite{gao2015consistency} and design convex surrogates to approximate the non-differentiable indicator function. Representative methods include stochastic AUC optimization with linear convergence \cite{natole2019stochauc}, large-scale deep AUC maximization with surrogate losses \cite{yuan2021deepauc}, federated AUC optimization \cite{yuan2021fdam}, and partial AUC optimization in restricted false positive regions \cite{yao2022partialauc}. Recent extensions further address robustness and data heterogeneity, such as DRAUC \cite{dai2023drauc} and AUC optimization from multiple unannotated datasets \cite{xie2024umlauc}. 
@@ -104,31 +104,26 @@ AUC optimization directly maximizes the area under the receiver operating charac
 We use a standard multiclass risk on corrected instances and soft class dependent posterior weights on pairwise relations from uncorrected instances. It keeps uncorrected samples as useful pairwise evidence and uses the fixed CLIP posterior as an external prior. This differs from applying one AUC objective to all samples or removing uncertain samples through hard trimming.
 
 \begin{table*}[t]
-\caption{Training-label quality (\%) at nominal correction rate $\rho=0.3$. UL-ER and FL-ER are pre-correction error rates in the unfiltered and filtered subsets. Random-30 uniformly samples 30\% of the training set; Random-M uniformly samples the same number of instances as prototype filtering. Random results are means $\pm$ sample standard deviations over selection seeds 42, 43, and 44. FCL-C is accuracy after prototype correction, and Gain is the corresponding improvement in percentage points. Caltech includes the background category (102 classes).}
+\caption{Training-label quality (\%) at nominal correction rate $\rho=0.3$. UL-ER and FL-ER are error rates before correction in the unfiltered and filtered subsets. FCL-C is accuracy after prototype correction. Gain is FCL-C minus CLIP in percentage points. Random-30 uniformly samples 30\% of the training set.}
 \label{tab:fcls-annotation}
 \centering
 \scriptsize
 \setlength{\tabcolsep}{2.5pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrrrrrr}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ccccccccc}
 \toprule
-Dataset & N & K & CLIP & UL-ER & FL-ER & Random-30 & Random-M & FCL-C & Gain (pp) \\
+Dataset & Train Samples &  Classes & CLIP & UL-ER & FL-ER & Random-30 & FCL-C & Gain \\
 \midrule
-\multicolumn{10}{l}{\textit{Original protocol}} \\
-CIFAR-100 & 45,000 & 100 & 75.63\% & 18.46\% & 38.23\% & -- & -- & 87.10\% & $+11.47$ \\
-Tiny-ImageNet & 90,000 & 200 & 70.17\% & 23.78\% & 43.88\% & -- & -- & 83.38\% & $+13.21$ \\
-Caltech-101 & 2,945 & 102 & 92.39\% & 4.55\% & 14.33\% & -- & -- & 96.88\% & $+4.49$ \\
-Food-101 & 65,650 & 101 & 89.01\% & 5.60\% & 23.53\% & -- & -- & 96.08\% & $+7.07$ \\
-EuroSAT & 21,600 & 10 & 43.00\% & 53.70\% & 64.74\% & -- & -- & 62.42\% & $+19.42$ \\
-\midrule
-\multicolumn{10}{l}{\textit{Controlled rerun}} \\
-CIFAR-100 & 45,000 & 100 & 75.580 & 18.471 & 38.233 & $82.960\pm0.104$ & $82.976\pm0.093$ & 87.089 & $+4.113$ \\
-Tiny-ImageNet & 90,000 & 200 & 74.778 & 17.255 & 43.721 & $82.384\pm0.117$ & $82.405\pm0.114$ & 87.939 & $+5.534$ \\
-Caltech-101 & 2,945 & 102 & 92.869 & 3.693 & 14.770 & $94.986\pm0.187$ & $95.065\pm0.137$ & 97.453 & $+2.388$ \\
-Food-101 & 65,650 & 101 & 89.016 & 5.591 & 23.528 & $92.323\pm0.005$ & $92.330\pm0.005$ & 96.090 & $+3.760$ \\
-EuroSAT & 21,600 & 10 & 43.005 & 53.688 & 64.703 & $60.256\pm0.198$ & $60.267\pm0.201$ & 62.431 & $+2.164$ \\
+CIFAR-100 & 45,000 & 100 & 75.650 & 18.471 & 38.233 & $82.960$  & 86.950 & $+11.30$ \\
+Tiny-ImageNet & 90,000 & 200 & 74.778 & 17.255 & 43.721 & $82.384$  & 87.939 & $+13.21$ \\
+Caltech-101 & 2,945 & 102 & 92.869 & 3.693 & 14.770 & $94.986$  & 97.453 & $+4.49$ \\
+Food-101 & 65,650 & 101 & 89.016 & 5.591 & 23.528 & $92.323$  & 96.090 & $+7.07$ \\
+EuroSAT & 21,600 & 10 & 43.005 & 53.688 & 64.703 & $60.256$  & 62.431 & $+19.42$ \\
 \bottomrule
 \end{tabular*}
-\end{table*}\section{Method}
+\end{table*}
+
+
+\section{Method}
 We first define the ranking risk, then describe prototype-based correction and the resulting training objective.
 \subsection{Preliminaries}
 \paragraph{Binary AUC.}
@@ -173,7 +168,7 @@ R_{\mathrm{mAUC}}(f)\,=\,\frac{1}{K}\sum_{i=1}^{K} R_{\mathrm{mAUC}}^{\,i}(f).
 
 
 \subsection{Filter-Corrected Labels}
-Filter-Corrected Labels (FCL-C) combine prototype-based selection with selective correction of CLIP annotations under a prescribed query budget. The procedure consists of label verification (i.e., prototype computation, filtering by prototype distance) and human correction. The specific details are as follows.
+Filter-Corrected Labels (FCLs) combine prototype-based selection with selective correction of CLIP annotations under a prescribed query budget. The procedure consists of label verification (i.e., prototype computation, filtering by prototype distance) and human correction. The specific details are as follows.
 
 \paragraph{Prototype Computation.}
 In our experiments, the maximum-probability CLIP class supplies the hard pseudo-label for each image. We group training images by these labels and average their normalized, frozen CLIP ViT-L/14 image features to obtain class prototypes. This prototype acts as a data center that supports a reliability measure defined by the distance from instance features to the class prototype. The resulting prototype based criterion is simple and effective, and it does not depend on any specific downstream model architecture.
@@ -182,18 +177,16 @@ In our experiments, the maximum-probability CLIP class supplies the hard pseudo-
 After obtaining prototypes, the reliability of each annotation is evaluated by the cosine distance from its CLIP image feature to the prototype of its CLIP-assigned class. The filter rate $\rho$ controls the per class proportion of largest distance outliers routed to manual correction. For each class, a threshold $\tau_{c}$ is set to the $(1-\rho)$ quantile of within class distances. Instances whose distances exceed $\tau_{c}$ are marked with $s=0$ to indicate that correction is required, and the remaining instances are marked with $s=1$ to indicate direct adoption. This mechanism partitions the training set before classifier optimization; the realized correction rate also depends on finite class sizes and distance ties.
 
 \paragraph{Correction.}
-In our benchmark experiments, human correction is simulated by replacing the selected CLIP pseudo-labels with the ground-truth labels provided by the benchmark datasets. Instances marked with $s=0$ receive benchmark ground-truth labels $y_{i}\in[K]$. The observed label $y_{\mathrm{obs}}$ is the benchmark ground truth for $s=0$ and the original CLIP hard pseudo-label for $s=1$. After correction, the indicator $s$ denotes the corrected subset for $s=0$ and the uncorrected subset for $s=1$. In the subsequent process, pairs used by the AUC-C method are drawn from the distribution of uncorrected instances, which means that $x_{a},x_{b}$ are sampled from $p(x\mid s=1)$, while samples used by the supervised loss are drawn from the distribution of corrected instances with $s=0$. Therefore, the FCL-C dataset is represented uniformly by triples $(x_{i},Y_{i},s_{i})$.
+In our benchmark experiments, human correction is simulated by replacing the selected CLIP pseudo-labels with the ground-truth labels provided by the benchmark datasets. Instances marked with $s=0$ receive benchmark ground-truth labels $y_{i}\in[K]$. The observed label $y_{\mathrm{obs}}$ is the benchmark ground truth for $s=0$ and the original CLIP hard pseudo-label for $s=1$. After correction, the indicator $s$ denotes the corrected subset for $s=0$ and the uncorrected subset for $s=1$. In the subsequent process, pairs used by the AUC-C method are drawn from the distribution of uncorrected instances, which means that $x_{a},x_{b}$ are sampled from $p(x\mid s=1)$, while samples used by the supervised loss are drawn from the distribution of corrected instances with $s=0$. Therefore, the FCLs dataset is represented uniformly by triples $(x_{i},Y_{i},s_{i})$.
 
 
-\paragraph{Advantages of FCL-C.}
-The advantages of FCL-C arise from both simplicity and effectiveness. The selection stage computes class means and distances from cached features without training an additional detector.  On the other hand, the effectiveness of FCL-C can be observed through their impact on label quality. To evaluate how FCL-C improve label quality, we use CLIP for hard pseudo-labeling and frozen features for prototype filtering and report the results in Table~\ref{tab:fcls-annotation}. We compute the error rate of CLIP pseudo-labels within the filtered region (i.e., FL-ER) and in the unfiltered region (i.e., UL-ER). Although the magnitudes differ across datasets, the filtered region has a higher error rate than the unfiltered region, indicating that prototype distance can help prioritize corrections in these experiments. Building on this observation, FCL-C apply human correction only to instances in the filter area. As shown in the column FCL-C in Table~\ref{tab:fcls-annotation}, correction improves annotation accuracy on every benchmark.
-
-The controlled block compares prototype selection with random correction on all five datasets. Random-30 uses uniform selection at the nominal rate, while Random-M accounts for per-class rounding in prototype selection. At matched query counts, FCL-C exceeds random correction by $2.164$--$5.534$ percentage points. These experiments use recovered caches that cannot be matched exactly to the original runs and are reported separately. The Caltech rows include the background category and use 102 classes, matching the main-text protocol.
+\paragraph{Advantages of FCLs.}
+The advantages of FCLs arise from both simplicity and effectiveness. The selection stage computes class means and distances from cached features without training an additional detector.  On the other hand, the effectiveness of FCLs can be observed through their impact on label quality. To evaluate how FCLs improve label quality, we use CLIP for hard pseudo-labeling and frozen features for prototype filtering and report the results in Table~\ref{tab:fcls-annotation}. We compute the error rate of CLIP pseudo-labels within the filtered region (i.e., FL-ER) and in the unfiltered region (i.e., UL-ER). Although the magnitudes differ across datasets, the filtered region has a higher error rate than the unfiltered region, indicating that prototype distance can help prioritize corrections in these experiments. Building on this observation, FCLs apply human correction only to instances in the filter area. As shown in the column FCLs in Table~\ref{tab:fcls-annotation}, correction improves annotation accuracy on every benchmark.
 
 
 \subsection{AUC-Based Consistency Objective}
 We use different losses for corrected and uncorrected instances, reflecting the reliability of their supervision.
-On the basis of FCL-C, we propose an objective for samples with different label reliability. Following posterior-based AUC formulations, AUC-C uses CLIP posterior probabilities to represent the class information of these samples. It combines them with the classifier posterior to obtain soft class dependent pair weights. This extends AUC optimization to uncorrected samples without reliable human labels and preserves their useful information. Corrected instances are trained with a standard multiclass risk, which anchors classifier learning.
+On the basis of FCLs, we propose an objective for samples with different label reliability. Following posterior-based AUC formulations, AUC-C uses CLIP posterior probabilities to represent the class information of these samples. It combines them with the classifier posterior to obtain soft class dependent pair weights. This extends AUC optimization to uncorrected samples without reliable human labels and preserves their useful information. Corrected instances are trained with a standard multiclass risk, which anchors classifier learning.
 
 \paragraph{Corrected Instances.} For corrected instances, the expected supervised risk is defined as
 \begin{equation}
@@ -238,7 +231,7 @@ where $f_{i}(x)$ denotes the $i$-th logit corresponding to class $i$, and $\lamb
 The supervised term is conditional on selection into the corrected subset. Because selection depends on the features and pseudo-labels, it is not an unbiased estimate of the full-population supervised risk. The second term supplies complementary pairwise supervision on the uncorrected subset.
 
 \paragraph{Empirical Approximation.}
-We arrange the FCL-C dataset as $\mathcal{D}_{FCL}=\mathcal{D}_C \bigcup \mathcal{D}_{UC}$, where $\mathcal{D}_C$ denotes the corrected data and $\mathcal{D}_{UC}$ denotes the uncorrected data. Let $B$ be a mini-batch containing corrected and uncorrected instances.
+We arrange the FCLs dataset as $\mathcal{D}_{FCL}=\mathcal{D}_C \bigcup \mathcal{D}_{UC}$, where $\mathcal{D}_C$ denotes the corrected data and $\mathcal{D}_{UC}$ denotes the uncorrected data. Let $B$ be a mini-batch containing corrected and uncorrected instances.
 
 Formally, the empirical approximation of the supervised term on the corrected subset is given by
 \begin{equation}
@@ -295,19 +288,13 @@ FSL-C  & 85.20 & 97.29 & 96.44 & 95.07 & 85.73 \\
 \midrule
 & \multicolumn{5}{c}{\textit{Weakly Supervised Learning Methods}} \\
 \cmidrule(lr){2-6}
-Zero-shot CLIP \cite{radford2021clip} & 75.63 & 92.39 & 43.00 & 89.01 & 70.17 \\
-CLIP-Conf-CE \cite{radford2021clip} & 82.40 & \underline{94.70} & 64.07 & \underline{92.35} & \underline{83.41} \\
+Zero-shot CLIP \cite{radford2021clip} & 75.65 & 92.87 & 43.01 & 89.02 & 74.78 \\
 FL-C \cite{radford2021clip} & 75.70 & 50.58 & \underline{80.67} & 90.00 & 77.96 \\
 NL-C \cite{radford2021clip} & 77.24 & 85.37 & 49.33 & 89.77 & 75.89 \\
 DivideMix \cite{li2020dividemix} & 78.70 & 66.94 & 44.70 & 90.69 & 78.62 \\
 DCD \cite{mu2025dcd} & 80.44 & 90.55 & 54.30 & 91.41 & 81.07 \\
 IDO \cite{zhang2025ido} & 78.34 & 65.09 & 43.85 & 89.53 & 79.56 \\
-DLD \cite{hou2025dld} & \underline{84.04} & 92.05 & 74.63 & 91.74 & 83.16 \\
-\midrule
-& \multicolumn{5}{c}{\textit{Selection and loss ablations}} \\
-\cmidrule(lr){2-6}
-Random+CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
-FCL-CE & 81.94 & 89.40 & 58.41 & 91.75 & 82.16 \\
+DLD \cite{hou2025dld} & \underline{84.04} & \underline{92.05} & 74.63 & \underline{91.74} & \underline{83.16} \\
 FCL (ours)        & \textbf{85.02} & \textbf{96.20} & \textbf{93.44} & \textbf{94.78} & \textbf{84.23} \\
 \bottomrule
 \end{tabular*}
@@ -350,16 +337,12 @@ We compare FCL with the following representative baselines:
 \begin{itemize}
     \item Zero-shot CLIP \cite{radford2021clip}: Direct classification using CLIP image--text similarities without downstream training.
     \item FSL-C \cite{radford2021clip}: Fully supervised method trained on all labeled training data using ground-truth.
-    \item CLIP-Conf-CE, FL-C, and NL-C \cite{radford2021clip}: Baselines with different label usage. CLIP-Conf-CE corrects low-confidence CLIP predictions and trains with cross-entropy. FL-C uses only the FCL-corrected instances, while NL-C uses only the uncorrected CLIP labels.
+    \item FL-C, and NL-C \cite{radford2021clip}: Baselines with different label usage. FL-C uses only the FCL-corrected instances, while NL-C uses only the uncorrected CLIP labels.
     \item DivideMix \cite{li2020dividemix}: Clean/noisy sample separation and consistency training.
     \item DCD \cite{mu2025dcd} and IDO \cite{zhang2025ido}: Center-distance mining and instance-difficulty modeling for noisy labels, respectively.
     \item DLD \cite{hou2025dld}: Diffusion-based label denoising.
-    \item Random+CE and FCL-CE: selection and loss controls
-    that use mixed corrected and uncorrected hard targets. The former uses a
-    uniform correction mask, while the latter uses the prototype-distance
-    mask; both are trained with cross-entropy.
 \end{itemize}
-DivideMix, DCD, IDO, and DLD are cache-level adaptations with linear classifiers. They share FCL's CLIP-based observed labels, corrected labels, correction masks, annotation budget, data partitions, and frozen CLIP features, while retaining method-specific sampling and optimization. The comparison concerns these implementations rather than the original full-model training pipelines. Additional baselines and the controlled AUC-C and soft-label objective ablations are reported in the supplementary material.
+DivideMix, DCD, IDO, and DLD are cache-level adaptations with linear classifiers. They share FCL's CLIP-based observed labels, corrected labels, correction masks, annotation budget, data partitions, and frozen CLIP features, while retaining method-specific sampling and optimization. The comparison concerns these implementations rather than the original full-model training pipelines. Additional baselines and ablations are reported in the supplementary material.
 
 % VERIFY V2: verify reported hyperparameters/sampler against CLIP run configurations.
 \paragraph{Implementation Details.}
@@ -368,14 +351,35 @@ Experiments use PyTorch on a vGPU-32GB server. CLIP generates hard pseudo-labels
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{./Figures/lam.pdf}
-  \caption{Experimental results on the influence of the consistency weight hyperparameter $\lambda$ using FCL-C data.}
+  \caption{Experimental results on the influence of the consistency weight hyperparameter $\lambda$ using FCLs data.}
   \label{fig:lam}
 \end{figure}
 
-\subsection{Results of FCL-C}
-Table~\ref{tab:method-compare-clip} compares FCL with the weakly supervised baselines on five benchmarks and includes FSL-C as a fully supervised reference. The final block reports the selection and loss ablations using the same test protocol.
+\subsection{Results of FCLs}
+Table~\ref{tab:method-compare-clip} compares FCL with the weakly supervised baselines on five benchmarks and includes FSL-C as a fully supervised reference.
 
 FCL achieves higher accuracy than the compared weakly supervised baselines on all five datasets. On EuroSAT, the gain over the strongest weakly supervised baseline in Table~\ref{tab:method-compare-clip} is $12.77$ percentage points; the gain over the additional FixMatch-style control is $3.33$ points. FCL also approaches the fully supervised reference on several datasets while correcting only a subset of training labels.
+
+\subsection{Annotation Quality and Budget Interpretation}
+The label-quality measurements provide a direct view of the selection stage,
+whereas the classification table measures the downstream use of the resulting
+labels. Let $a_F=1-\mathrm{FL\text{-}ER}$ and
+$a_U=1-\mathrm{UL\text{-}ER}$ denote the accuracies in the filtered and
+unfiltered regions. Under the per-class selection rule, the post-correction
+label accuracy at rate $\rho$ is approximately
+\[
+a(\rho)=\rho a_F+(1-\rho)a_U,
+\]
+so the gain over retaining all original labels is
+\[
+a(\rho)-a_U=\rho(a_F-a_U).
+\]
+Because the filtered region has higher error on every benchmark, the targeted
+correction budget is more effective than uniform selection at the same rate.
+This relation describes annotation quality rather than a guaranteed linear
+change in classifier accuracy: AUC-C also uses the residual uncorrected
+examples as pairwise evidence, and optimization and class balance affect the
+downstream result.
 
 \begin{figure}[t]
   \centering
@@ -431,7 +435,7 @@ To evaluate sensitivity to simulated correction errors, we vary correction accur
 As shown in Table~\ref{tab:human-correction-noise}, at $95\%$ correction accuracy, the decrease relative to the $100\%$ reference is below one percentage point on two datasets, while CIFAR-100 and EuroSAT lose $1.37$ and $3.75$ percentage points, respectively. At $80\%$, the decrease ranges from $1.29$ percentage points on Caltech-101 to $9.91$ percentage points on EuroSAT. Accuracy decreases consistently as correction errors increase across all four datasets. These results indicate tolerance to modest correction errors on several datasets, while the larger decline on EuroSAT highlights the importance of reliable corrected labels for FCL with AUC-C.
 
 \section{Conclusion}
-In this paper, we study Filter-Corrected Labels (FCL-C), which is a prototype-based filtering and correction mechanism to improve the reliability of noisy labels generated by VLMs. Furthermore, we introduce an AUC-based consistency objective that operates exclusively on the uncorrected data to stabilize pairwise rankings.
+In this paper, we study Filter-Corrected Labels (FCLs), which is a prototype-based filtering and correction mechanism to improve the reliability of noisy labels generated by VLMs. Furthermore, we introduce an AUC-based consistency objective that operates exclusively on the uncorrected data to stabilize pairwise rankings.
 Experiments on five benchmarks show improved accuracy over the compared implementations. Additional controls examine selection, loss design, four frozen CLIP encoders on EuroSAT, and simulated correction errors. The evidence is limited to frozen-feature classification, single-seed results, and simulated correction; measured human effort and broader deployment remain to be evaluated.
 
 \section*{LLM Usage Statement}

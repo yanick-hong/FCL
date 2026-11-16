@@ -15,7 +15,7 @@
 \def\confYear{2027}
 
 %%%%%%%%% TITLE - PLEASE UPDATE
-\title{Learning from Filter-Corrected Labels: Supplementary Material}
+\title{Supplementary Material}
 
 %%%%%%%%% AUTHORS - PLEASE UPDATE
 \author{
@@ -25,8 +25,9 @@
 
 \begin{document}
 \maketitle
-
 \appendix
+
+
 
 \section{Interpretation of the Pairwise Risk}
 The main text uses an unnormalized one-versus-rest risk. For a fixed distribution $Q$, let $q_i(x)=Q(y=i\mid x)$ and $\pi_i=Q(y=i)\in(0,1)$. For independent draws and the tie-aware indicator loss, the risk $U_i$ has the identity
@@ -35,7 +36,44 @@ U_i(f)=2\pi_i(1-\pi_i)[1-\mathrm{AUC}_{Q,i}(f)].
 \end{equation}
 To verify it, condition the first weighted loss on one positive and one negative example. The posterior factors yield $\pi_i(1-\pi_i)$ times the conditional ranking error, which equals $1-\mathrm{AUC}_{Q,i}$. Exchanging the independent examples gives the same value for the reverse term. Adding the two terms proves the identity, including ties. On the uncorrected subset, $Q=P(x,y\mid s=1)$ and its class priors must be used. This identity concerns exact posteriors and an indicator risk. It supplies no consistency or convergence guarantee for the practical mixed-posterior logistic objective.
 
-% VERIFY V2: recover split files and complete Caltech/EuroSAT validation and test counts.
+\section{Filter-Corrected Qwen Labels}
+\label{sec:supp-qwen-labels}
+
+\begin{table*}[t]
+\caption{Training-label quality (\%) at nominal correction rate $\rho=0.3$. UL-ER and FL-ER are error rates before correction in the unfiltered and filtered subsets. Qwen denotes initial Qwen annotation accuracy. FCL-Q is accuracy after filter correction. Gain is FCL-Q minus Qwen in percentage points.}
+\label{tab:supp-qwen-labels}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}ccccccccc}
+\toprule
+Dataset & Train Samples & Classes & Qwen & UL-ER & FL-ER & Random-30 & FCL-Q & Gain \\
+\midrule
+CIFAR-100 & 45,000 & 100 & 47.680 & 47.118 & 66.305 & $62.976$ & 67.630 & $+19.950$ \\
+Tiny-ImageNet & 90,000 & 200 & 28.413 & 65.437 & 85.860 & $49.759$ & 54.267 & $+25.853$ \\
+Caltech-101 & 2,945 & 102 & 64.856 & 30.967 & 44.384 & $75.042$  & 78.676 & $+13.820$ \\
+Food-101 & 65,650 & 101 & 51.484 & 39.829 & 68.720 & $66.096$  & 72.148 & $+20.664$ \\
+EuroSAT & 21,600 & 10 & 44.384 & 46.242 & 77.459 & $61.000$  & 67.644 & $+23.259$ \\
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+We test prototype correction on Qwen2.5-VL-7B-Instruct labels. FCL-C and
+FCL-Q denote corrected CLIP and Qwen label sets, respectively. Qwen uses an
+English class-list prompt, greedy legal-class decoding, and a
+$448\times448$-equivalent visual budget; it is not updated. Frozen CLIP
+ViT-L/14 features and verified partitions are shared with the CLIP study.
+
+For each Qwen-assigned class, we average normalized CLIP features and
+replace the farthest $\lceil0.3n_c\rceil$ annotations with benchmark labels.
+UL-ER and FL-ER are pre-correction error rates in the unselected and
+selected subsets.
+
+The selected subsets have higher pre-correction error on all datasets. FCL-Q
+improves Qwen accuracy by $13.820$--$25.853$ percentage points and exceeds
+Random-30 in every row, supporting prototype-based error concentration across both VLM label sources. These results concern annotation quality only.
+
+
 \section{Details of Datasets}
 We use five image-classification benchmarks that cover natural images,
 fine-grained recognition, and remote sensing. All image
@@ -80,34 +118,6 @@ test set is never used for model selection.
 
 CLIP generates hard pseudo-labels and supplies normalized image features, class-text embeddings, and class posteriors. To construct the FCL split, we group training images by the maximum-probability CLIP class and average their features within each group. The farthest instances are selected for simulated correction at nominal rate $\rho=0.3$. The observed-label cache stores $y_{\mathrm{obs}}$ and $s$: benchmark labels replace the selected labels when $s=0$, while the original CLIP labels are retained when $s=1$. AUC-C uses the CLIP posterior and detached classifier posterior for its pair weights.
 
-\begin{table*}[t]
-\caption{Test accuracy (\%) of the additional baselines and controlled
-ablations. All methods use the same frozen-feature protocol described in
-Additional Baseline Comparison. The highest and second-highest results in
-each dataset column are shown in bold and underlined, respectively.}
-\label{tab:supp-additional-baselines}
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}cccccc}
-\toprule
-Method & \textbf{CIFAR-100} & \textbf{Caltech-101} & \textbf{EuroSAT} & \textbf{Food-101} & \textbf{Tiny-ImageNet} \\
-\midrule
-CLIP-Zero-CE~\cite{radford2021clip} & 78.44 & 87.90 & 45.19 & 90.57 & 77.78 \\
-CLIP-Conf-CE~\cite{radford2021clip} & 82.40 & 94.70 & 64.07 & 92.35 & 83.41 \\
-Xie-Trim-AUC~\cite{xie2024wsauc} & 75.90 & 81.68 & 37.41 & 88.34 & 75.50 \\
-FixMatch*~\cite{sohn2020fixmatch} & 83.58 & 87.44 & 90.11 & 92.01 & 83.52 \\
-SoftMatch*~\cite{chen2023softmatch} & 62.66 & 16.13 & 70.52 & 92.04 & 82.63 \\
-Random+CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
-FCL-CE & 81.94 & 89.40 & 58.41 & 91.75 & 82.16 \\
-FCL+soft CE & 82.463 & \underline{95.322} & 86.901 & 94.595 & 80.660 \\
-Random + AUC-C & \underline{83.633} & 92.610 & 85.062 & \underline{94.672} & \underline{83.840} \\
-FCL (ours) & \textbf{85.02} & \textbf{96.20} & \textbf{93.44} & \textbf{94.78} & \textbf{84.23} \\
-\bottomrule
-\end{tabular*}
-
-\end{table*}
-
 \section{CLIP Class Descriptions}
 For each class, CLIP encodes the text template \texttt{a photo of a \{class\}.}. Underscores in class names are replaced by spaces. Normalized text and image embeddings determine class scores. The maximum-probability class supplies the hard pseudo-label, while the full class distribution supplies the prior in the AUC-C weights. CLIP does not generate integer responses to instruction prompts.
 
@@ -123,10 +133,10 @@ read from the per-epoch validation logs.}
 \end{figure}
 
 \section{Additional Baseline Comparison}
-This section reports all methods in Table~\ref{tab:supp-additional-baselines}
-using the same frozen CLIP features, data partitions, and test protocol as
-the main experiments. Label access and method-specific procedures are
-described below.
+This section adds baselines using the same frozen CLIP features, data
+partitions, and test protocol as the main experiments. Xie-Trim-AUC,
+FixMatch and SoftMatch are cache-level adaptations; CLIP-Margin-CE is a separate margin-weighted control. Label access and
+method-specific procedures are described below.
 
 \begin{table*}[t]
 \caption{Best validation accuracy (\%) on EuroSAT under different frozen
@@ -151,7 +161,37 @@ CLIP RN50 & 11.11 & 78.00 & 29.59 & \textbf{87.52} \\
 
 \end{table*}
 
+
 \paragraph{Compared methods.}
+
+\begin{table*}[t]
+\caption{Test accuracy (\%) of the additional baselines and controlled
+ablations. All methods use the same frozen-feature protocol described in
+Additional Baseline Comparison. The highest and second-highest results in
+each dataset column are shown in bold and underlined, respectively.}
+\label{tab:supp-additional-baselines}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}cccccc}
+\toprule
+Method & \textbf{CIFAR-100} & \textbf{Caltech-101} & \textbf{EuroSAT} & \textbf{Food-101} & \textbf{Tiny-ImageNet} \\
+\midrule
+CLIP-Zero-CE~\cite{radford2021clip} & 78.44 & 87.90 & 45.19 & 90.57 & 77.78 \\
+CLIP-Conf-CE~\cite{radford2021clip} & 82.40 & 94.70 & 64.07 & 92.35 & 83.41 \\
+Xie-Trim-AUC~\cite{xie2024wsauc} & 75.90 & 81.68 & 37.41 & 88.34 & 75.50 \\
+FixMatch*~\cite{sohn2020fixmatch} & 83.58 & 87.44 & \underline{90.11} & 92.01 & 83.52 \\
+SoftMatch*~\cite{chen2023softmatch} & 62.66 & 16.13 & 70.52 & 92.04 & 82.63 \\
+Random+CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
+FCL-CE & 81.94 & 89.40 & 58.41 & 91.75 & 82.16 \\
+FCL-soft CE & 82.463 & \underline{95.322} & 86.901 & 94.595 & 80.660 \\
+Random-AUC & \underline{83.633} & 92.610 & 85.062 & \underline{94.672} & \underline{83.840} \\
+FCL (ours) & \textbf{85.02} & \textbf{96.20} & \textbf{93.44} & \textbf{94.78} & \textbf{84.23} \\
+\bottomrule
+\end{tabular*}
+
+\end{table*}
+
 \begin{itemize}
     \item \textbf{CLIP-Zero-CE \cite{radford2021clip}.} This control uses CLIP's top-1 pseudo-label for
     every training image. A linear classifier is optimized with cross-entropy
@@ -174,7 +214,7 @@ CLIP RN50 & 11.11 & 78.00 & 29.59 & \textbf{87.52} \\
     whereas SoftMatch assigns a soft confidence weight. Both are implemented
     on frozen feature caches with small feature perturbations.
 
-    \item \textbf{Random+CE.} This method corrects a uniformly random
+    \item \textbf{Random-CE.} This method corrects a uniformly random
     subset with the same size as the FCL filter area and trains on the mixed
     corrected and pseudo-label targets with cross-entropy. It isolates the
     effect of prototype-based selection.
@@ -185,55 +225,19 @@ CLIP RN50 & 11.11 & 78.00 & 29.59 & \textbf{87.52} \\
     and uncorrected samples use the CLIP top-1 class. It compares the complete
     training rules under a common selection mask.
 
-    \item \textbf{FCL+soft CE.} This ablation keeps the prototype
+    \item \textbf{FCL-soft CE.} This ablation keeps the prototype
     correction mask, uses one-hot CE on corrected instances, and uses soft-label
     CE against the fixed full CLIP class distribution on uncorrected instances.
 
-    \item \textbf{Random + AUC-C.} This ablation replaces the prototype mask
+    \item \textbf{Random-AUC.} This ablation replaces the prototype mask
     with a uniform random correction mask at the same nominal rate, while
     retaining the corrected-sample CE and uncorrected-sample AUC-C losses.
-
-    \item \textbf{FCL (ours).} This is the complete method: the prototype
-    distance mask selects corrected instances, which use CE, while the
-    remaining instances use AUC-C with mixed CLIP and classifier posteriors.
 \end{itemize}
 
 Table~\ref{tab:supp-additional-baselines} reports the corresponding test
-accuracies. The SSL-style methods are competitive on some datasets, while
-their performance varies substantially across domains. The controlled rows
-make the effects of the correction mask and the uncorrected-sample objective
-directly comparable under the same protocol.
-
-\section{Impact of Different Feature Extractors}
-The filtering step depends on the geometry of the feature space, so the
-backbone can affect both prototype quality and the downstream classifier. We
-conduct a controlled EuroSAT study with ViT-L/14, ViT-B/16, ViT-B/32, and the
-CLIP RN50 visual encoder. For each extractor, the images are encoded once, the
-class-text scores and prototype filter are recomputed from that cache, and
-cache-level adaptations of DivideMix~\cite{li2020dividemix},
-DCD~\cite{mu2025dcd}, IDO~\cite{zhang2025ido}, and FCL are trained with the same split, filter rate,
-optimizer, and early-stopping rule. The table reports the best validation
-accuracy, which is the checkpoint-selection metric used throughout the paper.
-
-FCL achieves the best validation accuracy for every extractor. DCD is the
-strongest non-FCL control in each row, but FCL remains ahead by 21.66, 16.48,
-15.23, and 9.52 percentage points for ViT-L/14, ViT-B/16, ViT-B/32, and RN50,
-respectively. FCL consistently outperforms these three baselines across the
-four frozen CLIP encoders evaluated on EuroSAT.
-
-\paragraph{Controlled protocol.}
-The extractor comparison changes only the visual backbone. We keep the text
-template, class names, image preprocessing, filter rate, data partitions,
-random seed, optimizer, and stopping rule fixed. Within each backbone, all
-compared methods receive the same corrected labels and correction masks.
-Image features are normalized
-before prototype construction, and the class posterior is recomputed for each
-backbone from the same prompt. This prevents differences in prompts or data
-partitioning from being confounded with representation quality.
-
-All methods train linear classifiers on frozen features without updating the
-visual encoder.
-
+accuracies. FCL (ours) achieves the best result in every dataset among the
+methods shown here. The SSL-style methods are competitive on some datasets,
+while their performance varies substantially across domains. The FCL-specific controls compare selection under CE and the complete FCL training rule under prototype selection. The results favor prototype selection and FCL in these implementations; they do not establish why mixed-label CE is weaker or isolate sampler effects.
 
 \section{Stability across Training Seeds}
 \label{sec:supp-controlled-training-seeds}
@@ -270,44 +274,35 @@ variation under this protocol. The intervals quantify repeatability here;
 they do not cover new splits, VLM generations, correction masks, or the
 historical single-seed main-table entries.
 
-\section{Filter-Corrected Qwen Labels}
-\label{sec:supp-qwen-labels}
-We test prototype correction on Qwen2.5-VL-7B-Instruct labels. FCL-C and
-FCL-Q denote corrected CLIP and Qwen label sets, respectively. Qwen uses an
-English class-list prompt, greedy legal-class decoding, and a
-$448\times448$-equivalent visual budget; it is not updated. Frozen CLIP
-ViT-L/14 features and verified partitions are shared with the CLIP study.
+\section{Impact of Different Feature Extractors}
+The filtering step depends on the geometry of the feature space, so the
+backbone can affect both prototype quality and the downstream classifier. We
+conduct a controlled EuroSAT study with ViT-L/14, ViT-B/16, ViT-B/32, and the
+CLIP RN50 visual encoder. For each extractor, the images are encoded once, the
+class-text scores and prototype filter are recomputed from that cache, and
+cache-level adaptations of DivideMix~\cite{li2020dividemix},
+DCD~\cite{mu2025dcd}, IDO~\cite{zhang2025ido}, and FCL are trained with the same split, filter rate,
+optimizer, and early-stopping rule. The table reports the best validation
+accuracy, which is the checkpoint-selection metric used throughout the paper.
 
-For each Qwen-assigned class, we average normalized CLIP features and
-replace the farthest $\lceil0.3n_c\rceil$ annotations with benchmark labels.
-UL-ER and FL-ER are pre-correction error rates in the unselected and
-selected subsets. Random-30 and Random-M use uniform sampling (seed 42),
-with Random-M matching the prototype count. Caltech uses 102 classes,
-including the background category.
+FCL achieves the best validation accuracy for every extractor. DCD is the
+strongest non-FCL control in each row, but FCL remains ahead by 21.66, 16.48,
+15.23, and 9.52 percentage points for ViT-L/14, ViT-B/16, ViT-B/32, and RN50,
+respectively. FCL consistently outperforms these three baselines across the
+four frozen CLIP encoders evaluated on EuroSAT.
 
-\begin{table*}[t]
-\caption{Training-label quality (\%) at nominal correction rate $\rho=0.3$. UL-ER and FL-ER are error rates before correction in the unfiltered and filtered subsets. Qwen denotes initial Qwen annotation accuracy; FCL-Q is accuracy after prototype correction. Gain is FCL-Q minus Qwen in percentage points. Random-30 uniformly samples 30\% of the training set. Random-M uniformly samples the same number of instances as prototype filtering. Caltech includes the background category and uses 102 classes.}
-\label{tab:supp-qwen-labels}
-\centering
-\scriptsize
-\setlength{\tabcolsep}{2.5pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}cccccccccc}
-\toprule
-Dataset & Train Samples & Classes & Qwen & UL-ER & FL-ER & Random-30 & Random-M & FCL-Q & Gain \\
-\midrule
-CIFAR-100 & 45,000 & 100 & 47.107 & 47.118 & 66.305 & $62.976$ & $63.020$ & 67.064 & $+19.958$ \\
-Tiny-ImageNet & 90,000 & 200 & 28.413 & 65.437 & 85.860 & $49.759$ & $49.838$ & 54.267 & $+25.853$ \\
-Caltech-101 & 2,945 & 102 & 64.856 & 30.967 & 44.384 & $75.042$ & $75.416$ & 78.676 & $+13.820$ \\
-Food-101 & 65,650 & 101 & 51.484 & 39.829 & 68.720 & $66.096$ & $66.134$ & 72.148 & $+20.664$ \\
-EuroSAT & 21,600 & 10 & 44.384 & 46.242 & 77.459 & $61.000$ & $61.023$ & 67.644 & $+23.259$ \\
-\bottomrule
-\end{tabular*}
-\end{table*}
+\paragraph{Controlled protocol.}
+The extractor comparison changes only the visual backbone. We keep the text
+template, class names, image preprocessing, filter rate, data partitions,
+random seed, optimizer, and stopping rule fixed. Within each backbone, all
+compared methods receive the same corrected labels and correction masks.
+Image features are normalized
+before prototype construction, and the class posterior is recomputed for each
+backbone from the same prompt. This prevents differences in prompts or data
+partitioning from being confounded with representation quality.
 
-The selected subsets have higher pre-correction error on all datasets. FCL-Q
-improves Qwen accuracy by $13.820$--$25.853$ percentage points and exceeds
-Random-M in every row, supporting prototype-based error concentration across
-both VLM label sources. These results concern annotation quality only.
+All methods train linear classifiers on frozen features without updating the
+visual encoder.
 
 {
     \small
