@@ -394,7 +394,7 @@ Accuracy improves as $\lambda$ increases from $0$ to $1$, peaks near $1$, and th
 
 
 \subsection{Impact of \texorpdfstring{$\rho$}{rho} and Human Annotation Cost}
-To investigate the effect of the filter rate $\rho$, we conducted a controlled experiment to analyze how varying the proportion of filtered area influences the overall precision of the classification. The filter rate $\rho$ determines the percentage of instances that need to be corrected, measured by the distance of cosine from the class prototype, that are selected for human correction. 
+To investigate the effect of the filter rate $\rho$, we conducted a controlled experiment to analyze how varying the proportion of filtered area influences the overall precision of the classification.
 
 As shown in Figure~\ref{fig:rho}, the overall classification accuracy increases steadily as the filter rate $\rho$ increases. A larger $\rho$ introduces a greater proportion of human-corrected samples into the training set, thereby reducing the influence of noisy labels in the uncorrected subset. The number of training-label queries is approximately $N\rho$. Under a constant per-query cost $C_h$, the corresponding proxy is $C(\rho)=N\rho C_h$. This model excludes labeled validation data, feature extraction, model inference, and differences in the time required to correct individual images; no human timing study is conducted.
 
