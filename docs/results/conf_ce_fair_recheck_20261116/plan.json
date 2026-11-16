@@ -1,0 +1,142 @@
+{
+  "protocol": {
+    "datasets": [
+      "cifar100",
+      "caltech101",
+      "eurosat",
+      "food101",
+      "tinyimagenet200"
+    ],
+    "methods": [
+      "clip_conf_ce",
+      "fcl_filter_ce"
+    ],
+    "learning_rates": [
+      0.001,
+      0.002,
+      0.004
+    ],
+    "weight_decay": 0.0001,
+    "epochs": 100,
+    "patience": 101,
+    "batch_size": 1024,
+    "tuning_seed": 42,
+    "additional_seeds": [
+      43,
+      44
+    ],
+    "selection": "highest best_val_accuracy; ties choose smallest learning rate",
+    "data_loader_workers": 2,
+    "scheduler": "CosineAnnealingLR(T_max=100)",
+    "notes": "Separate reruns; do not replace historical manuscript entries or claim matching historical protocols.",
+    "device": "cpu",
+    "threads": 2,
+    "parallel_datasets": 3,
+    "python": "/root/miniconda3/bin/python3.12",
+    "root": "/root/autodl-tmp",
+    "core_root": "/root/autodl-tmp/outputs/controlled_correction_20261115"
+  },
+  "source": {
+    "git_commit": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+    "source_sha256": {
+      "configs/controlled_campaign.yaml": "a411e5b2a98ce0220af51c8863b5069447a3a670e288a3cf1b2998b56d8db5cb",
+      "configs/datasets.yaml": "42b3b8766a5dc6d38adba7a563c7917d6061d8fef07197b787d1a2ed993a4ab1",
+      "configs/paper_reproduction.yaml": "257bb744c663f0e8bf1641d09f0820e2825b032fae34e5586131015e5d320bd3",
+      "configs/paper_targets.yaml": "b00f4ff8e6a4779c252655ee698741a493ef3b6983a13b4727b64d57080d4711",
+      "configs/paths.yaml": "a75c01a6ea5bec283b13752998b8542dfde2e93753dbcef7771220596ffcf56b",
+      "scripts/check_preparation.py": "e0e2f548990af4775059f72546292f98d39fd88e0d4df16c4c744b6debee8fc1",
+      "scripts/compare_label_corrections.py": "21ba5ff22e74bb948a25c3ecd94c66eb1d5fc8d7878a031ace67042197bda8c4",
+      "scripts/evaluate_fcl_checkpoints.py": "e6fe208900346d1e7fff1fbcff0e520ddf5285b8b092590631951a0293a52c16",
+      "scripts/plot_mu_sensitivity.py": "be7254eca8dbee006391b2df1421a23e2ec039cf3f7f75d6731c74dba69c5e27",
+      "scripts/plot_revision_results.py": "bc0ade2f86693264dcf60ddd4a3d081fa5fbd45c242e80469815e422efe44b04",
+      "scripts/prepare_annotation_manifests.py": "b37f6e251d8956c1fc07835ce724c2cf166df1bcc8b13ffc5318d719623a58ec",
+      "scripts/prepare_labels.py": "964ef7868b2780f8ffd84be5e65466c535bb0efc67bfc9f43c95f4ba146c41fa",
+      "scripts/prepare_materials.py": "075c63c76a8b91b94c92792f5b07328e661e21e954216d71a2d237fcc53a1fd6",
+      "scripts/remote_diagnose.py": "20421a2733d24f344f691fafdc76956eaa6b32e00bdea5c4a81c476e50b3d005",
+      "scripts/run_cache_experiments.py": "894aff8ea67a6d8e691ee5303dc26839017e41a76b45203ff770ee010cf3dcb1",
+      "scripts/run_controlled_suite.py": "43ba3d3662160a7bece8676ac703de2f8da215c38e4a375d5751a6022cbd370b",
+      "scripts/run_controlled_training.py": "a859abff5198b8f7c689d46fc090bfff4a4d69e09ba7a873c091bc750385cc67",
+      "scripts/run_legacy_baselines.py": "f43f0838796071e18f15f04cf1c0ba768da542308627a9b05c7c4f0bdabbd41b",
+      "scripts/run_mu_sensitivity.py": "1f5452e01bc398345badc2c2a334e9bae778153aa24da14dc8893533e0ce0702",
+      "scripts/run_new_comparisons.py": "f91b539174d34418596ade5aa6bbbad856d13b4f9b60d60efa5e7b6d862ebbfd",
+      "scripts/run_paper_experiments.py": "1ca2b36c9a8b2f102ab5d96f158f7a1c07dd6006ef390a3fc210cdd7b2b8b22b",
+      "scripts/run_qwen_campaign.py": "7db0e859667ad5acd7329d014325ec2d8af47c39bd95e578a42df5f0b8476d5d",
+      "scripts/run_revision_experiments.py": "34a46875cc04f1ec332a04fc4f479b5ed43461c48f83e8a7967721b8d2e1a547",
+      "scripts/summarize_controlled_results.py": "28856bb6629c61512e1fbfcd4c732e432c71ff4d5216405b27e0b4c8ad15b56f",
+      "scripts/summarize_latest_metrics.py": "891213f65439864d50a2ac7a65dbcad86e4e3ece7d8d203e56ecc38170abea08",
+      "scripts/summarize_paper_results.py": "5df6419c6f08c854e9074f38c766ca05006a7bc7b14e801f0cb2d5d4848ebd44",
+      "src/__init__.py": "73d4e29165b0050e70b3f9010688a20d45f981a17dfd943a2c8b18ec77a26a90",
+      "src/contrast/__init__.py": "77847e4586708ed657511ff38c0cc221052575ed398f0e2fe78b83acf44f8931",
+      "src/contrast/cache_experiment.py": "3ad2b7d91d66281256f997ae951ff256fce5b49076a51cec74536463f1e744f3",
+      "src/contrast/train_csgn.py": "d2ade4db9820669c902add6e12b646a6fb6172a97dfc473af4f131a544bc5558",
+      "src/contrast/train_dcd.py": "7c2bdb5b720edea180f05274057fa1b1447d9ef77f40e73296f4cf16ebb790a0",
+      "src/contrast/train_dld.py": "6dcdbbef0f61f8ec1e7c5e712f4b5b4b0361f0d9a415752b14b79f63d6c84463",
+      "src/contrast/train_dld_cache.py": "1b0253f4adad7574dba4301da0fe62884c2e2615140668f42ea5948ae682f366",
+      "src/contrast/train_fullsup.py": "1c2b9e1e393ad8c90026c1dccc3c2cdf511b2165632d3ae251074cb5a4a34b01",
+      "src/contrast/train_ido_cache.py": "04b02050bf83a4b58b3ee1800e12f2faa8ae23e1664aab4c9db46443b2c72b9f",
+      "src/contrast/train_l2b.py": "0592b2f45dffd88a2b9cd4eebee1f3d8d97a5d6e96c920f644d8a00983345727",
+      "src/contrast/train_nlprompt.py": "33495ea287edbaf8bb5c07fb682318bb6eb41b8b980aa7767e043371b95f9bf6",
+      "src/contrast/train_noise.py": "526905d00f3f99d03272378b3d30b38ef6b9655a25bbbea1ae2eef265a7db7ae",
+      "src/contrast/train_revision_baselines.py": "87a65690141801845401bdbe860ab31047de3f4a295447ee68f2ba0b5f592468",
+      "src/contrast/train_trusted.py": "e5e0ec52fa02648b8e95ab643cfadd080d0334074f9429f863b6343e6bef7417",
+      "src/fcl/.ipynb_checkpoints/train_auc_ce-checkpoint.py": "915dc78b858c360a933aed26bce4b04f6e7e0fe7aa10fc82228e3fa2f989e2c9",
+      "src/fcl/__init__.py": "6c5c14bd1926604550762238e1d9c67b19d7cf65888e9ad5907068ad3b2edbe3",
+      "src/fcl/auc_loss.py": "36c5ee342ad5dcaa409666aedf75d3373388267ee0c36e1f7ba8d3b2c4485f22",
+      "src/fcl/train_auc_ce.py": "9be8fe19b04b61c1a2e11a43528f2c6c6a61d83ed0017319aba9eeebca271a0d",
+      "src/paths.py": "8a707f1af35fd02335af2f27db202a3ad9cf60e5041829611d92c3a751ea8cb1",
+      "src/utils/__init__.py": "55ee9fb242f6b298ae2ec7656c11d5855ec4a922d110e70684acc41913e1a386",
+      "src/utils/annotation/__init__.py": "3ebc66d093b121c21dd38ba67430c025b7a81630069f641eb50ad946d0833827",
+      "src/utils/annotation/__main__.py": "6d8b7d7846a845059d7a3107143f11131f63c5511d669b44085b15ec5e3d2279",
+      "src/utils/annotation/cli.py": "e939c32406ae008b69a3760213c987ee69cddfe8a63c79499d2013d2a3f7790d",
+      "src/utils/annotation/qwen_batch.py": "a47aac690b43158f5629583c6dbc80210a99dedafab64af17f1540f153cf94bc",
+      "src/utils/annotation/schema.py": "226fa1a749e20dcc495767cba2f77392d356333c9a5b6111c11924c5f4dd4c24",
+      "src/utils/annotation/store.py": "47ec1125a7792e84a36885251d76e40cd26b4bf76d764524e4424b1768818c42",
+      "src/utils/eval/__init__.py": "809f03b807b5c7a74ffabbe0328877a7eb21d5f7fcb373fdc5069a22db3bb2d9",
+      "src/utils/eval/eval_acc.py": "895672b216de0398e70f63b01fadae9185998d82b9a9d72b082c3e6f77310e86",
+      "src/utils/eval/eval_clip_zeroshot.py": "c3250118d6c313cdef888f58e3bf66f397ff3aef885ac361e468c2ecda2250dc",
+      "src/utils/eval/eval_outlier_and_correction_stats.py": "56aab545b08666660949d772659512f1e52fa2d669bfe9123104e4d6e6c798db",
+      "src/utils/extract/__init__.py": "15871cc625eeae2cd291a2215726a8be5a433952ae5426f550c9dda6f4217f3b",
+      "src/utils/extract/extract_CLIP_CIFAR100.py": "4e0040667b3938bd5eba10a0c81ca137b87e10af2e7c0e9b2438cae6032cbfb9",
+      "src/utils/extract/extract_CLIP_caltech101.py": "97d9c9944f84bc1f3b88d65993060078624e383f1635a65a7372fbd6f1f7b202",
+      "src/utils/extract/extract_CLIP_dtd.py": "a8f37bdcae335196dab5cc32eb833cb016a6b475f03ab7a754c32b1e31101b7a",
+      "src/utils/extract/extract_CLIP_eurosat.py": "5dd686556367686c170cd16af3dca30dcff0c22699ce659f21994ba18be98205",
+      "src/utils/extract/extract_CLIP_food101.py": "33a80e01e90cfca8232540468c01e3e5e34f3b2c47b6cc89e87869d789c7adf4",
+      "src/utils/extract/extract_CLIP_imagefolder.py": "caef2cf0cf5133b5b7a41e596434a56a269890f438c91e6352e2fae86192ca4b",
+      "src/utils/extract/extract_CLIP_stanford_cars.py": "b9818d26becf9ade39675604a50abc12518c5501ae9e80ef3db66fb3088260ec",
+      "src/utils/extract/extract_CLIP_tinyimagenet.py": "3b3f0e57064bb15c34a5fae9b5e1823eb5b115bb28163a8ab5501222e220dc01",
+      "src/utils/extract/extract_CLIP_tinyimagenet_openai.py": "04eb3daf0f5c12f2bb61d3828891c872aaec05bb48a12403e4f6278845cff651",
+      "src/utils/labels/__init__.py": "ca0b9b1519a054c67a70bbba97f9f2a54d47459ae5fc1d943f05a102ae4cee42",
+      "src/utils/labels/make_obs_labels_caltech101.py": "33e28f0d4ab741650bf5c82c38ce9a242d82d96341acd4b1d182348733d54ee1",
+      "src/utils/labels/make_obs_labels_cifar100.py": "d7a16ef9f2c2c22e76c42821d3af7297da959afa61a26bfc63d3782b8b09f7a4",
+      "src/utils/labels/make_obs_labels_dtd.py": "00ed1a2c4b1325619f0168992f8eb95277374c57ceacdd9261aee53fed0d5c5a",
+      "src/utils/labels/make_obs_labels_eurosat.py": "a6a16ef163888ffe80c5c7ef11de47e7b53613bf621e0752f74c05d07ed134b6",
+      "src/utils/labels/make_obs_labels_food101.py": "0fc8ebed2c6cb1ffcb5cd9580b154938944c5df963773dd638315725fa69beca",
+      "src/utils/labels/make_obs_labels_stanford_cars.py": "998f4856c437802927fddd82f49803155b2b4d52a15d5c60de7966ba94175cca",
+      "src/utils/labels/make_obs_labels_tinyimagenet.py": "b78cb0f431b18d05bcc86b4b735aaff90a63f6858be0bfe25320790ac7640810"
+    },
+    "wrapper_sha256": "ec67d578ecfab439991b8281be6f807b823e617673ab1a0d588a45065fe6beb4"
+  },
+  "training_count": 50,
+  "inputs": {
+    "cifar100": [
+      "/root/autodl-tmp/dataset/processed/cifar100_clip_vit-l-14_embeddings.pt",
+      "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/prototype.pt"
+    ],
+    "caltech101": [
+      "/root/autodl-tmp/dataset/processed/caltech101_clip_vit-l-14_embeddings.pt",
+      "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/caltech101/clip/prototype.pt"
+    ],
+    "eurosat": [
+      "/root/autodl-tmp/dataset/processed/eurosat_clip_vit-l-14_embeddings.pt",
+      "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/prototype.pt"
+    ],
+    "food101": [
+      "/root/autodl-tmp/dataset/processed/food101_clip_vit-l-14_embeddings.pt",
+      "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/prototype.pt"
+    ],
+    "tinyimagenet200": [
+      "/root/autodl-tmp/dataset/processed/tinyimagenet200_clip_vit-l-14_embeddings.pt",
+      "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/tinyimagenet200/clip/prototype.pt"
+    ]
+  }
+}

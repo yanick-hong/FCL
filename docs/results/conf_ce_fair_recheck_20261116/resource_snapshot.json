@@ -1,0 +1,8 @@
+{
+  "/sys/fs/cgroup/memory/memory.limit_in_bytes": "96636764160",
+  "/sys/fs/cgroup/memory/memory.usage_in_bytes": "45965733888",
+  "/sys/fs/cgroup/memory/memory.max_usage_in_bytes": "46643843072",
+  "/sys/fs/cgroup/cpuset/cpuset.cpus": "0-127",
+  "/sys/fs/cgroup/cpuacct/cpuacct.usage": "104139736041691",
+  "/proc/self/cgroup": "12:rdma:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n11:devices:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n10:cpuset:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n9:pids:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n8:perf_event:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n7:hugetlb:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n6:blkio:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n5:cpu,cpuacct:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n4:net_cls,net_prio:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n3:freezer:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n2:memory:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n1:name=systemd:/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da\n0::/docker/e7169122b7efc194b096371371da4e41c77df582414d09d20106ff36ec9c92da"
+}

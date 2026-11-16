@@ -1,0 +1,48 @@
+{
+  "campaign": "conf_ce_fair_recheck_20261116",
+  "purpose": "Transparent recheck of confidence selection and prototype selection followed by the same mixed-label CE training.",
+  "manuscript_policy": "Do not modify paper sources or replace historical manuscript numbers with these independent reruns.",
+  "selection_policy": "Choose learning rate by maximum validation accuracy only; retain every trial regardless of which method wins. Do not target a prescribed number of winning datasets.",
+  "datasets": ["cifar100", "caltech101", "eurosat", "food101", "tinyimagenet200"],
+  "methods": ["clip_conf_ce", "fcl_filter_ce"],
+  "source_commit": "1fec7c895c11a80493f0153e6ec2870ffa322bed",
+  "labels": "Original CLIP predictions; simulate correction only on selected indices. Both methods query the exact same number of labels, as specified by each dataset's controlled prototype mask.",
+  "training": {
+    "features": "Frozen OpenAI CLIP ViT-L/14; normalized by existing cache loader",
+    "classifier": "Existing LinearHead, Xavier uniform weights and zero bias",
+    "objective": "Cross entropy on all mixed hard targets",
+    "optimizer": "AdamW",
+    "learning_rate_grid": [0.001, 0.002, 0.004],
+    "weight_decay": 0.0001,
+    "scheduler": "Existing CosineAnnealingLR, T_max=100",
+    "epochs": 100,
+    "patience_argument": 101,
+    "batch_size": 1024,
+    "gradient_clip_norm": 5.0,
+    "tuning_seed": 42,
+    "additional_training_seeds": [43, 44],
+    "tie_break": "Lowest learning rate among equal maximum validation accuracies",
+    "checkpoint_selection": "First epoch attaining maximum validation accuracy",
+    "test_policy": "Existing training CLI evaluates test at the validation-selected checkpoint; test metrics never enter the learning-rate selector. Save all trial outputs."
+  },
+  "planned_runs": {
+    "tuning": 30,
+    "additional_seeds_at_selected_lr": 20,
+    "total": 50
+  },
+  "execution": {
+    "device": "cpu",
+    "torch_threads_per_process": 2,
+    "data_loader_workers_per_process": 2,
+    "maximum_parallel_datasets": 3,
+    "existing_gpu_queues": "Keep current source, HEAD, configuration files and processes unchanged"
+  },
+  "known_limitations": [
+    "These controlled caches cannot be proven identical to all historical manuscript inputs.",
+    "Recovered Caltech has 101 classes; manuscript reports a 102-class protocol.",
+    "CPU reruns are distinct from the historical GPU implementation settings and are recorded explicitly.",
+    "Seed 42 is used for validation-based tuning and included in the three-seed summary; seed variability is conditional on the selected learning rate, fixed data, labels and correction masks.",
+    "The confidence-threshold CLI argument does not affect clip_conf_ce; it is not a tuning variable for this campaign.",
+    "Current label-only audit favors confidence selection on all five datasets; the downstream comparison is allowed to favor either method."
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "datasets": {
+    "cifar100": {
+      "dataset": "cifar100",
+      "cache": "/root/autodl-tmp/dataset/processed/cifar100_clip_vit-l-14_embeddings.pt",
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/prototype.pt",
+      "classes": 100,
+      "split_counts": {
+        "train": 45000,
+        "val": 5000,
+        "test": 10000
+      },
+      "hashes": {
+        "cache_sha256": "506e630c722fb6bf0b74a61101d712e97e93c30b8367f71b19d83d0138edb74b",
+        "obs_sha256": "9b19261d29cb018d7d23190fde80c857d983729e46f42f3be8c4783a88127a64",
+        "mask_sha256": "7991cf510e256ae8048c65e811a9c245ada71b1fd33507edfdf64bb47991678c",
+        "y_obs_sha256": "cefb49f6984654bf6f283529c3ff2040ca04379a57f6f543501fa2ca46d84453",
+        "pseudo_sha256": "a3ae8921cb06111600e2a33d306f92053ce48ab10ce687155bcdf8450a58eb3a",
+        "sample_order_sha256": "27db3de749a44f08fcb562653532c032300cabe8a46a6f7ad12511efaf0cb3af"
+      },
+      "verified_count": 13546,
+      "rho": 0.30102222222222225,
+      "selection_audit": {
+        "clip_conf_ce": {
+          "mask_sha256": "cc76317dd16240d6dbb0855f04c112fd0cda3b267ae5eece56f2314653b0c88c",
+          "targets_sha256": "6e6ed8a7c12a109f0432b05b54efa23b10c8cf1c76bc242bc43d338fc71cf364",
+          "corrected_label_accuracy": 0.9038,
+          "selected_source_error_rate": 0.49165805403809243
+        },
+        "fcl_filter_ce": {
+          "mask_sha256": "7991cf510e256ae8048c65e811a9c245ada71b1fd33507edfdf64bb47991678c",
+          "targets_sha256": "cefb49f6984654bf6f283529c3ff2040ca04379a57f6f543501fa2ca46d84453",
+          "corrected_label_accuracy": 0.8708888888888889,
+          "selected_source_error_rate": 0.38232688616565774
+        }
+      },
+      "historical_protocol_note": "New controlled rerun; historical cache equivalence is not assumed."
+    },
+    "caltech101": {
+      "dataset": "caltech101",
+      "cache": "/root/autodl-tmp/dataset/processed/caltech101_clip_vit-l-14_embeddings.pt",
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/caltech101/clip/prototype.pt",
+      "classes": 101,
+      "split_counts": {
+        "train": 2945,
+        "val": 901,
+        "test": 4831
+      },
+      "hashes": {
+        "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+        "obs_sha256": "e769ad3bb697c62c4b20588d329e4c57764fb5e983831ccbe0f1bed9b799406b",
+        "mask_sha256": "a5410dd87feb9c9ff8270b420553984637b836ee750f5935741545881d5ae037",
+        "y_obs_sha256": "495fe3ee94f7ac590c20630f36712ff497e6d6c25b702c38cc3cfa1ceb007e71",
+        "pseudo_sha256": "b1e5bca8a226b58deac415d5518f34cbf946a99d136b557bed58a6531cd4e35b",
+        "sample_order_sha256": "2f3a73d8ff2e7ebecafd237331e4b05028f2586e28cc3edc2df7029a4bc269da"
+      },
+      "verified_count": 914,
+      "rho": 0.3103565365025467,
+      "selection_audit": {
+        "clip_conf_ce": {
+          "mask_sha256": "0836809964fd121ce969e9a50630ba2afdca08f775fb13f3476e03a3b52e7196",
+          "targets_sha256": "6e1a3ed2c6cc40e021c238ce1f7f4e1b2ef9a1738783e30233702ff8e93a2c5f",
+          "corrected_label_accuracy": 0.9962648556876061,
+          "selected_source_error_rate": 0.21772428884026257
+        },
+        "fcl_filter_ce": {
+          "mask_sha256": "a5410dd87feb9c9ff8270b420553984637b836ee750f5935741545881d5ae037",
+          "targets_sha256": "495fe3ee94f7ac590c20630f36712ff497e6d6c25b702c38cc3cfa1ceb007e71",
+          "corrected_label_accuracy": 0.9745331069609507,
+          "selected_source_error_rate": 0.14770240700218817
+        }
+      },
+      "historical_protocol_note": "Caltech recovered cache has 101 classes; historical main text uses 102."
+    },
+    "eurosat": {
+      "dataset": "eurosat",
+      "cache": "/root/autodl-tmp/dataset/processed/eurosat_clip_vit-l-14_embeddings.pt",
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/prototype.pt",
+      "classes": 10,
+      "split_counts": {
+        "train": 21600,
+        "val": 2700,
+        "test": 2700
+      },
+      "hashes": {
+        "cache_sha256": "247b5e61e946157f9358a3ea72bed42476a5b2f9383f5c6903df4fb63ac67a5d",
+        "obs_sha256": "bed0ceabb42f48065574eb82d550ec7224c6d2b8964480e4a8e24ddbc4e9659c",
+        "mask_sha256": "f4ed4b9d5657e26757cfa7b212a075b39e9ee3c2308b3eb4dba86bccc4cf58fb",
+        "y_obs_sha256": "7f5c178b6f197bd714491adb26939d68698546d26d9784c63341ed3c221f5e43",
+        "pseudo_sha256": "d87cbc94428034458aee97dd8834288a29347b710ea89b20696acfffea90f10f",
+        "sample_order_sha256": "0f9877fc088aff9b41941d2798ad163ca1f8c969db7a1941ed9413a1ebb95591"
+      },
+      "verified_count": 6485,
+      "rho": 0.3002314814814815,
+      "selection_audit": {
+        "clip_conf_ce": {
+          "mask_sha256": "dcc0028a9f722516e2a1367ee82277c26ba8e6bb3757c0031ed6731e6b6954c5",
+          "targets_sha256": "b319b18d6bf8a383f446fa2e21ca9c206cb0526563294fe0d246150baea1d9a8",
+          "corrected_label_accuracy": 0.6483796296296296,
+          "selected_source_error_rate": 0.7272166538164996
+        },
+        "fcl_filter_ce": {
+          "mask_sha256": "f4ed4b9d5657e26757cfa7b212a075b39e9ee3c2308b3eb4dba86bccc4cf58fb",
+          "targets_sha256": "7f5c178b6f197bd714491adb26939d68698546d26d9784c63341ed3c221f5e43",
+          "corrected_label_accuracy": 0.6243055555555556,
+          "selected_source_error_rate": 0.6470316114109483
+        }
+      },
+      "historical_protocol_note": "New controlled rerun; historical cache equivalence is not assumed."
+    },
+    "food101": {
+      "dataset": "food101",
+      "cache": "/root/autodl-tmp/dataset/processed/food101_clip_vit-l-14_embeddings.pt",
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/prototype.pt",
+      "classes": 101,
+      "split_counts": {
+        "train": 65650,
+        "val": 10100,
+        "test": 25250
+      },
+      "hashes": {
+        "cache_sha256": "ee2f3487d1a6e7ec8a7a8d582ff4b4e324ea42798c16a05d3f969f2a8a0c0718",
+        "obs_sha256": "cfade3bb3eb89d0374f83f719adf545700bddad2466f3f33fbb98399d36fc18a",
+        "mask_sha256": "978ae37b9a66d015acd32690196dcc4b377eaafe0f185ba622693d81b7b87e13",
+        "y_obs_sha256": "2efeb845462a8bd5696d0db9a27bd6c6cdbd494d42f2670620edb7173ee677fc",
+        "pseudo_sha256": "05fc871bb6f1353a60807e1db9768329f1b3afa9cbacd8b354ab4ffd7bd0bb21",
+        "sample_order_sha256": "fae041c6a7f40d0b1f706ccb86c9fa7aad7936ba6e23f3a9ef0a5e4f95b3d8bb"
+      },
+      "verified_count": 19738,
+      "rho": 0.30065498857578066,
+      "selection_audit": {
+        "clip_conf_ce": {
+          "mask_sha256": "cbe863604d5d8314eb67b212205b9f5388f81627ff6db62ed665688f08668523",
+          "targets_sha256": "3bc0c96d83ce1bef0e42febead25ac1d2bc40c3979dfae90aba6d01f02d58230",
+          "corrected_label_accuracy": 0.9877989337395278,
+          "selected_source_error_rate": 0.3247542810821765
+        },
+        "fcl_filter_ce": {
+          "mask_sha256": "978ae37b9a66d015acd32690196dcc4b377eaafe0f185ba622693d81b7b87e13",
+          "targets_sha256": "2efeb845462a8bd5696d0db9a27bd6c6cdbd494d42f2670620edb7173ee677fc",
+          "corrected_label_accuracy": 0.9608987052551409,
+          "selected_source_error_rate": 0.23528219677778903
+        }
+      },
+      "historical_protocol_note": "New controlled rerun; historical cache equivalence is not assumed."
+    },
+    "tinyimagenet200": {
+      "dataset": "tinyimagenet200",
+      "cache": "/root/autodl-tmp/dataset/processed/tinyimagenet200_clip_vit-l-14_embeddings.pt",
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/tinyimagenet200/clip/prototype.pt",
+      "classes": 200,
+      "split_counts": {
+        "train": 90000,
+        "val": 10000,
+        "test": 10000
+      },
+      "hashes": {
+        "cache_sha256": "11db1d55feb7f6080dca473782114ad4b7f435c509cb4c42ba92a034f030adef",
+        "obs_sha256": "254b1af8c5a4bac29c0ca88fc40ec0cda855d364b8c26465c53a5ccfade85823",
+        "mask_sha256": "c278cfe770f36c1a524a5034833d8dede908a430f7a57c8c2c9b41d0453fe609",
+        "y_obs_sha256": "a8c4d47e17f5cf94e35d6280c177bff74c2024858837a716fcb92d60e573aa24",
+        "pseudo_sha256": "35425a49f16c8050296fe48d292ead52b88a0f50ec33318924e9342bcf39a17e",
+        "sample_order_sha256": "cc8bfa48885ad2539cbad0f0eb578e612d198c9a423214197171ddeae81a6a42"
+      },
+      "verified_count": 27092,
+      "rho": 0.30102222222222225,
+      "selection_audit": {
+        "clip_conf_ce": {
+          "mask_sha256": "762de6f8f1d7cb4110d3c9c354aff7211b5388a18e157596e9911274688b5f63",
+          "targets_sha256": "816f2523586c1c2f5fa382f597583bc295ad90d99812f251a2b1c3276a3c5344",
+          "corrected_label_accuracy": 0.9147555555555555,
+          "selected_source_error_rate": 0.5547024952015355
+        },
+        "fcl_filter_ce": {
+          "mask_sha256": "c278cfe770f36c1a524a5034833d8dede908a430f7a57c8c2c9b41d0453fe609",
+          "targets_sha256": "a8c4d47e17f5cf94e35d6280c177bff74c2024858837a716fcb92d60e573aa24",
+          "corrected_label_accuracy": 0.8793888888888889,
+          "selected_source_error_rate": 0.43721393769378414
+        }
+      },
+      "historical_protocol_note": "New controlled rerun; historical cache equivalence is not assumed."
+    }
+  },
+  "runtime": {
+    "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+    "platform": "Linux-5.4.0-153-generic-x86_64-with-glibc2.35",
+    "torch": "2.5.1+cu124",
+    "cuda_runtime": "12.4",
+    "device": "cpu",
+    "gpu_name": null
+  }
+}
