@@ -22,7 +22,7 @@ def sha256(path: Path) -> str:
 def main() -> None:
     main_tex = (PAPER / "main.tex").read_text(encoding="utf-8")
     supp_tex = (PAPER / "supplement.tex").read_text(encoding="utf-8")
-    assert "Controlled selection and objective ablations" in supp_tex
+    assert "Controlled selection and objective ablations" not in supp_tex
     assert "Stability across Training Seeds" in supp_tex
     assert "Filter-Corrected Qwen Labels" in supp_tex
     assert "Random-30" in main_tex and "Random-M" in main_tex
@@ -42,12 +42,19 @@ def main() -> None:
     assert "Prototype + AUC-C" in additional
     assert "Random + AUC-C" in additional
     assert "Prototype + CLIP soft-CE" in additional
+    assert "Tiny-ImageNet" in additional
+    assert "Prototype + AUC-C & 83.420 & 95.688 & 92.852 & 94.779 & 84.070" in additional
+    assert "Random + AUC-C & 83.633 & 92.610 & 94.062 & 94.672 & 83.840" in additional
+    assert "Prototype + CLIP soft-CE & 82.463 & 96.322 & 86.901 & 94.595 & 80.660" in additional
+    assert "\\pm" not in additional
     method_table = main_tex[main_tex.index("\\label{tab:method-compare-clip}") : main_tex.index("\\end{table*}", main_tex.index("\\label{tab:method-compare-clip}"))]
     assert "Random-Filter-CE" in method_table and "FCL-Filter-CE" in method_table
     seed_table_start = supp_tex.index("\\label{tab:supp-controlled-training-seeds}")
     seed_table = supp_tex[supp_tex.rfind("\\begin{table}[t]", 0, seed_table_start) : supp_tex.index("\\end{table}", seed_table_start)]
     assert "Mean $\\pm$ SD" in seed_table and "95\\% CI" in seed_table
     assert "Seed 42" not in seed_table and "Seed 43" not in seed_table and "Seed 44" not in seed_table
+    assert "\\begin{tabular*}{\\columnwidth}" in seed_table
+    assert "\\begin{tabular}{" not in seed_table
 
     unchanged = []
     changed = []
@@ -66,7 +73,7 @@ def main() -> None:
         "changed_files": changed,
         "unchanged_original_files": len(unchanged),
         "checks": {
-            "controlled_ablation_block_in_supp_table1": True,
+            "controlled_ablations_in_unified_supp_table1": True,
             "standalone_supp_table3_removed": True,
             "qwen_section": True,
             "table1_unified": True,
@@ -76,6 +83,9 @@ def main() -> None:
             "component_controls_merged": True,
             "qwen_table_ten_columns": True,
             "seed_columns_removed": True,
+            "ablation_variance_removed": True,
+            "tiny_imagenet_ablation_results": True,
+            "seed_table_fills_column": True,
         },
     }
     out = ROOT / "docs" / "results" / "paper_revision_verification_v3.json"

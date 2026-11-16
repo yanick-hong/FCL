@@ -82,11 +82,9 @@ CLIP generates hard pseudo-labels and supplies normalized image features, class-
 
 \begin{table*}[t]
 \caption{Test accuracy (\%) of the additional baselines and controlled
-ablations. The first block reports methods evaluated on all five datasets;
-the final block reports the controlled selection and objective ablations.
-Implementation details are given in Additional Baseline Comparison. The
-best and second-best results within the baseline block are shown in bold and
-underlined, respectively. A dash denotes an unavailable controlled run.}
+ablations. All methods use the same frozen-feature protocol described in
+Additional Baseline Comparison. The best and second-best results among the
+additional baselines are shown in bold and underlined, respectively.}
 \label{tab:supp-additional-baselines}
 
 
@@ -99,19 +97,16 @@ underlined, respectively. A dash denotes an unavailable controlled run.}
 Method & \textbf{CIFAR-100} & \textbf{Caltech-101} & \textbf{EuroSAT} & \textbf{Food-101} & \textbf{Tiny-ImageNet} \\
 \midrule
 CLIP-Zero-CE~\cite{radford2021clip} & 78.44 & 87.90 & 45.19 & 90.57 & 77.78 \\
-Random-Filter-CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
-FCL-Filter-CE & 81.94 & \underline{89.40} & 58.41 & 91.75 & 82.16 \\
+CLIP-Margin-CE & 78.44 & 87.90 & 45.19 & 90.54 & 77.78 \\
 Xie-Trim-AUC~\cite{xie2024wsauc} & 75.90 & 81.68 & 37.41 & 88.34 & 75.50 \\
 FixMatch*~\cite{sohn2020fixmatch} & \underline{83.58} & 87.44 & \underline{90.11} & 92.01 & \underline{83.52} \\
 SoftMatch*~\cite{chen2023softmatch} & 62.66 & 16.13 & 70.52 & \underline{92.04} & 82.63 \\
-CLIP-Margin-CE & 78.44 & 87.90 & 45.19 & 90.54 & 77.78 \\
+Random-Filter-CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
+FCL-Filter-CE & 81.94 & \underline{89.40} & 58.41 & 91.75 & 82.16 \\
+Prototype + CLIP soft-CE & 82.463 & 96.322 & 86.901 & 94.595 & 80.660 \\
+Random + AUC-C & 83.633 & 92.610 & 94.062 & 94.672 & 83.840 \\
+Prototype + AUC-C & 83.420 & 95.688 & 92.852 & 94.779 & 84.070 \\
 FCL (ours) & \textbf{85.02} & \textbf{96.20} & \textbf{93.44} & \textbf{94.78} & \textbf{84.23} \\
-\midrule
-\multicolumn{6}{l}{\textit{Controlled selection and objective ablations}} \\
-\midrule
-Prototype + AUC-C & $83.420\pm0.010$ & $95.688\pm0.012$ & $92.852\pm0.037$ & $94.779\pm0.008$ & -- \\
-Random + AUC-C & $83.633\pm0.032$ & $92.610\pm0.108$ & $94.062\pm0.093$ & $94.672\pm0.026$ & -- \\
-Prototype + CLIP soft-CE & $82.463\pm0.055$ & $96.322\pm0.104$ & $86.901\pm0.057$ & $94.595\pm0.025$ & -- \\
 \bottomrule
 \end{tabular*}
 
@@ -166,27 +161,7 @@ CLIP RN50 & 11.11 & 78.00 & 29.59 & \textbf{87.52} \\
     every training image. A linear classifier is optimized with cross-entropy
     without human correction.
 
-    \item \textbf{Random-Filter-CE.} This method corrects a uniformly random
-    subset with the same size as the FCL filter area and trains on the mixed
-    corrected and pseudo-label targets with cross-entropy. It isolates the
-    effect of prototype-based selection.
-
-    \item \textbf{FCL-Filter-CE.} This control uses the FCL prototype-distance
-    filter and the same corrected labels as FCL, but replaces AUC-C with
-    ordinary cross-entropy on the resulting mixed targets. It compares the complete training rules under a common selection mask; loss-specific attribution additionally requires matched sampling and optimization.
-
-    \item \textbf{Prototype + AUC-C.} This controlled rerun uses the
-    prototype correction mask and trains corrected instances with CE and
-    uncorrected instances with AUC-C. It is the matched controlled version of
-    the FCL objective reported in the final block of Table~\ref{tab:supp-additional-baselines}.
-
-    \item \textbf{Random + AUC-C.} This ablation replaces the prototype mask
-    with a uniform random correction mask at the same nominal rate, while
-    retaining the corrected-sample CE and uncorrected-sample AUC-C losses.
-
-    \item \textbf{Prototype + CLIP soft-CE.} This ablation keeps the prototype
-    correction mask, uses CE on corrected instances, and uses CE against the
-    fixed CLIP class distribution on uncorrected instances.
+    \item \textbf{CLIP-Margin-CE.} This control converts the top-two CLIP score margin into a pseudo-label weight for cross-entropy. It does not implement DeFT's learned positive/negative prompts or encoder adaptation~\cite{wei2024deft}, so its scores are not reported as a reproduction of DeFT.
 
     \item \textbf{Xie-Trim-AUC \cite{xie2024wsauc}.} This is a cache-level adaptation inspired by
     the weakly supervised AUC formulation of Xie et al.~\cite{xie2024wsauc}.
@@ -200,15 +175,34 @@ CLIP RN50 & 11.11 & 78.00 & 29.59 & \textbf{87.52} \\
     whereas SoftMatch assigns a soft confidence weight. Both are implemented
     on frozen feature caches with small feature perturbations.
 
-    \item \textbf{CLIP-Margin-CE.} This control converts the top-two CLIP score margin into a pseudo-label weight for cross-entropy. It does not implement DeFT's learned positive/negative prompts or encoder adaptation~\cite{wei2024deft}, so its scores are not reported as a reproduction of DeFT.
+    \item \textbf{Random-Filter-CE.} This method corrects a uniformly random
+    subset with the same size as the FCL filter area and trains on the mixed
+    corrected and pseudo-label targets with cross-entropy. It isolates the
+    effect of prototype-based selection.
+
+    \item \textbf{FCL-Filter-CE.} This control uses the FCL prototype-distance
+    filter and the same corrected labels as FCL, but replaces AUC-C with
+    ordinary cross-entropy on the resulting mixed targets. It compares the complete training rules under a common selection mask; loss-specific attribution additionally requires matched sampling and optimization.
+
+    \item \textbf{Prototype + CLIP soft-CE.} This ablation keeps the prototype
+    correction mask, uses CE on corrected instances, and uses CE against the
+    fixed CLIP class distribution on uncorrected instances.
+
+    \item \textbf{Random + AUC-C.} This ablation replaces the prototype mask
+    with a uniform random correction mask at the same nominal rate, while
+    retaining the corrected-sample CE and uncorrected-sample AUC-C losses.
+
+    \item \textbf{Prototype + AUC-C.} This controlled rerun uses the
+    prototype correction mask and trains corrected instances with CE and
+    uncorrected instances with AUC-C. It is the matched controlled version of
+    the FCL objective reported in Table~\ref{tab:supp-additional-baselines}.
 \end{itemize}
 
 Table~\ref{tab:supp-additional-baselines} reports the corresponding test
-accuracies. The baseline block provides the common five-dataset comparison,
-while the final block places the controlled selection and objective results
-under the same table for direct reference. The SSL-style methods are
-competitive on some datasets, while their performance varies substantially
-across domains.
+accuracies. The SSL-style methods are competitive on some datasets, while
+their performance varies substantially across domains. The controlled rows
+make the effects of the correction mask and the uncorrected-sample objective
+directly comparable under the same protocol.
 
 \section{Impact of Different Feature Extractors}
 The filtering step depends on the geometry of the feature space, so the
@@ -267,7 +261,7 @@ entries.}
 \centering
 \scriptsize
 \setlength{\tabcolsep}{2.5pt}
-\begin{tabular}{@{}lrr@{}}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrr}
 \toprule
 Dataset & Mean $\pm$ SD & 95\% CI \\
 \midrule
@@ -276,7 +270,7 @@ Caltech-101 & $95.688\pm0.012$ & $[95.658, 95.717]$ \\
 EuroSAT & $92.852\pm0.037$ & $[92.760, 92.944]$ \\
 Food-101 & $94.779\pm0.008$ & $[94.758, 94.799]$ \\
 \bottomrule
-\end{tabular}
+\end{tabular*}
 \end{table}
 
 The 95\% CI is the two-sided Student-$t$ confidence interval for the mean

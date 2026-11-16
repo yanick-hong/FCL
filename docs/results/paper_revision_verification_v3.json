@@ -6,7 +6,7 @@
   ],
   "unchanged_original_files": 15,
   "checks": {
-    "controlled_ablation_block_in_supp_table1": true,
+    "controlled_ablations_in_unified_supp_table1": true,
     "standalone_supp_table3_removed": true,
     "qwen_section": true,
     "table1_unified": true,
@@ -15,6 +15,9 @@
     "dagger_footnotes_absent": true,
     "component_controls_merged": true,
     "qwen_table_ten_columns": true,
-    "seed_columns_removed": true
+    "seed_columns_removed": true,
+    "ablation_variance_removed": true,
+    "tiny_imagenet_ablation_results": true,
+    "seed_table_fills_column": true
   }
 }
