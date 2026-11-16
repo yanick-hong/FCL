@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "status": "completed",
+  "required_training_seeds": [
+    42,
+    43,
+    44
+  ],
+  "method": "sample SD (ddof=1); unbounded two-sided 95% Student-t CI; paired objective differences",
+  "groups": [
+    {
+      "dataset": "eurosat",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "ce_soft",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 86.90123558044434,
+      "sample_std": 0.05657372621679896,
+      "ci95_low": 86.76069865365494,
+      "ci95_high": 87.04177250723373,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "247b5e61e946157f9358a3ea72bed42476a5b2f9383f5c6903df4fb63ac67a5d",
+        "obs_sha256": "bed0ceabb42f48065574eb82d550ec7224c6d2b8964480e4a8e24ddbc4e9659c",
+        "mask_sha256": "f4ed4b9d5657e26757cfa7b212a075b39e9ee3c2308b3eb4dba86bccc4cf58fb",
+        "y_obs_sha256": "7f5c178b6f197bd714491adb26939d68698546d26d9784c63341ed3c221f5e43",
+        "sample_order_sha256": "0f9877fc088aff9b41941d2798ad163ca1f8c969db7a1941ed9413a1ebb95591",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "14bbc2ab71094dc9a32e5f3a439826e3d62cf0fc0b67b890cee1a036555b2282"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.8685185313224792,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/clip/prototype/ce_soft/seed-42/metrics.json",
+          "metrics_sha256": "77728446369ab6746af0b5f864f0931364f4474163b43e362c6c11356c7b3e51"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.8688889145851135,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/clip/prototype/ce_soft/seed-43/metrics.json",
+          "metrics_sha256": "5e5c68371c2b8c116a633a9493a3964c027d4ba4ce533961fcf210d16eeddacb"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.8696296215057373,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/clip/prototype/ce_soft/seed-44/metrics.json",
+          "metrics_sha256": "c02066b4a6bc3c2ab8dde3969d08211d0db6a27dd5747dae3bfd30f636733b61"
+        }
+      ]
+    },
+    {
+      "dataset": "eurosat",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 92.8518533706665,
+      "sample_std": 0.037038326263427734,
+      "ci95_low": 92.75984506761542,
+      "ci95_high": 92.94386167371759,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "247b5e61e946157f9358a3ea72bed42476a5b2f9383f5c6903df4fb63ac67a5d",
+        "obs_sha256": "bed0ceabb42f48065574eb82d550ec7224c6d2b8964480e4a8e24ddbc4e9659c",
+        "mask_sha256": "f4ed4b9d5657e26757cfa7b212a075b39e9ee3c2308b3eb4dba86bccc4cf58fb",
+        "y_obs_sha256": "7f5c178b6f197bd714491adb26939d68698546d26d9784c63341ed3c221f5e43",
+        "sample_order_sha256": "0f9877fc088aff9b41941d2798ad163ca1f8c969db7a1941ed9413a1ebb95591",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "14bbc2ab71094dc9a32e5f3a439826e3d62cf0fc0b67b890cee1a036555b2282"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.9281481504440308,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/clip/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "79b34bd1f39ddd7dd15c51ae48989b16d3fbfce69ee55c1ef085bf1070481eb0"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9288889169692993,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/clip/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "2432300cc81841e896e4c7ec27aeea719033919e1e834fab34ff49098d8ae97b"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.928518533706665,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/clip/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "a4acdd9d757f4c4ea9d7be83f565ca4dc046f0602f0a69739650699fe202510a"
+        }
+      ]
+    },
+    {
+      "dataset": "eurosat",
+      "label_source": "clip",
+      "selection": "random_global_exact",
+      "objective": "fcl_auc",
+      "selection_seed": 42,
+      "n": 3,
+      "mean": 94.0617283185323,
+      "sample_std": 0.09320831384888623,
+      "ci95_low": 93.83018603105162,
+      "ci95_high": 94.29327060601298,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "247b5e61e946157f9358a3ea72bed42476a5b2f9383f5c6903df4fb63ac67a5d",
+        "obs_sha256": "d5e19b174b892e9f0d212dba3f2dd13dcf32b9bd84639a0896952b54a604260f",
+        "mask_sha256": "0a1eb6bfdbbcc346c00aaab444850c7323a8d5622f142b9591bd564cefd847ab",
+        "y_obs_sha256": "b42e69007977d24334652bb19c2d2b26b322aa7ad31afd87106987095c92982c",
+        "sample_order_sha256": "0f9877fc088aff9b41941d2798ad163ca1f8c969db7a1941ed9413a1ebb95591",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "14bbc2ab71094dc9a32e5f3a439826e3d62cf0fc0b67b890cee1a036555b2282"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.9396296143531799,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/clip/random_global_exact/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "b1bfab11c37c50ad23f1e1f76187824d1f794c9f30e9f567c0a688cf0cd67c87"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9414814710617065,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/clip/random_global_exact/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "ca9d382b4f71700ff16309fd0e9151853d26240f397ad525c7f180666774aba9"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.9407407641410828,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/clip/random_global_exact/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "6ef246866f3e70b2dce7928ba36bcd9510c1a9ae267065c8e76e2fcbb33a835d"
+        }
+      ]
+    },
+    {
+      "dataset": "eurosat",
+      "label_source": "qwen",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 94.48148012161255,
+      "sample_std": 0.0,
+      "ci95_low": 94.48148012161255,
+      "ci95_high": 94.48148012161255,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "ea7da5e6076c2eda7df00f72c4133856585248c2370d1a1d2ffc0f80ad0ec215",
+        "obs_sha256": "3406a4a01b7bcaa44dfe52f8328fc2647f09a6b7aed879a764a6bebc9b55e01c",
+        "mask_sha256": "5f757907b22e746a3fb167e0c2ef961ff03a8d9f61ee97207eacd63902f984a4",
+        "y_obs_sha256": "6f91f1770312f4dd719632f0b13dccabe309833dc70b02ebe2df3a5094f73e44",
+        "sample_order_sha256": "957409292ce2b0953368a056d591ac43bea6b2730508be1c4bdb0c04de38c731",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "14bbc2ab71094dc9a32e5f3a439826e3d62cf0fc0b67b890cee1a036555b2282"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.9448148012161255,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/qwen/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "2c4b919997e7f4674c48139895e32878d960f0ca2af755bcd57740bc00579456"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9448148012161255,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/qwen/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "f01aa138dd294155b877484672b221912a025f059e52b9875fe375e93ed4a71c"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.9448148012161255,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/eurosat/qwen/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "1099251d09ea6b1b6ceeb2879852337c686eaab8fe9e7302e42bb64a0e049051"
+        }
+      ]
+    }
+  ],
+  "paired_objective_differences": [
+    {
+      "dataset": "eurosat",
+      "label_source": "clip",
+      "selection": "prototype",
+      "selection_seed": null,
+      "contrast": "fcl_auc - ce_soft",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "units": "percentage_points",
+      "per_seed_differences": [
+        5.962961912155151,
+        6.000000238418579,
+        5.888891220092773
+      ],
+      "n": 3,
+      "mean": 5.950617790222168,
+      "sample_std": 0.05657372621679896,
+      "ci95_low": 5.81008086343278,
+      "ci95_high": 6.091154717011556
+    }
+  ]
+}

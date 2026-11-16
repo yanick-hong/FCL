@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "status": "completed",
+  "required_training_seeds": [
+    42,
+    43,
+    44
+  ],
+  "method": "sample SD (ddof=1); unbounded two-sided 95% Student-t CI; paired objective differences",
+  "groups": [
+    {
+      "dataset": "food101",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "ce_soft",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 94.59537863731384,
+      "sample_std": 0.02514884333156219,
+      "ci95_low": 94.532905447187,
+      "ci95_high": 94.65785182744068,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "ee2f3487d1a6e7ec8a7a8d582ff4b4e324ea42798c16a05d3f969f2a8a0c0718",
+        "obs_sha256": "cfade3bb3eb89d0374f83f719adf545700bddad2466f3f33fbb98399d36fc18a",
+        "mask_sha256": "978ae37b9a66d015acd32690196dcc4b377eaafe0f185ba622693d81b7b87e13",
+        "y_obs_sha256": "2efeb845462a8bd5696d0db9a27bd6c6cdbd494d42f2670620edb7173ee677fc",
+        "sample_order_sha256": "fae041c6a7f40d0b1f706ccb86c9fa7aad7936ba6e23f3a9ef0a5e4f95b3d8bb",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "21798673ad5f8c19e316a48c0e67335177acd0b081f38ca0affa21003b9eea74"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.9460989832878113,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/clip/prototype/ce_soft/seed-42/metrics.json",
+          "metrics_sha256": "323d7fb365fd34aba30e4477017d8550fce89a82459a530dca89e9d0d0619af4"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9460989832878113,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/clip/prototype/ce_soft/seed-43/metrics.json",
+          "metrics_sha256": "04b782afc99da53824face6d173f3fe042b8c63593ee533ca7217376eb484ff0"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.9456633925437927,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/clip/prototype/ce_soft/seed-44/metrics.json",
+          "metrics_sha256": "50e8f404c0efef0105ea408d3da4924015e9d9a037180e44ecbb73daadd4155c"
+        }
+      ]
+    },
+    {
+      "dataset": "food101",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 94.77887749671936,
+      "sample_std": 0.008242050881013025,
+      "ci95_low": 94.75840310730366,
+      "ci95_high": 94.79935188613506,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "ee2f3487d1a6e7ec8a7a8d582ff4b4e324ea42798c16a05d3f969f2a8a0c0718",
+        "obs_sha256": "cfade3bb3eb89d0374f83f719adf545700bddad2466f3f33fbb98399d36fc18a",
+        "mask_sha256": "978ae37b9a66d015acd32690196dcc4b377eaafe0f185ba622693d81b7b87e13",
+        "y_obs_sha256": "2efeb845462a8bd5696d0db9a27bd6c6cdbd494d42f2670620edb7173ee677fc",
+        "sample_order_sha256": "fae041c6a7f40d0b1f706ccb86c9fa7aad7936ba6e23f3a9ef0a5e4f95b3d8bb",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "21798673ad5f8c19e316a48c0e67335177acd0b081f38ca0affa21003b9eea74"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.9477623701095581,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/clip/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "7b52de2ac8f426898d39de1ab08456b15c9e472702cbfa2c74ab9c8e28fef5b9"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9477227926254272,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/clip/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "196354f34d8c78e0f4ebfa68ee9cc05a52c8449c13f57b6351514be334af1e22"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.9478811621665955,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/clip/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "caef67bebd200a664304c8c2c04502ee4344d8bbc4d7ab3ef0de9d01f6dfc6dd"
+        }
+      ]
+    },
+    {
+      "dataset": "food101",
+      "label_source": "clip",
+      "selection": "random_global_exact",
+      "objective": "fcl_auc",
+      "selection_seed": 42,
+      "n": 3,
+      "mean": 94.67194676399231,
+      "sample_std": 0.02576873897215089,
+      "ci95_low": 94.60793366772734,
+      "ci95_high": 94.73595986025728,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "ee2f3487d1a6e7ec8a7a8d582ff4b4e324ea42798c16a05d3f969f2a8a0c0718",
+        "obs_sha256": "cabffd017c875b0fd4168e937f7e215ed535d5f9cdd8168cddea1022e2cd1641",
+        "mask_sha256": "4debb35d33d5df9147d1386c3d076b68f58ca60437c486047309861597a07715",
+        "y_obs_sha256": "fe5a431010079e1f7e0221b29e5b3acbf22f85861bc42a583c8460fdbc2f18f9",
+        "sample_order_sha256": "fae041c6a7f40d0b1f706ccb86c9fa7aad7936ba6e23f3a9ef0a5e4f95b3d8bb",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "21798673ad5f8c19e316a48c0e67335177acd0b081f38ca0affa21003b9eea74"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.9467326998710632,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/clip/random_global_exact/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "b4150f5dcc83f2d98d73c69121fac430a0451982c11df42bb0c0006406ff7dca"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9464554190635681,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/clip/random_global_exact/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "64d0fbd8f045854ec2667d5d17df4983f28f7d6aa7a40933010fceae80443531"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.9469702839851379,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/clip/random_global_exact/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "e69800c6c0d508c8e3c9188a37da5bc7d28610782c18d0277b719b4d5f2d434d"
+        }
+      ]
+    },
+    {
+      "dataset": "food101",
+      "label_source": "qwen",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 93.62508257230122,
+      "sample_std": 0.03593765280466558,
+      "ci95_low": 93.53580849369736,
+      "ci95_high": 93.71435665090509,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "5220bf1bef237981dedf481cb8cc0cfbff5c8e99731e63b944283ce90629f3fb",
+        "obs_sha256": "7698f4e0794010a1eab57f09bc1533924285ed4894b373c2da74f2a07de42eaf",
+        "mask_sha256": "f1d1eaf059349b4d6c8eadaa41331ac58d301a9524629965f07a460c9a617393",
+        "y_obs_sha256": "8a6c42af74e3af26a3e913d94209ce18c3e60aae6bf7e21fd9f62830ae49279f",
+        "sample_order_sha256": "fae041c6a7f40d0b1f706ccb86c9fa7aad7936ba6e23f3a9ef0a5e4f95b3d8bb",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "21798673ad5f8c19e316a48c0e67335177acd0b081f38ca0affa21003b9eea74"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.9365148544311523,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/qwen/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "1e1089b58ea4d2f3a38d8e8620e1bf291d7f0dc9b159ad12156bfa1374a3de57"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.9358415603637695,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/qwen/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "f3a539f81e7c402d750547e17ec404f8ffbe77f53366b95d6a58a4b672bf92f5"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.936396062374115,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/food101/qwen/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "1103d0773c8c3817496d1b00385f558c9b5d4dd1fca66db2249aabe5e6084725"
+        }
+      ]
+    }
+  ],
+  "paired_objective_differences": [
+    {
+      "dataset": "food101",
+      "label_source": "clip",
+      "selection": "prototype",
+      "selection_seed": null,
+      "contrast": "fcl_auc - ce_soft",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "units": "percentage_points",
+      "per_seed_differences": [
+        0.16633868217468262,
+        0.16238093376159668,
+        0.22177696228027344
+      ],
+      "n": 3,
+      "mean": 0.18349885940551758,
+      "sample_std": 0.03320882131140935,
+      "ci95_low": 0.10100357402306756,
+      "ci95_high": 0.26599414478796757
+    }
+  ]
+}

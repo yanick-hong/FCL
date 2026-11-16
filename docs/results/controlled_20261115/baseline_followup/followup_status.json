@@ -5639,6 +5639,6 @@
   ],
   "training_started": false,
   "core_gate": "pending",
-  "checked_at": "2026-11-15T17:34:36.606115+00:00",
-  "core_status_sha256": "2acbacde1bc721792dbe34cf73cd119f216060898201bf9d703c51772a366aa1"
+  "checked_at": "2026-11-16T03:25:54.685706+00:00",
+  "core_status_sha256": "9c96f756ad87c54c38420ce7a95c0803f755b9e13d246e21e88c669c9ea7f3a0"
 }

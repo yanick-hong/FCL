@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "dataset": "cifar100",
+  "label_source": "clip",
+  "prompt": null,
+  "from_cache": "/root/autodl-tmp/dataset/processed/cifar100_clip_vit-l-14_embeddings.pt",
+  "cache_sha256": "506e630c722fb6bf0b74a61101d712e97e93c30b8367f71b19d83d0138edb74b",
+  "sample_order_sha256": "27db3de749a44f08fcb562653532c032300cabe8a46a6f7ad12511efaf0cb3af",
+  "sample_order_kind": "cache_row_index_only",
+  "N": 45000,
+  "top_outlier_pct": 0.3,
+  "requested_rho": 0.3,
+  "source_probability_field": "clip_probs_train",
+  "mask_sha256_format": "torch_dtype + tuple_shape + contiguous_numpy_bytes",
+  "correction": "oracle simulation using dataset ground truth only at selected indices",
+  "selection_uses_ground_truth": false,
+  "script_sha256": "21ba5ff22e74bb948a25c3ecd94c66eb1d5fc8d7878a031ace67042197bda8c4",
+  "created_at": "2026-11-15T21:43:36.392946+00:00",
+  "source_metrics": {
+    "train": {
+      "accuracy": 0.7558,
+      "samples": 45000,
+      "errors": 10989,
+      "prediction_field": "clip_probs_train"
+    },
+    "val": {
+      "accuracy": 0.7632,
+      "samples": 5000,
+      "errors": 1184,
+      "prediction_field": "clip_probs_val"
+    },
+    "test": {
+      "accuracy": 0.7559,
+      "samples": 10000,
+      "errors": 2441,
+      "prediction_field": "clip_probs_test"
+    }
+  },
+  "omitted_source_splits": {},
+  "random_selection_seeds": [
+    42,
+    43,
+    44
+  ],
+  "prototype_actual_budget": 13546,
+  "random_global_exact_budget": 13500,
+  "global_requested_ratio_is_exactly_representable": true,
+  "budget_explanation": "Random global_exact fixes floor(rho*N+.5) rows; when rho*N is not an integer the requested fraction is rounded to the nearest row. Prototype uses ceil per predicted class. random_matched_prototype matches its actual count and is a separate comparison.",
+  "fixed_prototype_observed": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/prototype.pt",
+  "controlled_use": {
+    "ce_vs_soft_ce": "Reuse prototype.pt unchanged for both objectives",
+    "random_auc_c": "Use random_global_exact_seed-<seed>.pt; selection_seed and training seed are separate settings"
+  },
+  "conditions": [
+    {
+      "method": "prototype",
+      "selection_seed": null,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/prototype.pt",
+      "budget_rule": "sum_over_predicted_classes(ceil(rho*n_class))",
+      "mask_sha256": "7991cf510e256ae8048c65e811a9c245ada71b1fd33507edfdf64bb47991678c",
+      "source_accuracy": 0.7558,
+      "corrected_label_accuracy": 0.8708888888888888,
+      "corrected_count": 13546,
+      "corrected_ratio": 0.30102222222222225,
+      "source_errors": 10989,
+      "selected_errors": 5179,
+      "selected_error_precision": 0.38232688616565774,
+      "selected_error_recall": 0.4712894712894713,
+      "uncorrected_error_rate": 0.18471418579512938
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/random_global_exact_seed-42.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "2e72dc0b95437cf43aaa712d57ebd004d5483eb2da464ddb82cc02c2586375c7",
+      "source_accuracy": 0.7558,
+      "corrected_label_accuracy": 0.8285111111111111,
+      "corrected_count": 13500,
+      "corrected_ratio": 0.3,
+      "source_errors": 10989,
+      "selected_errors": 3272,
+      "selected_error_precision": 0.24237037037037037,
+      "selected_error_recall": 0.2977522977522978,
+      "uncorrected_error_rate": 0.24498412698412697
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/random_matched_prototype_seed-42.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "11e56a163f9dea027e5902674cdbdc5551dce4e5c12d2856f7ad9ef8fdbdf6b7",
+      "source_accuracy": 0.7558,
+      "corrected_label_accuracy": 0.8287777777777778,
+      "corrected_count": 13546,
+      "corrected_ratio": 0.30102222222222225,
+      "source_errors": 10989,
+      "selected_errors": 3284,
+      "selected_error_precision": 0.2424331906097741,
+      "selected_error_recall": 0.29884429884429886,
+      "uncorrected_error_rate": 0.2449608952756406
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/random_global_exact_seed-43.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "2a211d67ee84e2ee3d009955cbdb3ca66ae581e57fad79434819f07cdd34b1d0",
+      "source_accuracy": 0.7558,
+      "corrected_label_accuracy": 0.8305777777777777,
+      "corrected_count": 13500,
+      "corrected_ratio": 0.3,
+      "source_errors": 10989,
+      "selected_errors": 3365,
+      "selected_error_precision": 0.24925925925925926,
+      "selected_error_recall": 0.30621530621530624,
+      "uncorrected_error_rate": 0.24203174603174604
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/random_matched_prototype_seed-43.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "9f2a651a95432310eb6e5a4d6dd8558d77046a0f42fbd139c9a78c079c214c56",
+      "source_accuracy": 0.7558,
+      "corrected_label_accuracy": 0.8306222222222223,
+      "corrected_count": 13546,
+      "corrected_ratio": 0.30102222222222225,
+      "source_errors": 10989,
+      "selected_errors": 3367,
+      "selected_error_precision": 0.24856046065259116,
+      "selected_error_recall": 0.3063973063973064,
+      "uncorrected_error_rate": 0.24232212119285307
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/random_global_exact_seed-44.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "34e8fbcd6fca7e5b5f227998303aa611814cdea933470f756c37b533fb5e159c",
+      "source_accuracy": 0.7558,
+      "corrected_label_accuracy": 0.8297111111111111,
+      "corrected_count": 13500,
+      "corrected_ratio": 0.3,
+      "source_errors": 10989,
+      "selected_errors": 3326,
+      "selected_error_precision": 0.24637037037037038,
+      "selected_error_recall": 0.3026663026663027,
+      "uncorrected_error_rate": 0.24326984126984127
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/random_matched_prototype_seed-44.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "b16b26b9a19159d9a2c648cbe79ee2b8fe2f10dfaa1e42dbcbeeec7787ba3b74",
+      "source_accuracy": 0.7558,
+      "corrected_label_accuracy": 0.8298666666666666,
+      "corrected_count": 13546,
+      "corrected_ratio": 0.30102222222222225,
+      "source_errors": 10989,
+      "selected_errors": 3333,
+      "selected_error_precision": 0.24605049461095527,
+      "selected_error_recall": 0.3033033033033033,
+      "uncorrected_error_rate": 0.2434030647930311
+    }
+  ],
+  "random_aggregates": {
+    "random_global_exact": {
+      "corrected_label_accuracy": {
+        "mean": 0.8296,
+        "sample_std": 0.001037803949229829,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.246,
+        "sample_std": 0.003459346497432776,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.3022113022113022,
+        "sample_std": 0.0042498114219075836,
+        "seeds": 3
+      }
+    },
+    "random_matched_prototype": {
+      "corrected_label_accuracy": {
+        "mean": 0.8297555555555556,
+        "sample_std": 0.0009272287131122117,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.2456813819577735,
+        "sample_std": 0.003080266653628376,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.30284830284830283,
+        "sample_std": 0.0037970053771999262,
+        "seeds": 3
+      }
+    }
+  }
+}

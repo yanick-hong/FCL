@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "status": "completed",
+  "required_training_seeds": [
+    42,
+    43,
+    44
+  ],
+  "method": "sample SD (ddof=1); unbounded two-sided 95% Student-t CI; paired objective differences",
+  "groups": [
+    {
+      "dataset": "stanfordcars",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "ce_soft",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 78.40235431989034,
+      "sample_std": 0.03997840168983146,
+      "ci95_low": 78.30304246459713,
+      "ci95_high": 78.50166617518354,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "5773148817a0ec9e0f9c8d9040375eb817049e979a405fb9e756432c4bee22af",
+        "obs_sha256": "60baf18ddaa3d6684b1ecfdeae785e22cdd11eb00a536c18c34ed50ca52fb70f",
+        "mask_sha256": "fcce706554a1480f7c2ea2466aa50982f5f9f1ae9b6cb77a94606e8698d8bd3a",
+        "y_obs_sha256": "7e3d7c9aefb29531685e3d1e12543a6996ead6743de0a37d6d5537bd81bddc19",
+        "sample_order_sha256": "1879efef55e1f2b47c5fc8eb144114e327b494f5afa6be81fbf28392327fa1ad",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "4189b29cfa1efc871af4f671a1355b5122245c6119335080e065978e23d7de1c"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.7837333679199219,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/clip/prototype/ce_soft/seed-42/metrics.json",
+          "metrics_sha256": "123e9933412d48f0057169aa25f114cf99ea571ef439872bacc63ee2f4174f12"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.7838577032089233,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/clip/prototype/ce_soft/seed-43/metrics.json",
+          "metrics_sha256": "59bdd3744a7ed97d3cc8755a5f3f164faea10882e8247e8e9243046fba2bcd46"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.784479558467865,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/clip/prototype/ce_soft/seed-44/metrics.json",
+          "metrics_sha256": "222d49e324516e3f571046491e40e12935589d582f8eab9dc1b90e5fe619fa8e"
+        }
+      ]
+    },
+    {
+      "dataset": "stanfordcars",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 79.14023995399475,
+      "sample_std": 0.0613454261657903,
+      "ci95_low": 78.98784946741291,
+      "ci95_high": 79.29263044057659,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "5773148817a0ec9e0f9c8d9040375eb817049e979a405fb9e756432c4bee22af",
+        "obs_sha256": "60baf18ddaa3d6684b1ecfdeae785e22cdd11eb00a536c18c34ed50ca52fb70f",
+        "mask_sha256": "fcce706554a1480f7c2ea2466aa50982f5f9f1ae9b6cb77a94606e8698d8bd3a",
+        "y_obs_sha256": "7e3d7c9aefb29531685e3d1e12543a6996ead6743de0a37d6d5537bd81bddc19",
+        "sample_order_sha256": "1879efef55e1f2b47c5fc8eb144114e327b494f5afa6be81fbf28392327fa1ad",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "4189b29cfa1efc871af4f671a1355b5122245c6119335080e065978e23d7de1c"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.7918169498443604,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/clip/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "86a05f48d6d8b1a6e09df079994150f33c44ffc14442de4e268b62852591dce4"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.7916925549507141,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/clip/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "c1d215f5225795a5382086519cc06a38950af24e047f1eb3bbba10c8d7641a73"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.7906976938247681,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/clip/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "cea0e4c419ac5a4da7f63de2df66223a8cc27d632bbaa64c843e27d20d34a42d"
+        }
+      ]
+    },
+    {
+      "dataset": "stanfordcars",
+      "label_source": "clip",
+      "selection": "random_global_exact",
+      "objective": "fcl_auc",
+      "selection_seed": 42,
+      "n": 3,
+      "mean": 81.40778541564941,
+      "sample_std": 0.15281728966724104,
+      "ci95_low": 81.02816622337954,
+      "ci95_high": 81.78740460791929,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "5773148817a0ec9e0f9c8d9040375eb817049e979a405fb9e756432c4bee22af",
+        "obs_sha256": "5a3b0ea886a590e784e90876b8d3b7dc7030920a5ed78074d71a5a7528fd5985",
+        "mask_sha256": "0dd259b59fe8a23383715ddb0b6cbc3fe7bbad42378b03a6720d06c825000fa7",
+        "y_obs_sha256": "999c0057688f28e119f870e48fbd3ec72d558ecbaee0da41676cd06b04219bba",
+        "sample_order_sha256": "1879efef55e1f2b47c5fc8eb144114e327b494f5afa6be81fbf28392327fa1ad",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "4189b29cfa1efc871af4f671a1355b5122245c6119335080e065978e23d7de1c"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.8134560585021973,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/clip/random_global_exact/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "040e77e7d2f24c496e1198455b3ac0d49c70dc75d1e405f7c7be07db67157374"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.8158189058303833,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/clip/random_global_exact/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "61a85eb1545e103b0e5eb6b89444764cc08f5958393756e5f2bfa4eb14270d3e"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.8129585981369019,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/clip/random_global_exact/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "4af71a0071180aed56cb0cfad02c5f61d8ef0cbcb642710756578b6719ec4a7c"
+        }
+      ]
+    },
+    {
+      "dataset": "stanfordcars",
+      "label_source": "qwen",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 72.2546935081482,
+      "sample_std": 0.024873018264770508,
+      "ci95_low": 72.19290550547163,
+      "ci95_high": 72.31648151082476,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "eb41afc0a5a5b269046ebaf4970364ad70f9e4871a1e380da5bae49085508f43",
+        "obs_sha256": "ae8cbf19869f49ad59a22f297ab1758a95305a8fc6c4296e60982492bb047d90",
+        "mask_sha256": "005ed0f8f9506304a047e787665eab80bf473d4ac8401a2e01176d02e29b7d04",
+        "y_obs_sha256": "1bc59377babb0ae87b64459ab27c8f9fd96912c23cc370cd522f2ca843116062",
+        "sample_order_sha256": "1879efef55e1f2b47c5fc8eb144114e327b494f5afa6be81fbf28392327fa1ad",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "4189b29cfa1efc871af4f671a1355b5122245c6119335080e065978e23d7de1c"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.7222982048988342,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/qwen/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "837d4aa7cf6844dfdad5f83272fc6fb2323509ea254ef3341c80fbd816ef13d5"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.7225469350814819,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/qwen/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "4fe4aec293708be95037cd8d285bee8b6c96e19b659b82b2b0a90699266cd4ce"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.7227956652641296,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/stanfordcars/qwen/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "8c21cffd252b2dee9221fe65dd2a74c3fce0b88cf59cae2ec5c0630e10dc66de"
+        }
+      ]
+    }
+  ],
+  "paired_objective_differences": [
+    {
+      "dataset": "stanfordcars",
+      "label_source": "clip",
+      "selection": "prototype",
+      "selection_seed": null,
+      "contrast": "fcl_auc - ce_soft",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "units": "percentage_points",
+      "per_seed_differences": [
+        0.8083581924438477,
+        0.7834851741790771,
+        0.6218135356903076
+      ],
+      "n": 3,
+      "mean": 0.7378856341044108,
+      "sample_std": 0.1012877869345058,
+      "ci95_low": 0.4862728228406726,
+      "ci95_high": 0.989498445368149
+    }
+  ]
+}

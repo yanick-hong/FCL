@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "dataset": "stanfordcars",
+  "label_source": "clip",
+  "prompt": null,
+  "from_cache": "/root/autodl-tmp/dataset/processed/stanfordcars_clip_vit-l-14_embeddings.pt",
+  "cache_sha256": "5773148817a0ec9e0f9c8d9040375eb817049e979a405fb9e756432c4bee22af",
+  "sample_order_sha256": "1879efef55e1f2b47c5fc8eb144114e327b494f5afa6be81fbf28392327fa1ad",
+  "sample_order_kind": "sample_id",
+  "N": 7356,
+  "top_outlier_pct": 0.3,
+  "requested_rho": 0.3,
+  "source_probability_field": "clip_probs_train",
+  "mask_sha256_format": "torch_dtype + tuple_shape + contiguous_numpy_bytes",
+  "correction": "oracle simulation using dataset ground truth only at selected indices",
+  "selection_uses_ground_truth": false,
+  "script_sha256": "21ba5ff22e74bb948a25c3ecd94c66eb1d5fc8d7878a031ace67042197bda8c4",
+  "created_at": "2026-11-15T18:23:37.685214+00:00",
+  "source_metrics": {
+    "train": {
+      "accuracy": 0.765905383360522,
+      "samples": 7356,
+      "errors": 1722,
+      "prediction_field": "clip_probs_train"
+    },
+    "val": {
+      "accuracy": 0.7728426395939086,
+      "samples": 788,
+      "errors": 179,
+      "prediction_field": "clip_probs_val"
+    },
+    "test": {
+      "accuracy": 0.7670687725407288,
+      "samples": 8041,
+      "errors": 1873,
+      "prediction_field": "clip_probs_test"
+    }
+  },
+  "omitted_source_splits": {},
+  "random_selection_seeds": [
+    42,
+    43,
+    44
+  ],
+  "prototype_actual_budget": 2293,
+  "random_global_exact_budget": 2207,
+  "global_requested_ratio_is_exactly_representable": false,
+  "budget_explanation": "Random global_exact fixes floor(rho*N+.5) rows; when rho*N is not an integer the requested fraction is rounded to the nearest row. Prototype uses ceil per predicted class. random_matched_prototype matches its actual count and is a separate comparison.",
+  "fixed_prototype_observed": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/stanfordcars/clip/prototype.pt",
+  "controlled_use": {
+    "ce_vs_soft_ce": "Reuse prototype.pt unchanged for both objectives",
+    "random_auc_c": "Use random_global_exact_seed-<seed>.pt; selection_seed and training seed are separate settings"
+  },
+  "conditions": [
+    {
+      "method": "prototype",
+      "selection_seed": null,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/stanfordcars/clip/prototype.pt",
+      "budget_rule": "sum_over_predicted_classes(ceil(rho*n_class))",
+      "mask_sha256": "fcce706554a1480f7c2ea2466aa50982f5f9f1ae9b6cb77a94606e8698d8bd3a",
+      "source_accuracy": 0.765905383360522,
+      "corrected_label_accuracy": 0.8633768352365416,
+      "corrected_count": 2293,
+      "corrected_ratio": 0.3117183251767265,
+      "source_errors": 1722,
+      "selected_errors": 717,
+      "selected_error_precision": 0.31269079808111644,
+      "selected_error_recall": 0.4163763066202091,
+      "uncorrected_error_rate": 0.19849891368753703
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/stanfordcars/clip/random_global_exact_seed-42.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "0dd259b59fe8a23383715ddb0b6cbc3fe7bbad42378b03a6720d06c825000fa7",
+      "source_accuracy": 0.765905383360522,
+      "corrected_label_accuracy": 0.8355084284937466,
+      "corrected_count": 2207,
+      "corrected_ratio": 0.3000271886895052,
+      "source_errors": 1722,
+      "selected_errors": 512,
+      "selected_error_precision": 0.23198912550974174,
+      "selected_error_recall": 0.29732868757259,
+      "uncorrected_error_rate": 0.2349970868129734
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/stanfordcars/clip/random_matched_prototype_seed-42.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "8a8dd24df7fb73bfe830c40626479eedc29a04b5df8f86a864c2ab36c996695e",
+      "source_accuracy": 0.765905383360522,
+      "corrected_label_accuracy": 0.838363240891789,
+      "corrected_count": 2293,
+      "corrected_ratio": 0.3117183251767265,
+      "source_errors": 1722,
+      "selected_errors": 533,
+      "selected_error_precision": 0.2324465765372874,
+      "selected_error_recall": 0.30952380952380953,
+      "uncorrected_error_rate": 0.23484100335769306
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/stanfordcars/clip/random_global_exact_seed-43.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "b3d4093ff140fcea302af5707b1155206690edce78d532af319d5f3872c3b57d",
+      "source_accuracy": 0.765905383360522,
+      "corrected_label_accuracy": 0.8306144643828167,
+      "corrected_count": 2207,
+      "corrected_ratio": 0.3000271886895052,
+      "source_errors": 1722,
+      "selected_errors": 476,
+      "selected_error_precision": 0.21567739012233803,
+      "selected_error_recall": 0.2764227642276423,
+      "uncorrected_error_rate": 0.24198873567683046
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/stanfordcars/clip/random_matched_prototype_seed-43.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "26e8e330ee594b84f677e126e2b139d1d1b59d43558f8b875d05d3564816f3bc",
+      "source_accuracy": 0.765905383360522,
+      "corrected_label_accuracy": 0.8333333333333334,
+      "corrected_count": 2293,
+      "corrected_ratio": 0.3117183251767265,
+      "source_errors": 1722,
+      "selected_errors": 496,
+      "selected_error_precision": 0.21631051024858264,
+      "selected_error_recall": 0.2880371660859466,
+      "uncorrected_error_rate": 0.24214892356310488
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/stanfordcars/clip/random_global_exact_seed-44.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "2ed06ef28d92ef9ebca93fe5ea151dc9d0d11b8cc36eb9ac1d2ae8f5402e58be",
+      "source_accuracy": 0.765905383360522,
+      "corrected_label_accuracy": 0.8398586188145731,
+      "corrected_count": 2207,
+      "corrected_ratio": 0.3000271886895052,
+      "source_errors": 1722,
+      "selected_errors": 544,
+      "selected_error_precision": 0.2464884458541006,
+      "selected_error_recall": 0.3159117305458769,
+      "uncorrected_error_rate": 0.22878228782287824
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/stanfordcars/clip/random_matched_prototype_seed-44.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "7c18c690bc17f0a5ec3c65a20a54e6eed787d83766a0002e4a1bc7c6ac10d1f7",
+      "source_accuracy": 0.765905383360522,
+      "corrected_label_accuracy": 0.8427134312126155,
+      "corrected_count": 2293,
+      "corrected_ratio": 0.3117183251767265,
+      "source_errors": 1722,
+      "selected_errors": 565,
+      "selected_error_precision": 0.24640209332751853,
+      "selected_error_recall": 0.3281068524970964,
+      "uncorrected_error_rate": 0.22852063993679636
+    }
+  ],
+  "random_aggregates": {
+    "random_global_exact": {
+      "corrected_label_accuracy": {
+        "mean": 0.8353271705637122,
+        "sample_std": 0.004624742005500493,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.23138498716206013,
+        "sample_std": 0.01541440969300477,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.2965543941153697,
+        "sample_std": 0.01975586654614491,
+        "seeds": 3
+      }
+    },
+    "random_matched_prototype": {
+      "corrected_label_accuracy": {
+        "mean": 0.838136668479246,
+        "sample_std": 0.004694151717810438,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.23171972670446286,
+        "sample_std": 0.015058953352033898,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.3085559427022842,
+        "sample_std": 0.02005236935900914,
+        "seeds": 3
+      }
+    }
+  }
+}

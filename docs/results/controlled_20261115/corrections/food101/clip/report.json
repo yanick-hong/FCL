@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "dataset": "food101",
+  "label_source": "clip",
+  "prompt": null,
+  "from_cache": "/root/autodl-tmp/dataset/processed/food101_clip_vit-l-14_embeddings.pt",
+  "cache_sha256": "ee2f3487d1a6e7ec8a7a8d582ff4b4e324ea42798c16a05d3f969f2a8a0c0718",
+  "sample_order_sha256": "fae041c6a7f40d0b1f706ccb86c9fa7aad7936ba6e23f3a9ef0a5e4f95b3d8bb",
+  "sample_order_kind": "sample_id",
+  "N": 65650,
+  "top_outlier_pct": 0.3,
+  "requested_rho": 0.3,
+  "source_probability_field": "clip_probs_train",
+  "mask_sha256_format": "torch_dtype + tuple_shape + contiguous_numpy_bytes",
+  "correction": "oracle simulation using dataset ground truth only at selected indices",
+  "selection_uses_ground_truth": false,
+  "script_sha256": "21ba5ff22e74bb948a25c3ecd94c66eb1d5fc8d7878a031ace67042197bda8c4",
+  "created_at": "2026-11-16T02:24:27.749223+00:00",
+  "source_metrics": {
+    "train": {
+      "accuracy": 0.8901599390708301,
+      "samples": 65650,
+      "errors": 7211,
+      "prediction_field": "clip_probs_train"
+    },
+    "val": {
+      "accuracy": 0.890990099009901,
+      "samples": 10100,
+      "errors": 1101,
+      "prediction_field": "clip_probs_val"
+    },
+    "test": {
+      "accuracy": 0.9205940594059406,
+      "samples": 25250,
+      "errors": 2005,
+      "prediction_field": "clip_probs_test"
+    }
+  },
+  "omitted_source_splits": {},
+  "random_selection_seeds": [
+    42,
+    43,
+    44
+  ],
+  "prototype_actual_budget": 19738,
+  "random_global_exact_budget": 19695,
+  "global_requested_ratio_is_exactly_representable": true,
+  "budget_explanation": "Random global_exact fixes floor(rho*N+.5) rows; when rho*N is not an integer the requested fraction is rounded to the nearest row. Prototype uses ceil per predicted class. random_matched_prototype matches its actual count and is a separate comparison.",
+  "fixed_prototype_observed": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/prototype.pt",
+  "controlled_use": {
+    "ce_vs_soft_ce": "Reuse prototype.pt unchanged for both objectives",
+    "random_auc_c": "Use random_global_exact_seed-<seed>.pt; selection_seed and training seed are separate settings"
+  },
+  "conditions": [
+    {
+      "method": "prototype",
+      "selection_seed": null,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/prototype.pt",
+      "budget_rule": "sum_over_predicted_classes(ceil(rho*n_class))",
+      "mask_sha256": "978ae37b9a66d015acd32690196dcc4b377eaafe0f185ba622693d81b7b87e13",
+      "source_accuracy": 0.8901599390708301,
+      "corrected_label_accuracy": 0.9608987052551409,
+      "corrected_count": 19738,
+      "corrected_ratio": 0.30065498857578066,
+      "source_errors": 7211,
+      "selected_errors": 4644,
+      "selected_error_precision": 0.23528219677778903,
+      "selected_error_recall": 0.6440160865344612,
+      "uncorrected_error_rate": 0.05591130859034675
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/random_global_exact_seed-42.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "4debb35d33d5df9147d1386c3d076b68f58ca60437c486047309861597a07715",
+      "source_accuracy": 0.8901599390708301,
+      "corrected_label_accuracy": 0.9232292460015232,
+      "corrected_count": 19695,
+      "corrected_ratio": 0.3,
+      "source_errors": 7211,
+      "selected_errors": 2171,
+      "selected_error_precision": 0.11023102310231023,
+      "selected_error_recall": 0.3010678130633754,
+      "uncorrected_error_rate": 0.10967250571210967
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/random_matched_prototype_seed-42.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "43dfbb5c27f2160ea2fd2ad5d134333f5b09d7a73a434f93ec611d259870e050",
+      "source_accuracy": 0.8901599390708301,
+      "corrected_label_accuracy": 0.9233054074638233,
+      "corrected_count": 19738,
+      "corrected_ratio": 0.30065498857578066,
+      "source_errors": 7211,
+      "selected_errors": 2176,
+      "selected_error_precision": 0.11024419900699159,
+      "selected_error_recall": 0.30176119816946334,
+      "uncorrected_error_rate": 0.1096663181738979
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/random_global_exact_seed-43.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "5c1d48751e8c4ee9a57c34d32676f6fb4f83861a22e983f348a653fd80fe08a0",
+      "source_accuracy": 0.8901599390708301,
+      "corrected_label_accuracy": 0.9232749428789033,
+      "corrected_count": 19695,
+      "corrected_ratio": 0.3,
+      "source_errors": 7211,
+      "selected_errors": 2174,
+      "selected_error_precision": 0.11038334602691038,
+      "selected_error_recall": 0.30148384412702817,
+      "uncorrected_error_rate": 0.1096072244587096
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/random_matched_prototype_seed-43.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "9ffd108c5e5561f2cc4f84c33fa1df19ba958a13b524f28cfee53d3becd7da6b",
+      "source_accuracy": 0.8901599390708301,
+      "corrected_label_accuracy": 0.9233511043412034,
+      "corrected_count": 19738,
+      "corrected_ratio": 0.30065498857578066,
+      "source_errors": 7211,
+      "selected_errors": 2179,
+      "selected_error_precision": 0.11039619009018138,
+      "selected_error_recall": 0.3021772292331161,
+      "uncorrected_error_rate": 0.10960097577975257
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/random_global_exact_seed-44.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "83862b634a77366fc592fa0b29a7d454fd139c4c46f44efdb9fae7a1998df8ba",
+      "source_accuracy": 0.8901599390708301,
+      "corrected_label_accuracy": 0.9231835491241431,
+      "corrected_count": 19695,
+      "corrected_ratio": 0.3,
+      "source_errors": 7211,
+      "selected_errors": 2168,
+      "selected_error_precision": 0.11007870017771008,
+      "selected_error_recall": 0.30065178199972264,
+      "uncorrected_error_rate": 0.10973778696550973
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/random_matched_prototype_seed-44.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "d4feab0ea03a558e465bc902e9ade782da7ed0eee4d800ad09a497ca930dc1a0",
+      "source_accuracy": 0.8901599390708301,
+      "corrected_label_accuracy": 0.9232444782939833,
+      "corrected_count": 19738,
+      "corrected_ratio": 0.30065498857578066,
+      "source_errors": 7211,
+      "selected_errors": 2172,
+      "selected_error_precision": 0.11004154422940521,
+      "selected_error_recall": 0.301206490084593,
+      "uncorrected_error_rate": 0.10975344136609165
+    }
+  ],
+  "random_aggregates": {
+    "random_global_exact": {
+      "corrected_label_accuracy": {
+        "mean": 0.9232292460015232,
+        "sample_std": 4.569687738009698e-05,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.11023102310231023,
+        "sample_std": 0.0001523229246001498,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.3010678130633754,
+        "sample_std": 0.0004160310636527609,
+        "seeds": 3
+      }
+    },
+    "random_matched_prototype": {
+      "corrected_label_accuracy": {
+        "mean": 0.9233003300330033,
+        "sample_std": 5.3494053073638725e-05,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.11022731110885939,
+        "sample_std": 0.00017792504733429407,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.30171497249572415,
+        "sample_std": 0.0004870176930084898,
+        "seeds": 3
+      }
+    }
+  }
+}

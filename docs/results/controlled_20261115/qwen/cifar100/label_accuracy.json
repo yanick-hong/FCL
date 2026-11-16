@@ -1,0 +1,35 @@
+{
+  "status": "completed",
+  "splits": {
+    "train": {
+      "annotated": 45000,
+      "expected": 45000,
+      "correct": 21198,
+      "accuracy": 0.4710666537284851,
+      "annotations_sha256": "3a6fa25e4bb5881f19d68ba9098511991a40c8bebb03abbd2eba03e852576346",
+      "status": "completed"
+    },
+    "val": {
+      "annotated": 5000,
+      "expected": 5000,
+      "correct": 2372,
+      "accuracy": 0.47440001368522644,
+      "annotations_sha256": "a65a27586dd08d51c7d5a7978be003785692959e6c65d32be94f1333e8b14dc5",
+      "status": "completed"
+    },
+    "test": {
+      "annotated": 10000,
+      "expected": 10000,
+      "correct": 4656,
+      "accuracy": 0.46560001373291016,
+      "annotations_sha256": "27770a914a4d27b5f68960b5f187590fa80b07fbdc689644a1297c674e431b1d",
+      "status": "completed"
+    }
+  },
+  "prompt_sha256": "db0345adc25a27af62214d7a01a933293b18295d5957093bbd25202d767d911d",
+  "cache_sha256": "506e630c722fb6bf0b74a61101d712e97e93c30b8367f71b19d83d0138edb74b",
+  "source_model": "Qwen/Qwen2.5-VL-7B-Instruct",
+  "decoding": "greedy_legal_class_id_token_trie",
+  "derived_cache": "/root/autodl-tmp/outputs/controlled_correction_20261115/qwen/cifar100/cifar100_qwen_through-test.pt",
+  "derived_cache_sha256": "2b96761d20f3298aabf8b04a0d716341fda6f123ee08b8ddaf4a264601038f8e"
+}

@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "status": "completed",
+  "required_training_seeds": [
+    42,
+    43,
+    44
+  ],
+  "method": "sample SD (ddof=1); unbounded two-sided 95% Student-t CI; paired objective differences",
+  "groups": [
+    {
+      "dataset": "cifar100",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "ce_soft",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 82.46333400408427,
+      "sample_std": 0.05507600652083903,
+      "ci95_low": 82.32651761927325,
+      "ci95_high": 82.6001503888953,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "506e630c722fb6bf0b74a61101d712e97e93c30b8367f71b19d83d0138edb74b",
+        "obs_sha256": "9b19261d29cb018d7d23190fde80c857d983729e46f42f3be8c4783a88127a64",
+        "mask_sha256": "7991cf510e256ae8048c65e811a9c245ada71b1fd33507edfdf64bb47991678c",
+        "y_obs_sha256": "cefb49f6984654bf6f283529c3ff2040ca04379a57f6f543501fa2ca46d84453",
+        "sample_order_sha256": "27db3de749a44f08fcb562653532c032300cabe8a46a6f7ad12511efaf0cb3af",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "21798673ad5f8c19e316a48c0e67335177acd0b081f38ca0affa21003b9eea74"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.8241000175476074,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/clip/prototype/ce_soft/seed-42/metrics.json",
+          "metrics_sha256": "cab1833f4aedbee83c14968f2d65b64bd68c5e3f70cd1d9b483b564273228965"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.8252000212669373,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/clip/prototype/ce_soft/seed-43/metrics.json",
+          "metrics_sha256": "ce09ad68a106d565d9ba20a18bdb4eeb213d369dfb8270dad29fca186ccd24c4"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.8245999813079834,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/clip/prototype/ce_soft/seed-44/metrics.json",
+          "metrics_sha256": "882fafc080aff462609c170abd0848f8b6ae99730829d9005a421c12dd8707d8"
+        }
+      ]
+    },
+    {
+      "dataset": "cifar100",
+      "label_source": "clip",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 83.42000047365825,
+      "sample_std": 0.009998679309121067,
+      "ci95_low": 83.39516237731877,
+      "ci95_high": 83.44483856999773,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "506e630c722fb6bf0b74a61101d712e97e93c30b8367f71b19d83d0138edb74b",
+        "obs_sha256": "9b19261d29cb018d7d23190fde80c857d983729e46f42f3be8c4783a88127a64",
+        "mask_sha256": "7991cf510e256ae8048c65e811a9c245ada71b1fd33507edfdf64bb47991678c",
+        "y_obs_sha256": "cefb49f6984654bf6f283529c3ff2040ca04379a57f6f543501fa2ca46d84453",
+        "sample_order_sha256": "27db3de749a44f08fcb562653532c032300cabe8a46a6f7ad12511efaf0cb3af",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "21798673ad5f8c19e316a48c0e67335177acd0b081f38ca0affa21003b9eea74"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.8341000080108643,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/clip/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "a3dd86b64b503b2568cd669b4a5e48fcb8fd78bc2e26650cd1df896791ff5479"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.8342000246047974,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/clip/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "bfa40282fed3c58c6555c793668f03a4bcffa2fb2037dd3e1a3c4e1d66525f74"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.8342999815940857,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/clip/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "5e2e9207aa1b971a4f1cc883e55841ccb19a37af299f03a3b0210b08a121ffcb"
+        }
+      ]
+    },
+    {
+      "dataset": "cifar100",
+      "label_source": "clip",
+      "selection": "random_global_exact",
+      "objective": "fcl_auc",
+      "selection_seed": 42,
+      "n": 3,
+      "mean": 83.63333344459534,
+      "sample_std": 0.03214743735172895,
+      "ci95_low": 83.55347478313378,
+      "ci95_high": 83.7131921060569,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "506e630c722fb6bf0b74a61101d712e97e93c30b8367f71b19d83d0138edb74b",
+        "obs_sha256": "96268c73af97a9532160fe96e4c8055fe2523fb5453a7cdf481c8d7a5be8b2a4",
+        "mask_sha256": "2e72dc0b95437cf43aaa712d57ebd004d5483eb2da464ddb82cc02c2586375c7",
+        "y_obs_sha256": "77cdc68a810ff4a52fa2e4d8a6deb2667fdfb808fce0747d7a7d8fa3c8378136",
+        "sample_order_sha256": "27db3de749a44f08fcb562653532c032300cabe8a46a6f7ad12511efaf0cb3af",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "21798673ad5f8c19e316a48c0e67335177acd0b081f38ca0affa21003b9eea74"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.8360999822616577,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/clip/random_global_exact/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "4778f316b861d5ece1a495f375204b51dee3e4c59dc0ebeb177c593b50bdc5d5"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.8367000222206116,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/clip/random_global_exact/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "151ae55be1330d462a678061b7d7526ebafed2a40a8d340cf74b971b3c46d342"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.8361999988555908,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/clip/random_global_exact/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "595587c5fac95c951cea31b875d2d972f704434def8a3e3a6d15eb0044b0f7fe"
+        }
+      ]
+    },
+    {
+      "dataset": "cifar100",
+      "label_source": "qwen",
+      "selection": "prototype",
+      "objective": "fcl_auc",
+      "selection_seed": null,
+      "n": 3,
+      "mean": 81.11666639645894,
+      "sample_std": 0.07571901012321373,
+      "ci95_low": 80.92856994791546,
+      "ci95_high": 81.30476284500241,
+      "units": "percentage_points",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "fingerprints": {
+        "cache_sha256": "2b96761d20f3298aabf8b04a0d716341fda6f123ee08b8ddaf4a264601038f8e",
+        "obs_sha256": "327d7cbcd337612e8854da31e5e55f2af1cbbd8144e9e2bd36ca5be468b1f78e",
+        "mask_sha256": "a7576965f98bff162e3105c4e8f666f91701afaae2f7d3286fe6582342db425d",
+        "y_obs_sha256": "8a886424b4cb2e8c33c13a7ad885f93699029f42a60fe7344393998c8fe3e7cd",
+        "sample_order_sha256": "d8d2255fde404fb94a7f47bdebaff85889af297a0114b022acaf1c761846c20c",
+        "source_sha256": "6219fc0913c1571a79b66c29ad981981cc022ee7b763d19c46eeaec66c558817",
+        "protocol_sha256": "21798673ad5f8c19e316a48c0e67335177acd0b081f38ca0affa21003b9eea74"
+      },
+      "runs": [
+        {
+          "seed": 42,
+          "test_accuracy": 0.8102999925613403,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/qwen/prototype/fcl_auc/seed-42/metrics.json",
+          "metrics_sha256": "e0c9f75fe0ca76487c5687aa342b83470f849c2a15801cb86b014464ae7c9f6e"
+        },
+        {
+          "seed": 43,
+          "test_accuracy": 0.8115000128746033,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/qwen/prototype/fcl_auc/seed-43/metrics.json",
+          "metrics_sha256": "7d10ec4f2355ec32eddf394873c1244d4bad730ae0c38c9172714b3556d10167"
+        },
+        {
+          "seed": 44,
+          "test_accuracy": 0.8116999864578247,
+          "metrics_path": "/root/autodl-tmp/outputs/controlled_correction_20261115/runs/cifar100/qwen/prototype/fcl_auc/seed-44/metrics.json",
+          "metrics_sha256": "58d2b88399093e6c7bbdacc85b9b918a821dbe1477f7a4f1796d9a5d2b3c018a"
+        }
+      ]
+    }
+  ],
+  "paired_objective_differences": [
+    {
+      "dataset": "cifar100",
+      "label_source": "clip",
+      "selection": "prototype",
+      "selection_seed": null,
+      "contrast": "fcl_auc - ce_soft",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "units": "percentage_points",
+      "per_seed_differences": [
+        0.9999990463256836,
+        0.9000003337860107,
+        0.9700000286102295
+      ],
+      "n": 3,
+      "mean": 0.9566664695739746,
+      "sample_std": 0.05131543115699216,
+      "ci95_low": 0.8291918718421625,
+      "ci95_high": 1.0841410673057867
+    }
+  ]
+}

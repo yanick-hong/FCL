@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "dataset": "eurosat",
+  "label_source": "clip",
+  "prompt": null,
+  "from_cache": "/root/autodl-tmp/dataset/processed/eurosat_clip_vit-l-14_embeddings.pt",
+  "cache_sha256": "247b5e61e946157f9358a3ea72bed42476a5b2f9383f5c6903df4fb63ac67a5d",
+  "sample_order_sha256": "0f9877fc088aff9b41941d2798ad163ca1f8c969db7a1941ed9413a1ebb95591",
+  "sample_order_kind": "cache_row_index_only",
+  "N": 21600,
+  "top_outlier_pct": 0.3,
+  "requested_rho": 0.3,
+  "source_probability_field": "clip_probs_train",
+  "mask_sha256_format": "torch_dtype + tuple_shape + contiguous_numpy_bytes",
+  "correction": "oracle simulation using dataset ground truth only at selected indices",
+  "selection_uses_ground_truth": false,
+  "script_sha256": "21ba5ff22e74bb948a25c3ecd94c66eb1d5fc8d7878a031ace67042197bda8c4",
+  "created_at": "2026-11-15T19:05:49.794560+00:00",
+  "source_metrics": {
+    "train": {
+      "accuracy": 0.4300462962962963,
+      "samples": 21600,
+      "errors": 12311,
+      "prediction_field": "clip_probs_train"
+    },
+    "val": {
+      "accuracy": 0.43518518518518523,
+      "samples": 2700,
+      "errors": 1525,
+      "prediction_field": "clip_probs_val"
+    },
+    "test": {
+      "accuracy": 0.43740740740740736,
+      "samples": 2700,
+      "errors": 1519,
+      "prediction_field": "clip_probs_test"
+    }
+  },
+  "omitted_source_splits": {},
+  "random_selection_seeds": [
+    42,
+    43,
+    44
+  ],
+  "prototype_actual_budget": 6485,
+  "random_global_exact_budget": 6480,
+  "global_requested_ratio_is_exactly_representable": true,
+  "budget_explanation": "Random global_exact fixes floor(rho*N+.5) rows; when rho*N is not an integer the requested fraction is rounded to the nearest row. Prototype uses ceil per predicted class. random_matched_prototype matches its actual count and is a separate comparison.",
+  "fixed_prototype_observed": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/prototype.pt",
+  "controlled_use": {
+    "ce_vs_soft_ce": "Reuse prototype.pt unchanged for both objectives",
+    "random_auc_c": "Use random_global_exact_seed-<seed>.pt; selection_seed and training seed are separate settings"
+  },
+  "conditions": [
+    {
+      "method": "prototype",
+      "selection_seed": null,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/prototype.pt",
+      "budget_rule": "sum_over_predicted_classes(ceil(rho*n_class))",
+      "mask_sha256": "f4ed4b9d5657e26757cfa7b212a075b39e9ee3c2308b3eb4dba86bccc4cf58fb",
+      "source_accuracy": 0.4300462962962963,
+      "corrected_label_accuracy": 0.6243055555555556,
+      "corrected_count": 6485,
+      "corrected_ratio": 0.3002314814814815,
+      "source_errors": 12311,
+      "selected_errors": 4196,
+      "selected_error_precision": 0.6470316114109483,
+      "selected_error_recall": 0.3408334010234749,
+      "uncorrected_error_rate": 0.5368838901753226
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/random_global_exact_seed-42.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "0a1eb6bfdbbcc346c00aaab444850c7323a8d5622f142b9591bd564cefd847ab",
+      "source_accuracy": 0.4300462962962963,
+      "corrected_label_accuracy": 0.6007407407407408,
+      "corrected_count": 6480,
+      "corrected_ratio": 0.3,
+      "source_errors": 12311,
+      "selected_errors": 3687,
+      "selected_error_precision": 0.5689814814814815,
+      "selected_error_recall": 0.2994882625294452,
+      "uncorrected_error_rate": 0.5703703703703704
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 42,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/random_matched_prototype_seed-42.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "94c2d263a8390615f1eee30c21740c41d955b173fb9119ab92e12498cd77a023",
+      "source_accuracy": 0.4300462962962963,
+      "corrected_label_accuracy": 0.6008333333333333,
+      "corrected_count": 6485,
+      "corrected_ratio": 0.3002314814814815,
+      "source_errors": 12311,
+      "selected_errors": 3689,
+      "selected_error_precision": 0.5688511950655358,
+      "selected_error_recall": 0.2996507188693039,
+      "uncorrected_error_rate": 0.5704267284154813
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/random_global_exact_seed-43.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "bb07283443f5f0dd0d9543fc48bd57d4da2bae847fae65d86a08075468962ea5",
+      "source_accuracy": 0.4300462962962963,
+      "corrected_label_accuracy": 0.6022685185185186,
+      "corrected_count": 6480,
+      "corrected_ratio": 0.3,
+      "source_errors": 12311,
+      "selected_errors": 3720,
+      "selected_error_precision": 0.5740740740740741,
+      "selected_error_recall": 0.3021687921371132,
+      "uncorrected_error_rate": 0.5681878306878307
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 43,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/random_matched_prototype_seed-43.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "75d4e65d6cf066c890b4619c0a8d7f41b0bef0e399d136a83a5e53d8539d5970",
+      "source_accuracy": 0.4300462962962963,
+      "corrected_label_accuracy": 0.6023611111111111,
+      "corrected_count": 6485,
+      "corrected_ratio": 0.3002314814814815,
+      "source_errors": 12311,
+      "selected_errors": 3722,
+      "selected_error_precision": 0.5739398612181958,
+      "selected_error_recall": 0.3023312484769718,
+      "uncorrected_error_rate": 0.5682434667548792
+    },
+    {
+      "method": "random_global_exact",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/random_global_exact_seed-44.pt",
+      "budget_rule": "floor(rho*N+.5)",
+      "mask_sha256": "4ec3f466747d79beaff78157bd283e0c330fcd8639359bd1b5c25add24e66944",
+      "source_accuracy": 0.4300462962962963,
+      "corrected_label_accuracy": 0.604675925925926,
+      "corrected_count": 6480,
+      "corrected_ratio": 0.3,
+      "source_errors": 12311,
+      "selected_errors": 3772,
+      "selected_error_precision": 0.5820987654320988,
+      "selected_error_recall": 0.30639265697343837,
+      "uncorrected_error_rate": 0.5647486772486773
+    },
+    {
+      "method": "random_matched_prototype",
+      "selection_seed": 44,
+      "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/random_matched_prototype_seed-44.pt",
+      "budget_rule": "prototype_actual_count",
+      "mask_sha256": "ce07a57ed964466ff064566143c9359e1cb2d5fdb6d19597bf4094a156e05548",
+      "source_accuracy": 0.4300462962962963,
+      "corrected_label_accuracy": 0.6048148148148148,
+      "corrected_count": 6485,
+      "corrected_ratio": 0.3002314814814815,
+      "source_errors": 12311,
+      "selected_errors": 3775,
+      "selected_error_precision": 0.582112567463377,
+      "selected_error_recall": 0.3066363414832264,
+      "uncorrected_error_rate": 0.5647370162090638
+    }
+  ],
+  "random_aggregates": {
+    "random_global_exact": {
+      "corrected_label_accuracy": {
+        "mean": 0.6025617283950618,
+        "sample_std": 0.001983910188038296,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.5750514403292182,
+        "sample_std": 0.006613033960127622,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.30268323721333223,
+        "sample_std": 0.003480826907775713,
+        "seeds": 3
+      }
+    },
+    "random_matched_prototype": {
+      "corrected_label_accuracy": {
+        "mean": 0.6026697530864198,
+        "sample_std": 0.0020086048886072115,
+        "seeds": 3
+      },
+      "selected_error_precision": {
+        "mean": 0.5749678745823695,
+        "sample_std": 0.006690187447018651,
+        "seeds": 3
+      },
+      "selected_error_recall": {
+        "mean": 0.302872769609834,
+        "sample_std": 0.00352415446299373,
+        "seeds": 3
+      }
+    }
+  }
+}

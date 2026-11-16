@@ -22,36 +22,36 @@
       "controlled_suite": "completed"
     },
     "stanfordcars": {
-      "qwen": "running",
-      "controlled_suite": "pending"
+      "qwen": "completed",
+      "controlled_suite": "completed"
     },
     "eurosat": {
-      "qwen": "pending",
-      "controlled_suite": "pending"
+      "qwen": "completed",
+      "controlled_suite": "completed"
     },
     "cifar100": {
-      "qwen": "pending",
-      "controlled_suite": "pending"
+      "qwen": "completed",
+      "controlled_suite": "completed"
     },
     "food101": {
-      "qwen": "pending",
-      "controlled_suite": "pending"
+      "qwen": "completed",
+      "controlled_suite": "completed"
     },
     "tinyimagenet200": {
-      "qwen": "pending",
+      "qwen": "running",
       "controlled_suite": "pending"
     }
   },
-  "current_dataset": "stanfordcars",
+  "current_dataset": "tinyimagenet200",
   "current_phase": "qwen",
   "current_command": [
     "/root/autodl-tmp/.autodl/qwen-venv/bin/python",
     "/root/autodl-tmp/scripts/run_qwen_campaign.py",
     "--datasets",
-    "stanfordcars",
+    "tinyimagenet200",
     "--model-path",
     "dataset/weights/Qwen2.5-VL-7B-Instruct",
     "--resume"
   ],
-  "updated_at": "2026-11-15T16:24:03.008150+00:00"
+  "updated_at": "2026-11-16T02:59:24.285471+00:00"
 }

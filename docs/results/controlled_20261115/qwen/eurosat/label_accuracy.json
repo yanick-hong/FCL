@@ -1,0 +1,35 @@
+{
+  "status": "completed",
+  "splits": {
+    "train": {
+      "annotated": 21600,
+      "expected": 21600,
+      "correct": 9587,
+      "accuracy": 0.4438425898551941,
+      "annotations_sha256": "a04f252aaacc59b182bad16ce01ebe04ac539cc8d89021ebc680cfa75805b4b2",
+      "status": "completed"
+    },
+    "val": {
+      "annotated": 2700,
+      "expected": 2700,
+      "correct": 1198,
+      "accuracy": 0.44370371103286743,
+      "annotations_sha256": "d76aceb3786fcdb934719098dcac70143800da2bdb578118884dadf3444ad35a",
+      "status": "completed"
+    },
+    "test": {
+      "annotated": 2700,
+      "expected": 2700,
+      "correct": 1182,
+      "accuracy": 0.4377777874469757,
+      "annotations_sha256": "94dff33022b34fdf84fc127b55b7cbd971dea2459bfac29cbeee0dd302c59218",
+      "status": "completed"
+    }
+  },
+  "prompt_sha256": "8065db817dbb2ab6faad1b5c2eeecc949cdd35cdc71974680febc5eec97e2fca",
+  "cache_sha256": "247b5e61e946157f9358a3ea72bed42476a5b2f9383f5c6903df4fb63ac67a5d",
+  "source_model": "Qwen/Qwen2.5-VL-7B-Instruct",
+  "decoding": "greedy_legal_class_id_token_trie",
+  "derived_cache": "/root/autodl-tmp/outputs/controlled_correction_20261115/qwen/eurosat/eurosat_qwen_through-test.pt",
+  "derived_cache_sha256": "ea7da5e6076c2eda7df00f72c4133856585248c2370d1a1d2ffc0f80ad0ec215"
+}

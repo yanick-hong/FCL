@@ -1,0 +1,35 @@
+{
+  "status": "completed",
+  "splits": {
+    "train": {
+      "annotated": 65650,
+      "expected": 65650,
+      "correct": 33799,
+      "accuracy": 0.5148362517356873,
+      "annotations_sha256": "d9c3dfb30c2cb35a018a7d862cb5120f2b5c2a57306b7d61da9117044eef6c21",
+      "status": "completed"
+    },
+    "val": {
+      "annotated": 10100,
+      "expected": 10100,
+      "correct": 5197,
+      "accuracy": 0.5145544409751892,
+      "annotations_sha256": "ec0a6ed39f7a7c3ce79d02120f748631911a8fa4e4ba87c7ce4c9043d8cf0235",
+      "status": "completed"
+    },
+    "test": {
+      "annotated": 25250,
+      "expected": 25250,
+      "correct": 13724,
+      "accuracy": 0.5435247421264648,
+      "annotations_sha256": "16bb1af72807f60418f6de808bf9e3603b5b4401423ac4ea4e856cf06d44caec",
+      "status": "completed"
+    }
+  },
+  "prompt_sha256": "63a0604424908dfdd33011f5c9af213e8ebdb33ffa0ce00c163df8e83bad1483",
+  "cache_sha256": "ee2f3487d1a6e7ec8a7a8d582ff4b4e324ea42798c16a05d3f969f2a8a0c0718",
+  "source_model": "Qwen/Qwen2.5-VL-7B-Instruct",
+  "decoding": "greedy_legal_class_id_token_trie",
+  "derived_cache": "/root/autodl-tmp/outputs/controlled_correction_20261115/qwen/food101/food101_qwen_through-test.pt",
+  "derived_cache_sha256": "5220bf1bef237981dedf481cb8cc0cfbff5c8e99731e63b944283ce90629f3fb"
+}
