@@ -1,0 +1,49 @@
+{
+  "method": "fcl_filter_ce",
+  "dataset": "food101",
+  "paper": "FCL filter + standard CE control",
+  "best_val_accuracy": 0.9203960299491882,
+  "best_epoch": 52,
+  "test": {
+    "accuracy": 0.9447920918464661,
+    "nll": 0.188937246799469,
+    "valid_count": 25250,
+    "total_count": 25250,
+    "macro_f1": 0.9449925599711957,
+    "ece": 0.012915907427668571
+  },
+  "verified_count": 19738,
+  "rho": 0.30065498857578066,
+  "epochs_completed": 100,
+  "selection": {
+    "verified_count": 19738,
+    "rho": 0.30065498857578066,
+    "method": "fcl_filter_ce",
+    "dataset": "food101",
+    "paper": "FCL filter + standard CE control",
+    "cache_level": true,
+    "cache": "/root/autodl-tmp/dataset/processed/food101_clip_vit-l-14_embeddings.pt",
+    "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/prototype.pt",
+    "budget_verified_count": 19738,
+    "budget_rho": 0.30065498857578066,
+    "args": {
+      "method": "fcl_filter_ce",
+      "dataset": "food101",
+      "cache": "/root/autodl-tmp/dataset/processed/food101_clip_vit-l-14_embeddings.pt",
+      "obs_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/prototype.pt",
+      "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/food101/fcl_filter_ce/lr-0.004/seed-42",
+      "epochs": 100,
+      "batch_size": 1024,
+      "lr": 0.004,
+      "weight_decay": 0.0001,
+      "patience": 101,
+      "confidence_threshold": 0.95,
+      "trim_keep_fraction": 0.7,
+      "pairwise_batch_size": 256,
+      "strong_noise": 0.02,
+      "unsup_weight": 1.0,
+      "seed": 42
+    }
+  },
+  "elapsed_seconds": 73.43907618522644
+}

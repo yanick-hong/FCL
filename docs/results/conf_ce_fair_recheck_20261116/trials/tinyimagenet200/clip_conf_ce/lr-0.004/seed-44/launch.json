@@ -1,0 +1,48 @@
+{
+  "command": [
+    "/root/miniconda3/bin/python3.12",
+    "/root/autodl-tmp/src/contrast/train_revision_baselines.py",
+    "--method",
+    "clip_conf_ce",
+    "--dataset",
+    "tinyimagenet200",
+    "--cache",
+    "/root/autodl-tmp/dataset/processed/tinyimagenet200_clip_vit-l-14_embeddings.pt",
+    "--obs-labels",
+    "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/tinyimagenet200/clip/prototype.pt",
+    "--run-dir",
+    "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/tinyimagenet200/clip_conf_ce/lr-0.004/seed-44",
+    "--epochs",
+    "100",
+    "--patience",
+    "101",
+    "--batch-size",
+    "1024",
+    "--lr",
+    "0.004",
+    "--weight-decay",
+    "0.0001",
+    "--seed",
+    "44"
+  ],
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "tinyimagenet200",
+    "method": "clip_conf_ce",
+    "learning_rate": 0.004,
+    "seed": 44,
+    "input_hashes": {
+      "cache_sha256": "11db1d55feb7f6080dca473782114ad4b7f435c509cb4c42ba92a034f030adef",
+      "obs_sha256": "254b1af8c5a4bac29c0ca88fc40ec0cda855d364b8c26465c53a5ccfade85823",
+      "mask_sha256": "c278cfe770f36c1a524a5034833d8dede908a430f7a57c8c2c9b41d0453fe609",
+      "y_obs_sha256": "a8c4d47e17f5cf94e35d6280c177bff74c2024858837a716fcb92d60e573aa24",
+      "pseudo_sha256": "35425a49f16c8050296fe48d292ead52b88a0f50ec33318924e9342bcf39a17e",
+      "sample_order_sha256": "cc8bfa48885ad2539cbad0f0eb578e612d198c9a423214197171ddeae81a6a42"
+    }
+  },
+  "started_at": "2026-11-16T10:50:02.842733+00:00",
+  "threads": 2,
+  "device_request": "cpu",
+  "data_loader_workers": 2,
+  "source_algorithm_modified": false
+}

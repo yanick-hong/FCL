@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "cifar100",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 43,
+    "input_hashes": {
+      "cache_sha256": "506e630c722fb6bf0b74a61101d712e97e93c30b8367f71b19d83d0138edb74b",
+      "obs_sha256": "9b19261d29cb018d7d23190fde80c857d983729e46f42f3be8c4783a88127a64",
+      "mask_sha256": "7991cf510e256ae8048c65e811a9c245ada71b1fd33507edfdf64bb47991678c",
+      "y_obs_sha256": "cefb49f6984654bf6f283529c3ff2040ca04379a57f6f543501fa2ca46d84453",
+      "pseudo_sha256": "a3ae8921cb06111600e2a33d306f92053ce48ab10ce687155bcdf8450a58eb3a",
+      "sample_order_sha256": "27db3de749a44f08fcb562653532c032300cabe8a46a6f7ad12511efaf0cb3af"
+    }
+  },
+  "result": {
+    "dataset": "cifar100",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 43,
+    "best_val_accuracy": 0.8294000029563904,
+    "test_accuracy": 0.8187000155448914,
+    "best_epoch": 85,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/cifar100/fcl_filter_ce/lr-0.004/seed-43",
+    "metrics_sha256": "e5482c9a1c9da53fb1fc61aa4bc8539ebe3dad612f18b67fef4e3c6148e28383"
+  },
+  "files": {
+    "best.ckpt": "f99ddd4890343bad29fd78266945628010f1b1c13678f5d029c127d96ef19c7a",
+    "config.yaml": "26bcd2b76520a77f75899bb446798a47c0266ffb16d4f598b932df9fc509bed4",
+    "console.log": "c0e1a77ae46c17810206aaa9ff7bc45f60b1a8680f7e4f725e52b98a60bed685",
+    "last.ckpt": "833ac500a23c4263226a1eef7adaadba465cc8b52e4a529b1b1605495f9dc97d",
+    "launch.json": "fe6f5509e6bb0b86dc65e88a7ea79e91022af5c400a377de8dd51563cf9da26c",
+    "logs/val_metrics.csv": "bac4891486b4ed332f5907eff73b643b7204b6f5fb486d9363b19b70df817277",
+    "metrics.json": "e5482c9a1c9da53fb1fc61aa4bc8539ebe3dad612f18b67fef4e3c6148e28383",
+    "run_metadata.json": "de1648ba171a7338756ebbef33ea19a75507885809df8d22e0f81329faeac409"
+  },
+  "sealed_at": "2026-11-16T10:44:19.245294+00:00"
+}

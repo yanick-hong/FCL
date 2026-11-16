@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "caltech101",
+    "method": "clip_conf_ce",
+    "learning_rate": 0.004,
+    "seed": 43,
+    "input_hashes": {
+      "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+      "obs_sha256": "e769ad3bb697c62c4b20588d329e4c57764fb5e983831ccbe0f1bed9b799406b",
+      "mask_sha256": "a5410dd87feb9c9ff8270b420553984637b836ee750f5935741545881d5ae037",
+      "y_obs_sha256": "495fe3ee94f7ac590c20630f36712ff497e6d6c25b702c38cc3cfa1ceb007e71",
+      "pseudo_sha256": "b1e5bca8a226b58deac415d5518f34cbf946a99d136b557bed58a6531cd4e35b",
+      "sample_order_sha256": "2f3a73d8ff2e7ebecafd237331e4b05028f2586e28cc3edc2df7029a4bc269da"
+    }
+  },
+  "result": {
+    "dataset": "caltech101",
+    "method": "clip_conf_ce",
+    "learning_rate": 0.004,
+    "seed": 43,
+    "best_val_accuracy": 0.9722530245780945,
+    "test_accuracy": 0.971020519733429,
+    "best_epoch": 65,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/clip_conf_ce/lr-0.004/seed-43",
+    "metrics_sha256": "6edf9b0e105395995d7c9162275360c4f4912a179873f2599f10e8584873dffe"
+  },
+  "files": {
+    "best.ckpt": "2bdfdd78479d305f23819734704c9b2de07d00a42f7d07dd8d7f0047a1e1819e",
+    "config.yaml": "ee0fab91b09392c5e808f72ae047f5778030f9dd7ec2a6a6694a7e34b78b23e1",
+    "console.log": "96d5100548e2fa47bcbc11ec36ae9005ca81574bc99063b0a69d973997f47b6b",
+    "last.ckpt": "ecef66c0b992ea29a141ad8a0505234f0515a6285aedaab7f0157ee1593ce197",
+    "launch.json": "c4c7cf57dccf72f17f4f41272eea284c221c86ec9251fad4b5ebb2d590948959",
+    "logs/val_metrics.csv": "88a72efaee40c651c582a120f2210dec7f682729e21d0878ec32f3771dd6b86e",
+    "metrics.json": "6edf9b0e105395995d7c9162275360c4f4912a179873f2599f10e8584873dffe",
+    "run_metadata.json": "6877b0a27669e6e9edbf92ff6a33082755d3d8612f4fbf8a4736bca6b973c47c"
+  },
+  "sealed_at": "2026-11-16T10:35:13.982087+00:00"
+}

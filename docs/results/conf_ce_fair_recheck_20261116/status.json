@@ -1,0 +1,27 @@
+{
+  "status": "completed",
+  "pid": 104983,
+  "started_at": "2026-11-16T10:34:03.152672+00:00",
+  "binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+  "training_count": 50,
+  "completed_trials": 50,
+  "datasets": {
+    "cifar100": {
+      "status": "completed"
+    },
+    "caltech101": {
+      "status": "completed"
+    },
+    "eurosat": {
+      "status": "completed"
+    },
+    "food101": {
+      "status": "completed"
+    },
+    "tinyimagenet200": {
+      "status": "completed"
+    }
+  },
+  "updated_at": "2026-11-16T11:01:05.962029+00:00",
+  "finished_at": "2026-11-16T11:01:05.968677+00:00"
+}

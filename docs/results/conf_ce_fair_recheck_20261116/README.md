@@ -14,11 +14,11 @@
 
 ## 当前状态
 
-五集严格输入预检已通过，单独的Caltech 100轮CPU试运行正常完成（仅用于资源/CLI检查，不参与正式选参）。正式50次训练已于2026-11-16 18:33:51北京时间启动，远端worker PID为104983。实际进度与结果以运行记录为准，未完成部分不能当成已完成实验。
+正式50次训练已全部完成（2026-11-16 18:33:51启动，19:01:05结束，北京时间）。独立审计已验证50个sealed trial、30个最终模型、10个参数选择及10份统计汇总，并在CPU逐个重算30个best checkpoint的验证集和测试集准确率。五集结果均为Conf+CE更高，FCL+CE为0/5均值领先。易读结果见[RESULTS.md](RESULTS.md)。
 
 正式输出目录为AutoDL的`/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/`，包括计划、输入核验、每次命令与配置、每轮验证记录、best/last checkpoint、逐项指标、输出指纹和汇总。
 
-输出会再做一次独立审计，将汇总和seal中的数值逐字段与原始metrics/验证历史核对；交付汇总不只信任缓存的seal.result字段。
+`final_audit.json`保存独立核验结果，已逐字段核对汇总与seal中的数值、原始metrics及验证历史。完整模型和日志已同步到本地`F:/CodeProjects/FCL2/outputs/conf_ce_fair_recheck_20261116/`及同级同名zip；本地与远端压缩包SHA一致。每项原始配置、metrics、验证记录、命令和seal另复制到本目录的`trials/`，模型不纳入Git。
 
 ## 解释边界
 

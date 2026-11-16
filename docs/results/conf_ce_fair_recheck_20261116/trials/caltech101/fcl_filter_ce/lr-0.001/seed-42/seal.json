@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "caltech101",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.001,
+    "seed": 42,
+    "input_hashes": {
+      "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+      "obs_sha256": "e769ad3bb697c62c4b20588d329e4c57764fb5e983831ccbe0f1bed9b799406b",
+      "mask_sha256": "a5410dd87feb9c9ff8270b420553984637b836ee750f5935741545881d5ae037",
+      "y_obs_sha256": "495fe3ee94f7ac590c20630f36712ff497e6d6c25b702c38cc3cfa1ceb007e71",
+      "pseudo_sha256": "b1e5bca8a226b58deac415d5518f34cbf946a99d136b557bed58a6531cd4e35b",
+      "sample_order_sha256": "2f3a73d8ff2e7ebecafd237331e4b05028f2586e28cc3edc2df7029a4bc269da"
+    }
+  },
+  "result": {
+    "dataset": "caltech101",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.001,
+    "seed": 42,
+    "best_val_accuracy": 0.9067702293395996,
+    "test_accuracy": 0.8876008987426758,
+    "best_epoch": 67,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/fcl_filter_ce/lr-0.001/seed-42",
+    "metrics_sha256": "10f42cc6b27372dd972c1b53802218439ea86a0f14d5a04b68c182d641b62175"
+  },
+  "files": {
+    "best.ckpt": "36cfdd5456c6936193249a2796057ff7a7087d2ee9c1b04d7f8655d61f02b38b",
+    "config.yaml": "f0b32e6e123f1f5745324d87481d4f80f368636e7a627d9565f94e6a72335e01",
+    "console.log": "f6777b8b2620dfa72a9ec1574263a976c0e25d4b5deb9cf44b96fa2bd34293c3",
+    "last.ckpt": "2e6d14a48e9fdcfe199bd500915d74c706fa2f9fb855295e846f766f130185b8",
+    "launch.json": "37e6bc06e926043db8f98a062e0317c51827272a0ca92b983df6dd3ff436dea1",
+    "logs/val_metrics.csv": "d17bca2aa67a29084793f730c2e9f3eaf6aeef4354c51d1006c4a21e21a74c7a",
+    "metrics.json": "10f42cc6b27372dd972c1b53802218439ea86a0f14d5a04b68c182d641b62175",
+    "run_metadata.json": "14fd228cc48db241dfa508307faf83a910c9cf36e842f41265a8a6b78a576f74"
+  },
+  "sealed_at": "2026-11-16T10:35:48.238207+00:00"
+}

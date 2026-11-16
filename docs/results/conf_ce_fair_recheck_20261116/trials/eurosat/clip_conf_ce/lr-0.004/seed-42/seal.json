@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "eurosat",
+    "method": "clip_conf_ce",
+    "learning_rate": 0.004,
+    "seed": 42,
+    "input_hashes": {
+      "cache_sha256": "247b5e61e946157f9358a3ea72bed42476a5b2f9383f5c6903df4fb63ac67a5d",
+      "obs_sha256": "bed0ceabb42f48065574eb82d550ec7224c6d2b8964480e4a8e24ddbc4e9659c",
+      "mask_sha256": "f4ed4b9d5657e26757cfa7b212a075b39e9ee3c2308b3eb4dba86bccc4cf58fb",
+      "y_obs_sha256": "7f5c178b6f197bd714491adb26939d68698546d26d9784c63341ed3c221f5e43",
+      "pseudo_sha256": "d87cbc94428034458aee97dd8834288a29347b710ea89b20696acfffea90f10f",
+      "sample_order_sha256": "0f9877fc088aff9b41941d2798ad163ca1f8c969db7a1941ed9413a1ebb95591"
+    }
+  },
+  "result": {
+    "dataset": "eurosat",
+    "method": "clip_conf_ce",
+    "learning_rate": 0.004,
+    "seed": 42,
+    "best_val_accuracy": 0.6511111259460449,
+    "test_accuracy": 0.6666666865348816,
+    "best_epoch": 67,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/eurosat/clip_conf_ce/lr-0.004/seed-42",
+    "metrics_sha256": "1999556e1d1e33fa3c8eb9ff8bc696253ea69157cd6ab4d1894df039fe8c5015"
+  },
+  "files": {
+    "best.ckpt": "8c02b2185b5d3eed91041f58e10a0993976c2b20bbdd143fcade1833c25b9706",
+    "config.yaml": "59ff75e66609f357f24d64a22721877bbd197229d436fdcfbd82ea7db2c7cfd5",
+    "console.log": "56e0b33bcf8181b41bd3c8f2d7dfa096d2cc8e5579c3a9061292ed1405480248",
+    "last.ckpt": "a2d8ba7e9b571c7e8998335ded0d210b53e8a99cc045ed41ead06d4fb756f140",
+    "launch.json": "b6d755fb4e52cd215ee38fada55c7790fafd7618ece5406e32ea308d1cb84841",
+    "logs/val_metrics.csv": "eba4b62b7160f6ab3210b6fd1909feccdf7c6e6d13ab7eb0fda28161f6aee8b7",
+    "metrics.json": "1999556e1d1e33fa3c8eb9ff8bc696253ea69157cd6ab4d1894df039fe8c5015",
+    "run_metadata.json": "db3fa0737ca6a111b8f721ec4f1781c03c860b3c8dd05489845fb487434096f7"
+  },
+  "sealed_at": "2026-11-16T10:36:38.782226+00:00"
+}

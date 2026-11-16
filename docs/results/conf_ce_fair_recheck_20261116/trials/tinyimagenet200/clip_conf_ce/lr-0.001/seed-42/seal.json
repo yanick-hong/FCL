@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "tinyimagenet200",
+    "method": "clip_conf_ce",
+    "learning_rate": 0.001,
+    "seed": 42,
+    "input_hashes": {
+      "cache_sha256": "11db1d55feb7f6080dca473782114ad4b7f435c509cb4c42ba92a034f030adef",
+      "obs_sha256": "254b1af8c5a4bac29c0ca88fc40ec0cda855d364b8c26465c53a5ccfade85823",
+      "mask_sha256": "c278cfe770f36c1a524a5034833d8dede908a430f7a57c8c2c9b41d0453fe609",
+      "y_obs_sha256": "a8c4d47e17f5cf94e35d6280c177bff74c2024858837a716fcb92d60e573aa24",
+      "pseudo_sha256": "35425a49f16c8050296fe48d292ead52b88a0f50ec33318924e9342bcf39a17e",
+      "sample_order_sha256": "cc8bfa48885ad2539cbad0f0eb578e612d198c9a423214197171ddeae81a6a42"
+    }
+  },
+  "result": {
+    "dataset": "tinyimagenet200",
+    "method": "clip_conf_ce",
+    "learning_rate": 0.001,
+    "seed": 42,
+    "best_val_accuracy": 0.8288999795913696,
+    "test_accuracy": 0.8270999789237976,
+    "best_epoch": 84,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/tinyimagenet200/clip_conf_ce/lr-0.001/seed-42",
+    "metrics_sha256": "348c9fabee044768eaef826a8c67d2ac1f1b3999e7164f2af075043c1c43aaba"
+  },
+  "files": {
+    "best.ckpt": "b088659d645dde2d3f9781e6c837324f196e1102e2524f9c960347cef8f3dc14",
+    "config.yaml": "dfabb802f70c470ada53b92148a6cc675a80eaf980fe04fdc49e1582ba70130b",
+    "console.log": "934ada972bfd282b0905dbb1bbeebcc807bbadae7c2e008c7cf7c7c2c74ace14",
+    "last.ckpt": "444c8c55144aefc262a39f8dc77962810179dadd930d414a2e2223783de0bbe0",
+    "launch.json": "1368617b3ebbf5ff8e4948175adf5859e0087b3cbc0e8dee00e44fd3c5560ab0",
+    "logs/val_metrics.csv": "1b6fd47242c7c2ef60eeb1e38a40eb9124d143f45dceb5c8e677466963cf6dba",
+    "metrics.json": "348c9fabee044768eaef826a8c67d2ac1f1b3999e7164f2af075043c1c43aaba",
+    "run_metadata.json": "86278f231711192d8329ab10997f897457db4cbb484f4f4f034b1187419f7e17"
+  },
+  "sealed_at": "2026-11-16T10:44:09.242553+00:00"
+}

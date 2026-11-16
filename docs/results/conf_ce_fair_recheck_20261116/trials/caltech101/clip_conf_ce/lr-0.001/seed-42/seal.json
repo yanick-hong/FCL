@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "caltech101",
+    "method": "clip_conf_ce",
+    "learning_rate": 0.001,
+    "seed": 42,
+    "input_hashes": {
+      "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+      "obs_sha256": "e769ad3bb697c62c4b20588d329e4c57764fb5e983831ccbe0f1bed9b799406b",
+      "mask_sha256": "a5410dd87feb9c9ff8270b420553984637b836ee750f5935741545881d5ae037",
+      "y_obs_sha256": "495fe3ee94f7ac590c20630f36712ff497e6d6c25b702c38cc3cfa1ceb007e71",
+      "pseudo_sha256": "b1e5bca8a226b58deac415d5518f34cbf946a99d136b557bed58a6531cd4e35b",
+      "sample_order_sha256": "2f3a73d8ff2e7ebecafd237331e4b05028f2586e28cc3edc2df7029a4bc269da"
+    }
+  },
+  "result": {
+    "dataset": "caltech101",
+    "method": "clip_conf_ce",
+    "learning_rate": 0.001,
+    "seed": 42,
+    "best_val_accuracy": 0.9544950127601624,
+    "test_accuracy": 0.9592217206954956,
+    "best_epoch": 76,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/clip_conf_ce/lr-0.001/seed-42",
+    "metrics_sha256": "1fce7c2d085b62a652a15eb88d0d2d18723b7b31ca53f68cd9aedd26b29a947f"
+  },
+  "files": {
+    "best.ckpt": "eb3ad3c63a43baf5f0b056fe3ec7896a298cf0fa9f0222f035432aaedbe31d1b",
+    "config.yaml": "6a8689a98f75b8be68bcf3f7b1c9485adfa4cc5a7d2e7e073d3edf023a037bdb",
+    "console.log": "17c93e850836fe672641253dd6c9bacc73a012d6aba499c44f0bab88db5e72ca",
+    "last.ckpt": "8ca99500f6b3d4e1a9e8e0904d1d9480074232a14df602aecb277f1cb73ffc7c",
+    "launch.json": "9a19b49d98351fc39a414f164f4aaff3f9f12b9be48668520b97d5ae7468094d",
+    "logs/val_metrics.csv": "2fc32edf402ef1b5c7d60321e2738c40da2bd395d473096f0607eb038bd6f43b",
+    "metrics.json": "1fce7c2d085b62a652a15eb88d0d2d18723b7b31ca53f68cd9aedd26b29a947f",
+    "run_metadata.json": "2ab1ca3058677c42506f5a544eae8a7838ffec910a954da930025d8a965f5879"
+  },
+  "sealed_at": "2026-11-16T10:34:20.784255+00:00"
+}

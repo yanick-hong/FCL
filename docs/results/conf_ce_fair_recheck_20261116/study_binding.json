@@ -1,0 +1,11 @@
+{
+  "binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+  "runtime": {
+    "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+    "platform": "Linux-5.4.0-153-generic-x86_64-with-glibc2.35",
+    "torch": "2.5.1+cu124",
+    "cuda_runtime": "12.4",
+    "device": "cpu",
+    "gpu_name": null
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "allow_partial": false,
+  "study_root": "F:\\CodeProjects\\FCL2\\outputs\\conf_ce_fair_recheck_20261116",
+  "binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+  "expected_trials": 50,
+  "sealed_trials": 50,
+  "referenced_trials": 50,
+  "final_runs": 30,
+  "selected_conditions": 10,
+  "summaries": 10,
+  "sealed_not_yet_referenced": 0,
+  "environment_checks": {
+    "inputs": false,
+    "source": false,
+    "wrapper": false
+  },
+  "checkpoint_checks": null,
+  "statistical_limit": "Seed 42 also selected the LR; seed 42/43/44 CI is exploratory and conditional on that selection."
+}

@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "eurosat",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 42,
+    "input_hashes": {
+      "cache_sha256": "247b5e61e946157f9358a3ea72bed42476a5b2f9383f5c6903df4fb63ac67a5d",
+      "obs_sha256": "bed0ceabb42f48065574eb82d550ec7224c6d2b8964480e4a8e24ddbc4e9659c",
+      "mask_sha256": "f4ed4b9d5657e26757cfa7b212a075b39e9ee3c2308b3eb4dba86bccc4cf58fb",
+      "y_obs_sha256": "7f5c178b6f197bd714491adb26939d68698546d26d9784c63341ed3c221f5e43",
+      "pseudo_sha256": "d87cbc94428034458aee97dd8834288a29347b710ea89b20696acfffea90f10f",
+      "sample_order_sha256": "0f9877fc088aff9b41941d2798ad163ca1f8c969db7a1941ed9413a1ebb95591"
+    }
+  },
+  "result": {
+    "dataset": "eurosat",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 42,
+    "best_val_accuracy": 0.610370397567749,
+    "test_accuracy": 0.6092592477798462,
+    "best_epoch": 87,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/eurosat/fcl_filter_ce/lr-0.004/seed-42",
+    "metrics_sha256": "50a098ad9eb95a7b776093e6b38fd67078a49f052e45f3cd175b76b2646b3aee"
+  },
+  "files": {
+    "best.ckpt": "501f6f03e6bad45bfd8d0705b88b43b5f348b247609f69e9ad088ed42e58d247",
+    "config.yaml": "43e71d760ce51f3a22b8fc652c5ea9326caf5690f11c7fed45a0bdb960d437ee",
+    "console.log": "a24df4f1744f4f941ef65c8f77157f33d40c2caa343b806032652165923bf0ec",
+    "last.ckpt": "c6b729b73448aceb5af2caa8b8a07550730382f96d1e536516eb01df5b0cf0bd",
+    "launch.json": "0bd0c7f3b0c8230794fb39ae03a396d893b129c941a2851dcbc3ca3a833a6700",
+    "logs/val_metrics.csv": "2b305607bd3d893063ee2f91d80d2f09ab043de8ac6a161bb11185bb71edfb70",
+    "metrics.json": "50a098ad9eb95a7b776093e6b38fd67078a49f052e45f3cd175b76b2646b3aee",
+    "run_metadata.json": "612579d964cb1873f4f236a5880b4dc14a404906b27175968f59686b14d48c45"
+  },
+  "sealed_at": "2026-11-16T10:40:30.596750+00:00"
+}

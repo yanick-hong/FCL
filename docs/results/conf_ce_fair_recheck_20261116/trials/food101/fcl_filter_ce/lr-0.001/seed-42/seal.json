@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "food101",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.001,
+    "seed": 42,
+    "input_hashes": {
+      "cache_sha256": "ee2f3487d1a6e7ec8a7a8d582ff4b4e324ea42798c16a05d3f969f2a8a0c0718",
+      "obs_sha256": "cfade3bb3eb89d0374f83f719adf545700bddad2466f3f33fbb98399d36fc18a",
+      "mask_sha256": "978ae37b9a66d015acd32690196dcc4b377eaafe0f185ba622693d81b7b87e13",
+      "y_obs_sha256": "2efeb845462a8bd5696d0db9a27bd6c6cdbd494d42f2670620edb7173ee677fc",
+      "pseudo_sha256": "05fc871bb6f1353a60807e1db9768329f1b3afa9cbacd8b354ab4ffd7bd0bb21",
+      "sample_order_sha256": "fae041c6a7f40d0b1f706ccb86c9fa7aad7936ba6e23f3a9ef0a5e4f95b3d8bb"
+    }
+  },
+  "result": {
+    "dataset": "food101",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.001,
+    "seed": 42,
+    "best_val_accuracy": 0.9159405827522278,
+    "test_accuracy": 0.9407524466514587,
+    "best_epoch": 92,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/food101/fcl_filter_ce/lr-0.001/seed-42",
+    "metrics_sha256": "fe999b6bd668af163ab547a04973e0e657d946bac8bbef61d0f0b939667f2d90"
+  },
+  "files": {
+    "best.ckpt": "12510fe18247245b031aa0bb8a029055e34a04da82b4823cffefb59d3d911d4e",
+    "config.yaml": "ec3452219a49114586f3bcba12a5a00a4c335424a6b80f6a1306f3724522a0b7",
+    "console.log": "aa3d7e1fec6f2d0588973ddb6dc48a59c70f31a514ff910ff86ea64cd275ddee",
+    "last.ckpt": "79bfaecab904c224bcb9f0ba08525cfac4f259177b67d53e8ddf3ac40e51aab5",
+    "launch.json": "34c8a6a75285d3c2e71a0b0bafa333e5c0e4f8e915f7dbcbed94061fdeac3d5a",
+    "logs/val_metrics.csv": "5b5ea7401a1e5547586fda0167e280d527f341d6f570ab63214efe211025639b",
+    "metrics.json": "fe999b6bd668af163ab547a04973e0e657d946bac8bbef61d0f0b939667f2d90",
+    "run_metadata.json": "ac24d239d3e85c60f7ec51bc5650d41ba745edcd9426aa81ffb9c10dd6f58b87"
+  },
+  "sealed_at": "2026-11-16T10:45:40.133967+00:00"
+}

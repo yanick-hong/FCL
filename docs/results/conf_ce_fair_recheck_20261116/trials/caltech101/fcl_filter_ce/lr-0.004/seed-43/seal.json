@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "caltech101",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 43,
+    "input_hashes": {
+      "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+      "obs_sha256": "e769ad3bb697c62c4b20588d329e4c57764fb5e983831ccbe0f1bed9b799406b",
+      "mask_sha256": "a5410dd87feb9c9ff8270b420553984637b836ee750f5935741545881d5ae037",
+      "y_obs_sha256": "495fe3ee94f7ac590c20630f36712ff497e6d6c25b702c38cc3cfa1ceb007e71",
+      "pseudo_sha256": "b1e5bca8a226b58deac415d5518f34cbf946a99d136b557bed58a6531cd4e35b",
+      "sample_order_sha256": "2f3a73d8ff2e7ebecafd237331e4b05028f2586e28cc3edc2df7029a4bc269da"
+    }
+  },
+  "result": {
+    "dataset": "caltech101",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 43,
+    "best_val_accuracy": 0.9489456415176392,
+    "test_accuracy": 0.9091285467147827,
+    "best_epoch": 68,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/fcl_filter_ce/lr-0.004/seed-43",
+    "metrics_sha256": "ec08ff5299074575a9fa1d7ff1ed376eee38341c15496ff65b5c7f9024fcda4e"
+  },
+  "files": {
+    "best.ckpt": "b26ad562f9e7457bb7e785d62d28f3ade89d3b280955c01ee9c587c7d38b022a",
+    "config.yaml": "557550d21c8d5c344521f1a71e7ab6a00ccfd88e7b5f9a10fa7d8542ce0729cb",
+    "console.log": "3f9cacb1c034d8efe30de7e14295c70b4b25d12a8b5a0b9b2a7501d411337c32",
+    "last.ckpt": "104fd00a282de6d51d122bbf220a27cada81e1495767df2626fc12e425eda4b7",
+    "launch.json": "b459e75f25d46906494b50d86a97b0c6fd24362cec1d7b39661f66673e220825",
+    "logs/val_metrics.csv": "992aad0bc3fe7bfead4ca444041e9c1ddd1d69906be942f33df884629e36166e",
+    "metrics.json": "ec08ff5299074575a9fa1d7ff1ed376eee38341c15496ff65b5c7f9024fcda4e",
+    "run_metadata.json": "596efe76e25f459724151a164078a785bdcf80d7f4c559cd5e8f015b35ccfaac"
+  },
+  "sealed_at": "2026-11-16T10:36:40.334439+00:00"
+}

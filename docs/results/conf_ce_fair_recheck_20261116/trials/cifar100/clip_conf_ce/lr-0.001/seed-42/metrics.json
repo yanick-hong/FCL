@@ -1,0 +1,52 @@
+{
+  "method": "clip_conf_ce",
+  "dataset": "cifar100",
+  "paper": "CLIP confidence threshold + CE control",
+  "best_val_accuracy": 0.817799985408783,
+  "best_epoch": 87,
+  "test": {
+    "accuracy": 0.8130000233650208,
+    "nll": 0.8603125214576721,
+    "valid_count": 10000,
+    "total_count": 10000,
+    "macro_f1": 0.8125306233763695,
+    "ece": 0.18842542171478271
+  },
+  "verified_count": 13546,
+  "rho": 0.30102222222222225,
+  "epochs_completed": 100,
+  "selection": {
+    "verified_count": 13546,
+    "rho": 0.30102222222222225,
+    "selection": "lowest CLIP top-1 confidence",
+    "selected_count": 13546,
+    "selected_vlm_accuracy": 0.5083419680595398,
+    "method": "clip_conf_ce",
+    "dataset": "cifar100",
+    "paper": "CLIP confidence threshold + CE control",
+    "cache_level": true,
+    "cache": "/root/autodl-tmp/dataset/processed/cifar100_clip_vit-l-14_embeddings.pt",
+    "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/prototype.pt",
+    "budget_verified_count": 13546,
+    "budget_rho": 0.30102222222222225,
+    "args": {
+      "method": "clip_conf_ce",
+      "dataset": "cifar100",
+      "cache": "/root/autodl-tmp/dataset/processed/cifar100_clip_vit-l-14_embeddings.pt",
+      "obs_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/prototype.pt",
+      "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/cifar100/clip_conf_ce/lr-0.001/seed-42",
+      "epochs": 100,
+      "batch_size": 1024,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "patience": 101,
+      "confidence_threshold": 0.95,
+      "trim_keep_fraction": 0.7,
+      "pairwise_batch_size": 256,
+      "strong_noise": 0.02,
+      "unsup_weight": 1.0,
+      "seed": 42
+    }
+  },
+  "elapsed_seconds": 70.77249670028687
+}

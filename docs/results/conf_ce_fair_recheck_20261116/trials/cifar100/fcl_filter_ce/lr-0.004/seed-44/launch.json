@@ -1,0 +1,48 @@
+{
+  "command": [
+    "/root/miniconda3/bin/python3.12",
+    "/root/autodl-tmp/src/contrast/train_revision_baselines.py",
+    "--method",
+    "fcl_filter_ce",
+    "--dataset",
+    "cifar100",
+    "--cache",
+    "/root/autodl-tmp/dataset/processed/cifar100_clip_vit-l-14_embeddings.pt",
+    "--obs-labels",
+    "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/cifar100/clip/prototype.pt",
+    "--run-dir",
+    "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/cifar100/fcl_filter_ce/lr-0.004/seed-44",
+    "--epochs",
+    "100",
+    "--patience",
+    "101",
+    "--batch-size",
+    "1024",
+    "--lr",
+    "0.004",
+    "--weight-decay",
+    "0.0001",
+    "--seed",
+    "44"
+  ],
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "cifar100",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 44,
+    "input_hashes": {
+      "cache_sha256": "506e630c722fb6bf0b74a61101d712e97e93c30b8367f71b19d83d0138edb74b",
+      "obs_sha256": "9b19261d29cb018d7d23190fde80c857d983729e46f42f3be8c4783a88127a64",
+      "mask_sha256": "7991cf510e256ae8048c65e811a9c245ada71b1fd33507edfdf64bb47991678c",
+      "y_obs_sha256": "cefb49f6984654bf6f283529c3ff2040ca04379a57f6f543501fa2ca46d84453",
+      "pseudo_sha256": "a3ae8921cb06111600e2a33d306f92053ce48ab10ce687155bcdf8450a58eb3a",
+      "sample_order_sha256": "27db3de749a44f08fcb562653532c032300cabe8a46a6f7ad12511efaf0cb3af"
+    }
+  },
+  "started_at": "2026-11-16T10:44:19.710802+00:00",
+  "threads": 2,
+  "device_request": "cpu",
+  "data_loader_workers": 2,
+  "source_algorithm_modified": false
+}

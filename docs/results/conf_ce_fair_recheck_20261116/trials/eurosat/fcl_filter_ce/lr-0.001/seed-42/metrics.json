@@ -1,0 +1,49 @@
+{
+  "method": "fcl_filter_ce",
+  "dataset": "eurosat",
+  "paper": "FCL filter + standard CE control",
+  "best_val_accuracy": 0.5503703951835632,
+  "best_epoch": 92,
+  "test": {
+    "accuracy": 0.5592592358589172,
+    "nll": 1.1358953714370728,
+    "valid_count": 2700,
+    "total_count": 2700,
+    "macro_f1": 0.5920627251267433,
+    "ece": 0.17144189774990082
+  },
+  "verified_count": 6485,
+  "rho": 0.3002314814814815,
+  "epochs_completed": 100,
+  "selection": {
+    "verified_count": 6485,
+    "rho": 0.3002314814814815,
+    "method": "fcl_filter_ce",
+    "dataset": "eurosat",
+    "paper": "FCL filter + standard CE control",
+    "cache_level": true,
+    "cache": "/root/autodl-tmp/dataset/processed/eurosat_clip_vit-l-14_embeddings.pt",
+    "observed_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/prototype.pt",
+    "budget_verified_count": 6485,
+    "budget_rho": 0.3002314814814815,
+    "args": {
+      "method": "fcl_filter_ce",
+      "dataset": "eurosat",
+      "cache": "/root/autodl-tmp/dataset/processed/eurosat_clip_vit-l-14_embeddings.pt",
+      "obs_labels": "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/eurosat/clip/prototype.pt",
+      "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/eurosat/fcl_filter_ce/lr-0.001/seed-42",
+      "epochs": 100,
+      "batch_size": 1024,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "patience": 101,
+      "confidence_threshold": 0.95,
+      "trim_keep_fraction": 0.7,
+      "pairwise_batch_size": 256,
+      "strong_noise": 0.02,
+      "unsup_weight": 1.0,
+      "seed": 42
+    }
+  },
+  "elapsed_seconds": 40.9067816734314
+}

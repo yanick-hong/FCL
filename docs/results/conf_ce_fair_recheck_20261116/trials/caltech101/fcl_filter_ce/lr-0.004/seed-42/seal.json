@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "caltech101",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 42,
+    "input_hashes": {
+      "cache_sha256": "15ea17afe51c5a50a90cf8c976d8d7bde6561eb7e068bd5c9d0a0f8e58f9747f",
+      "obs_sha256": "e769ad3bb697c62c4b20588d329e4c57764fb5e983831ccbe0f1bed9b799406b",
+      "mask_sha256": "a5410dd87feb9c9ff8270b420553984637b836ee750f5935741545881d5ae037",
+      "y_obs_sha256": "495fe3ee94f7ac590c20630f36712ff497e6d6c25b702c38cc3cfa1ceb007e71",
+      "pseudo_sha256": "b1e5bca8a226b58deac415d5518f34cbf946a99d136b557bed58a6531cd4e35b",
+      "sample_order_sha256": "2f3a73d8ff2e7ebecafd237331e4b05028f2586e28cc3edc2df7029a4bc269da"
+    }
+  },
+  "result": {
+    "dataset": "caltech101",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 42,
+    "best_val_accuracy": 0.9489456415176392,
+    "test_accuracy": 0.9089215397834778,
+    "best_epoch": 62,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/fcl_filter_ce/lr-0.004/seed-42",
+    "metrics_sha256": "a4eb07fe4e45e3a9fd8032441fc2d6f09f807963c458680a5089b14a69f6a566"
+  },
+  "files": {
+    "best.ckpt": "eb614ddf54749d79313ef35c3834c65e8566a9c39a1b4db7ffb2f39ae19368af",
+    "config.yaml": "19fd783f9ec9d6cd7c3111dddeae1d4a91d3fe498139eec429f4485ab8ce5da6",
+    "console.log": "51f633824aed70fafbbd19e514a2a40a410f44c2722ec05d27634bb66f344935",
+    "last.ckpt": "65da7cf2deb54447803923bf08e78ad8535b279d78e22d09129df667e7670252",
+    "launch.json": "58613ee2e445a5741bb01ea2979a1e30382f536d92dac74d5d01a57ad34967f5",
+    "logs/val_metrics.csv": "375c5346d6a67306a5a03fa0f7a6648288271bb7e6e10cb8331074b657161cae",
+    "metrics.json": "a4eb07fe4e45e3a9fd8032441fc2d6f09f807963c458680a5089b14a69f6a566",
+    "run_metadata.json": "9bdbe792b1880e1a0d251812c819643fc8f2fb897139b8a976fdca4607029979"
+  },
+  "sealed_at": "2026-11-16T10:36:23.934365+00:00"
+}

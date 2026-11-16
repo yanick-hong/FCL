@@ -1,0 +1,19 @@
+{
+  "pid": 104983,
+  "command": [
+    "/root/miniconda3/bin/python",
+    "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/preparation/fair_ce_runner.py",
+    "--root",
+    "/root/autodl-tmp",
+    "--device",
+    "cpu",
+    "--threads",
+    "2",
+    "--jobs",
+    "3",
+    "--execute",
+    "--resume"
+  ],
+  "started_at": "2026-11-16T10:33:51.480900+00:00",
+  "cpu_niceness": 10
+}

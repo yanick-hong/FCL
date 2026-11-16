@@ -1,0 +1,48 @@
+{
+  "command": [
+    "/root/miniconda3/bin/python3.12",
+    "/root/autodl-tmp/src/contrast/train_revision_baselines.py",
+    "--method",
+    "fcl_filter_ce",
+    "--dataset",
+    "food101",
+    "--cache",
+    "/root/autodl-tmp/dataset/processed/food101_clip_vit-l-14_embeddings.pt",
+    "--obs-labels",
+    "/root/autodl-tmp/outputs/controlled_correction_20261115/corrections/food101/clip/prototype.pt",
+    "--run-dir",
+    "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/food101/fcl_filter_ce/lr-0.004/seed-43",
+    "--epochs",
+    "100",
+    "--patience",
+    "101",
+    "--batch-size",
+    "1024",
+    "--lr",
+    "0.004",
+    "--weight-decay",
+    "0.0001",
+    "--seed",
+    "43"
+  ],
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "food101",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 43,
+    "input_hashes": {
+      "cache_sha256": "ee2f3487d1a6e7ec8a7a8d582ff4b4e324ea42798c16a05d3f969f2a8a0c0718",
+      "obs_sha256": "cfade3bb3eb89d0374f83f719adf545700bddad2466f3f33fbb98399d36fc18a",
+      "mask_sha256": "978ae37b9a66d015acd32690196dcc4b377eaafe0f185ba622693d81b7b87e13",
+      "y_obs_sha256": "2efeb845462a8bd5696d0db9a27bd6c6cdbd494d42f2670620edb7173ee677fc",
+      "pseudo_sha256": "05fc871bb6f1353a60807e1db9768329f1b3afa9cbacd8b354ab4ffd7bd0bb21",
+      "sample_order_sha256": "fae041c6a7f40d0b1f706ccb86c9fa7aad7936ba6e23f3a9ef0a5e4f95b3d8bb"
+    }
+  },
+  "started_at": "2026-11-16T10:48:17.864318+00:00",
+  "threads": 2,
+  "device_request": "cpu",
+  "data_loader_workers": 2,
+  "source_algorithm_modified": false
+}

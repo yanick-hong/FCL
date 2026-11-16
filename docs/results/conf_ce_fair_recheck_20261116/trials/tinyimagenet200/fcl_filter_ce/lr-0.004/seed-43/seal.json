@@ -1,0 +1,39 @@
+{
+  "binding": {
+    "study_binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+    "dataset": "tinyimagenet200",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 43,
+    "input_hashes": {
+      "cache_sha256": "11db1d55feb7f6080dca473782114ad4b7f435c509cb4c42ba92a034f030adef",
+      "obs_sha256": "254b1af8c5a4bac29c0ca88fc40ec0cda855d364b8c26465c53a5ccfade85823",
+      "mask_sha256": "c278cfe770f36c1a524a5034833d8dede908a430f7a57c8c2c9b41d0453fe609",
+      "y_obs_sha256": "a8c4d47e17f5cf94e35d6280c177bff74c2024858837a716fcb92d60e573aa24",
+      "pseudo_sha256": "35425a49f16c8050296fe48d292ead52b88a0f50ec33318924e9342bcf39a17e",
+      "sample_order_sha256": "cc8bfa48885ad2539cbad0f0eb578e612d198c9a423214197171ddeae81a6a42"
+    }
+  },
+  "result": {
+    "dataset": "tinyimagenet200",
+    "method": "fcl_filter_ce",
+    "learning_rate": 0.004,
+    "seed": 43,
+    "best_val_accuracy": 0.8260999917984009,
+    "test_accuracy": 0.8220000267028809,
+    "best_epoch": 49,
+    "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/tinyimagenet200/fcl_filter_ce/lr-0.004/seed-43",
+    "metrics_sha256": "4f7890a90d12370932de1dc9327a6d405d2af5d9d9ee60a610b5a86d9add75ed"
+  },
+  "files": {
+    "best.ckpt": "d22c3b2f71f0ec29dfe68c907d440d4ba75e19a3b411b522a1ab1670d3d104c5",
+    "config.yaml": "09560eba9f2d8160a20c304f97b1b8e86d0221b78c7d31a8cec5f62f2a665468",
+    "console.log": "14a999b4795819a58a66e5c96a53874a910a44289b47aa42d681c8986d2e5017",
+    "last.ckpt": "e8f9009320bb44a0cc3e7f9bbe0d31ba5e84cad7e64d8c6f3b9168cedc437c80",
+    "launch.json": "227412077f01bbe37dc2254cb792d155eacf223e91cd047c7558ac902c9352c2",
+    "logs/val_metrics.csv": "e29e4d76e47925a4d18dd932aa013f1ae1b5d5899f88cc5659ca1c911d4e2aee",
+    "metrics.json": "4f7890a90d12370932de1dc9327a6d405d2af5d9d9ee60a610b5a86d9add75ed",
+    "run_metadata.json": "68bb0822733818726fd8b89ec760a3fbdd65a8bcf127fbbffbb3376f74cd9ce6"
+  },
+  "sealed_at": "2026-11-16T10:59:15.900674+00:00"
+}

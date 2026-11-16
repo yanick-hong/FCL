@@ -1,0 +1,30 @@
+verified_count: 914
+rho: 0.3103565365025467
+selection: lowest CLIP top-1 confidence
+selected_count: 914
+selected_vlm_accuracy: 0.7822757363319397
+method: clip_conf_ce
+dataset: caltech101
+paper: CLIP confidence threshold + CE control
+cache_level: true
+cache: /root/autodl-tmp/dataset/processed/caltech101_clip_vit-l-14_embeddings.pt
+observed_labels: /root/autodl-tmp/outputs/controlled_correction_20261115/corrections/caltech101/clip/prototype.pt
+budget_verified_count: 914
+budget_rho: 0.3103565365025467
+args:
+  method: clip_conf_ce
+  dataset: caltech101
+  cache: /root/autodl-tmp/dataset/processed/caltech101_clip_vit-l-14_embeddings.pt
+  obs_labels: /root/autodl-tmp/outputs/controlled_correction_20261115/corrections/caltech101/clip/prototype.pt
+  run_dir: /root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/clip_conf_ce/lr-0.002/seed-42
+  epochs: 100
+  batch_size: 1024
+  lr: 0.002
+  weight_decay: 0.0001
+  patience: 101
+  confidence_threshold: 0.95
+  trim_keep_fraction: 0.7
+  pairwise_batch_size: 256
+  strong_noise: 0.02
+  unsup_weight: 1.0
+  seed: 42

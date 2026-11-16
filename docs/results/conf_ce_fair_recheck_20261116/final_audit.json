@@ -1,0 +1,296 @@
+{
+  "status": "passed",
+  "allow_partial": false,
+  "study_root": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116",
+  "binding": "ca16ec661da4895472639418c732b14cf5b3e86c73c601184a33ac31051373c7",
+  "expected_trials": 50,
+  "sealed_trials": 50,
+  "referenced_trials": 50,
+  "final_runs": 30,
+  "selected_conditions": 10,
+  "summaries": 10,
+  "sealed_not_yet_referenced": 0,
+  "environment_checks": {
+    "inputs": true,
+    "source": true,
+    "wrapper": true
+  },
+  "checkpoint_checks": {
+    "device": "cpu",
+    "torch": "2.5.1+cu124",
+    "count": 30,
+    "runs": [
+      {
+        "dataset": "cifar100",
+        "method": "clip_conf_ce",
+        "seed": 42,
+        "best_epoch": 79,
+        "recomputed_val_accuracy": 0.8366000056266785,
+        "recomputed_test_accuracy": 0.8274999856948853,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/cifar100/clip_conf_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "cifar100",
+        "method": "clip_conf_ce",
+        "seed": 43,
+        "best_epoch": 83,
+        "recomputed_val_accuracy": 0.8363999724388123,
+        "recomputed_test_accuracy": 0.8271999955177307,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/cifar100/clip_conf_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "cifar100",
+        "method": "clip_conf_ce",
+        "seed": 44,
+        "best_epoch": 79,
+        "recomputed_val_accuracy": 0.8361999988555908,
+        "recomputed_test_accuracy": 0.8273000121116638,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/cifar100/clip_conf_ce/lr-0.004/seed-44"
+      },
+      {
+        "dataset": "cifar100",
+        "method": "fcl_filter_ce",
+        "seed": 42,
+        "best_epoch": 97,
+        "recomputed_val_accuracy": 0.829800009727478,
+        "recomputed_test_accuracy": 0.8179000020027161,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/cifar100/fcl_filter_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "cifar100",
+        "method": "fcl_filter_ce",
+        "seed": 43,
+        "best_epoch": 85,
+        "recomputed_val_accuracy": 0.8294000029563904,
+        "recomputed_test_accuracy": 0.8187000155448914,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/cifar100/fcl_filter_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "cifar100",
+        "method": "fcl_filter_ce",
+        "seed": 44,
+        "best_epoch": 69,
+        "recomputed_val_accuracy": 0.829200029373169,
+        "recomputed_test_accuracy": 0.8177000284194946,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/cifar100/fcl_filter_ce/lr-0.004/seed-44"
+      },
+      {
+        "dataset": "caltech101",
+        "method": "clip_conf_ce",
+        "seed": 42,
+        "best_epoch": 51,
+        "recomputed_val_accuracy": 0.9744728207588196,
+        "recomputed_test_accuracy": 0.9691575169563293,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/clip_conf_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "caltech101",
+        "method": "clip_conf_ce",
+        "seed": 43,
+        "best_epoch": 65,
+        "recomputed_val_accuracy": 0.9722530245780945,
+        "recomputed_test_accuracy": 0.971020519733429,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/clip_conf_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "caltech101",
+        "method": "clip_conf_ce",
+        "seed": 44,
+        "best_epoch": 33,
+        "recomputed_val_accuracy": 0.9722530245780945,
+        "recomputed_test_accuracy": 0.9666735529899597,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/clip_conf_ce/lr-0.004/seed-44"
+      },
+      {
+        "dataset": "caltech101",
+        "method": "fcl_filter_ce",
+        "seed": 42,
+        "best_epoch": 62,
+        "recomputed_val_accuracy": 0.9489456415176392,
+        "recomputed_test_accuracy": 0.9089215397834778,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/fcl_filter_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "caltech101",
+        "method": "fcl_filter_ce",
+        "seed": 43,
+        "best_epoch": 68,
+        "recomputed_val_accuracy": 0.9489456415176392,
+        "recomputed_test_accuracy": 0.9091285467147827,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/fcl_filter_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "caltech101",
+        "method": "fcl_filter_ce",
+        "seed": 44,
+        "best_epoch": 66,
+        "recomputed_val_accuracy": 0.9489456415176392,
+        "recomputed_test_accuracy": 0.9097495079040527,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/caltech101/fcl_filter_ce/lr-0.004/seed-44"
+      },
+      {
+        "dataset": "eurosat",
+        "method": "clip_conf_ce",
+        "seed": 42,
+        "best_epoch": 67,
+        "recomputed_val_accuracy": 0.6511111259460449,
+        "recomputed_test_accuracy": 0.6666666865348816,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/eurosat/clip_conf_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "eurosat",
+        "method": "clip_conf_ce",
+        "seed": 43,
+        "best_epoch": 73,
+        "recomputed_val_accuracy": 0.6503703594207764,
+        "recomputed_test_accuracy": 0.6655555367469788,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/eurosat/clip_conf_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "eurosat",
+        "method": "clip_conf_ce",
+        "seed": 44,
+        "best_epoch": 77,
+        "recomputed_val_accuracy": 0.6507407426834106,
+        "recomputed_test_accuracy": 0.6655555367469788,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/eurosat/clip_conf_ce/lr-0.004/seed-44"
+      },
+      {
+        "dataset": "eurosat",
+        "method": "fcl_filter_ce",
+        "seed": 42,
+        "best_epoch": 87,
+        "recomputed_val_accuracy": 0.610370397567749,
+        "recomputed_test_accuracy": 0.6092592477798462,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/eurosat/fcl_filter_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "eurosat",
+        "method": "fcl_filter_ce",
+        "seed": 43,
+        "best_epoch": 81,
+        "recomputed_val_accuracy": 0.6081481575965881,
+        "recomputed_test_accuracy": 0.6070370078086853,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/eurosat/fcl_filter_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "eurosat",
+        "method": "fcl_filter_ce",
+        "seed": 44,
+        "best_epoch": 87,
+        "recomputed_val_accuracy": 0.6100000143051147,
+        "recomputed_test_accuracy": 0.6077777743339539,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/eurosat/fcl_filter_ce/lr-0.004/seed-44"
+      },
+      {
+        "dataset": "food101",
+        "method": "clip_conf_ce",
+        "seed": 42,
+        "best_epoch": 72,
+        "recomputed_val_accuracy": 0.9265346527099609,
+        "recomputed_test_accuracy": 0.9515247344970703,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/food101/clip_conf_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "food101",
+        "method": "clip_conf_ce",
+        "seed": 43,
+        "best_epoch": 87,
+        "recomputed_val_accuracy": 0.9265346527099609,
+        "recomputed_test_accuracy": 0.9517228007316589,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/food101/clip_conf_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "food101",
+        "method": "clip_conf_ce",
+        "seed": 44,
+        "best_epoch": 44,
+        "recomputed_val_accuracy": 0.926435649394989,
+        "recomputed_test_accuracy": 0.9511682987213135,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/food101/clip_conf_ce/lr-0.004/seed-44"
+      },
+      {
+        "dataset": "food101",
+        "method": "fcl_filter_ce",
+        "seed": 42,
+        "best_epoch": 52,
+        "recomputed_val_accuracy": 0.9203960299491882,
+        "recomputed_test_accuracy": 0.9447920918464661,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/food101/fcl_filter_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "food101",
+        "method": "fcl_filter_ce",
+        "seed": 43,
+        "best_epoch": 67,
+        "recomputed_val_accuracy": 0.9203960299491882,
+        "recomputed_test_accuracy": 0.944950520992279,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/food101/fcl_filter_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "food101",
+        "method": "fcl_filter_ce",
+        "seed": 44,
+        "best_epoch": 84,
+        "recomputed_val_accuracy": 0.9203960299491882,
+        "recomputed_test_accuracy": 0.9448316693305969,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/food101/fcl_filter_ce/lr-0.004/seed-44"
+      },
+      {
+        "dataset": "tinyimagenet200",
+        "method": "clip_conf_ce",
+        "seed": 42,
+        "best_epoch": 52,
+        "recomputed_val_accuracy": 0.8382999897003174,
+        "recomputed_test_accuracy": 0.8375999927520752,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/tinyimagenet200/clip_conf_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "tinyimagenet200",
+        "method": "clip_conf_ce",
+        "seed": 43,
+        "best_epoch": 52,
+        "recomputed_val_accuracy": 0.8385999798774719,
+        "recomputed_test_accuracy": 0.8371999859809875,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/tinyimagenet200/clip_conf_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "tinyimagenet200",
+        "method": "clip_conf_ce",
+        "seed": 44,
+        "best_epoch": 56,
+        "recomputed_val_accuracy": 0.8385000228881836,
+        "recomputed_test_accuracy": 0.8371999859809875,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/tinyimagenet200/clip_conf_ce/lr-0.004/seed-44"
+      },
+      {
+        "dataset": "tinyimagenet200",
+        "method": "fcl_filter_ce",
+        "seed": 42,
+        "best_epoch": 48,
+        "recomputed_val_accuracy": 0.826200008392334,
+        "recomputed_test_accuracy": 0.8226000070571899,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/tinyimagenet200/fcl_filter_ce/lr-0.004/seed-42"
+      },
+      {
+        "dataset": "tinyimagenet200",
+        "method": "fcl_filter_ce",
+        "seed": 43,
+        "best_epoch": 49,
+        "recomputed_val_accuracy": 0.8260999917984009,
+        "recomputed_test_accuracy": 0.8220000267028809,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/tinyimagenet200/fcl_filter_ce/lr-0.004/seed-43"
+      },
+      {
+        "dataset": "tinyimagenet200",
+        "method": "fcl_filter_ce",
+        "seed": 44,
+        "best_epoch": 55,
+        "recomputed_val_accuracy": 0.8260999917984009,
+        "recomputed_test_accuracy": 0.8220000267028809,
+        "run_dir": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/trials/tinyimagenet200/fcl_filter_ce/lr-0.004/seed-44"
+      }
+    ]
+  },
+  "statistical_limit": "Seed 42 also selected the LR; seed 42/43/44 CI is exploratory and conditional on that selection."
+}

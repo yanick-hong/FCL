@@ -1,0 +1,16 @@
+[CACHE] Loading from: /root/autodl-tmp/dataset/processed/cifar100_clip_vit-l-14_embeddings.pt
+[CACHE] Loaded successfully.
+[OBS] Using obs_path -> y_obs(shape=(45000,)), s(shape=(45000,))
+[CACHE] Loading from: /root/autodl-tmp/dataset/processed/caltech101_clip_vit-l-14_embeddings.pt
+[CACHE] Loaded successfully.
+[OBS] Using obs_path -> y_obs(shape=(2945,)), s(shape=(2945,))
+[CACHE] Loading from: /root/autodl-tmp/dataset/processed/eurosat_clip_vit-l-14_embeddings.pt
+[CACHE] Loaded successfully.
+[OBS] Using obs_path -> y_obs(shape=(21600,)), s(shape=(21600,))
+[CACHE] Loading from: /root/autodl-tmp/dataset/processed/food101_clip_vit-l-14_embeddings.pt
+[CACHE] Loaded successfully.
+[OBS] Using obs_path -> y_obs(shape=(65650,)), s(shape=(65650,))
+[CACHE] Loading from: /root/autodl-tmp/dataset/processed/tinyimagenet200_clip_vit-l-14_embeddings.pt
+[CACHE] Loaded successfully.
+[OBS] Using obs_path -> y_obs(shape=(90000,)), s(shape=(90000,))
+{"status": "completed", "results": "/root/autodl-tmp/outputs/conf_ce_fair_recheck_20261116/results.json"}
