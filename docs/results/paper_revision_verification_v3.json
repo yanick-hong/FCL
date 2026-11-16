@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "changed_files": [
+    "main.tex",
+    "supplement.tex"
+  ],
+  "unchanged_original_files": 15,
+  "checks": {
+    "two_ablation_sections": true,
+    "qwen_section": true,
+    "table1_unified": true,
+    "query_count_columns_removed": true,
+    "caltech_102_class": true,
+    "dagger_footnotes_absent": true
+  }
+}

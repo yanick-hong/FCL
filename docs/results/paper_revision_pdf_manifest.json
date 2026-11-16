@@ -1,0 +1,15 @@
+{
+  "generated_utc": "2026-11-16T16:33:17.4619728Z",
+  "supplement": {
+    "pages": 5,
+    "bytes": 95112,
+    "path": "output/pdf/fcl_supplement_with_ablations.pdf",
+    "sha256": "05EDE5F035B2555CBD70CAC0484C47A94C389C08FB55DE7BCB53D43133A89FD4"
+  },
+  "main": {
+    "pages": 10,
+    "bytes": 1028423,
+    "path": "output/pdf/fcl_main_with_ablations.pdf",
+    "sha256": "40DBE6B95C4E872AC94A892476226B5579BD4F565BF722FE19D1E71D09820B43"
+  }
+}
