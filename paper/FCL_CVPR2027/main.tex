@@ -104,7 +104,7 @@ AUC optimization directly maximizes the area under the receiver operating charac
 We use a standard multiclass risk on corrected instances and soft class dependent posterior weights on pairwise relations from uncorrected instances. It keeps uncorrected samples as useful pairwise evidence and uses the fixed CLIP posterior as an external prior. This differs from applying one AUC objective to all samples or removing uncertain samples through hard trimming.
 
 \begin{table*}[t]
-\caption{Training-label quality (\%) at nominal correction rate $\rho=0.3$. The original and controlled records are combined in one table while retaining their protocol-specific rows. UL-ER and FL-ER are error rates before correction in the unfiltered and filtered subsets. FCL-C is accuracy after prototype correction. For original rows, Gain is FCL-C minus CLIP; for controlled rows, Gain is FCL-C minus Random-M, in percentage points (pp). Random-30 and Random-M are uniform random controls, with means $\pm$ sample standard deviations over selection seeds 42, 43, and 44. The Caltech rows include the background category and use the 102-class label space.}
+\caption{Training-label quality (\%) at nominal correction rate $\rho=0.3$. UL-ER and FL-ER are pre-correction error rates in the unfiltered and filtered subsets. Random-30 uniformly samples 30\% of the training set; Random-M uniformly samples the same number of instances as prototype filtering. Random results are means $\pm$ sample standard deviations over selection seeds 42, 43, and 44. FCL-C is accuracy after prototype correction, and Gain is the corresponding improvement in percentage points. Caltech includes the background category (102 classes).}
 \label{tab:fcls-annotation}
 \centering
 \scriptsize

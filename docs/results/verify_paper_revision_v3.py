@@ -27,7 +27,8 @@ def main() -> None:
     assert "Filter-Corrected Qwen Labels" in supp_tex
     assert "Random-30" in main_tex and "Random-M" in main_tex
     assert "FCL-C" in main_tex and "FCL-Q" in supp_tex
-    assert "102-class" in main_tex and "102-class" in supp_tex
+    assert ("102-class" in main_tex or "102 classes" in main_tex)
+    assert ("102-class" in supp_tex or "102 classes" in supp_tex)
     assert "dagger" not in main_tex.lower() and "dagger" not in supp_tex.lower()
     # The requested query/count columns are absent from the two affected tables.
     table1 = main_tex[main_tex.index("\\label{tab:fcls-annotation}") : main_tex.index("\\end{table*}", main_tex.index("\\label{tab:fcls-annotation}"))]

@@ -1,15 +1,16 @@
 {
-  "generated_utc": "2026-11-16T16:33:17.4619728Z",
-  "supplement": {
-    "pages": 5,
-    "bytes": 95112,
-    "path": "output/pdf/fcl_supplement_with_ablations.pdf",
-    "sha256": "05EDE5F035B2555CBD70CAC0484C47A94C389C08FB55DE7BCB53D43133A89FD4"
-  },
+  "generated_utc": "2026-11-16T17:38:42.6967065Z",
+  "change": "Shortened Random-30/Random-M description in main Table 1 caption",
   "main": {
-    "pages": 10,
-    "bytes": 1028423,
     "path": "output/pdf/fcl_main_with_ablations.pdf",
-    "sha256": "40DBE6B95C4E872AC94A892476226B5579BD4F565BF722FE19D1E71D09820B43"
+    "bytes": 1026251,
+    "sha256": "2CBCB10706DDA39FB7F1E66DE67A88F6495E992A5E606F575100CABD522CFB6E",
+    "pages": 10
+  },
+  "supplement": {
+    "path": "output/pdf/fcl_supplement_with_ablations.pdf",
+    "bytes": 94434,
+    "sha256": "D9576143E455C99D0C2A048B20BAF21429247362E559FB6988A9EE762D24FC69",
+    "pages": 5
   }
 }
