@@ -18,6 +18,9 @@
     "seed_columns_removed": true,
     "ablation_variance_removed": true,
     "tiny_imagenet_ablation_results": true,
-    "seed_table_fills_column": true
+    "seed_table_fills_column": true,
+    "obsolete_controls_removed": true,
+    "method_names_updated": true,
+    "all_table1_methods_described": true
   }
 }

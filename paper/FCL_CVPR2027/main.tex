@@ -307,7 +307,7 @@ DLD \cite{hou2025dld} & \underline{84.04} & 92.05 & 74.63 & 91.74 & 83.16 \\
 & \multicolumn{5}{c}{\textit{Selection and loss ablations}} \\
 \cmidrule(lr){2-6}
 Random-Filter-CE & 80.78 & 89.29 & 55.33 & 91.22 & 81.21 \\
-FCL-Filter-CE & 81.94 & 89.40 & 58.41 & 91.75 & 82.16 \\
+FCL-CE & 81.94 & 89.40 & 58.41 & 91.75 & 82.16 \\
 FCL (ours)        & \textbf{85.02} & \textbf{96.20} & \textbf{93.44} & \textbf{94.78} & \textbf{84.23} \\
 \bottomrule
 \end{tabular*}
@@ -354,7 +354,7 @@ We compare FCL with the following representative baselines:
     \item DivideMix \cite{li2020dividemix}: Clean/noisy sample separation and consistency training.
     \item DCD \cite{mu2025dcd} and IDO \cite{zhang2025ido}: Center-distance mining and instance-difficulty modeling for noisy labels, respectively.
     \item DLD \cite{hou2025dld}: Diffusion-based label denoising.
-    \item Random-Filter-CE and FCL-Filter-CE: selection and loss controls
+    \item Random-Filter-CE and FCL-CE: selection and loss controls
     that use mixed corrected and uncorrected hard targets. The former uses a
     uniform correction mask, while the latter uses the prototype-distance
     mask; both are trained with cross-entropy.

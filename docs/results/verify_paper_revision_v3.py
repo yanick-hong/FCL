@@ -39,16 +39,21 @@ def main() -> None:
     assert "tab:component-controls" not in main_tex
     assert "tab:supp-controlled-selection-objective" not in supp_tex
     additional = supp_tex[supp_tex.index("\\label{tab:supp-additional-baselines}") : supp_tex.index("\\end{table*}", supp_tex.index("\\label{tab:supp-additional-baselines}"))]
-    assert "Prototype + AUC-C" in additional
     assert "Random + AUC-C" in additional
-    assert "Prototype + CLIP soft-CE" in additional
+    assert "FCL+soft CE" in additional
+    assert "FCL-CE" in additional
+    assert "CLIP-Margin-CE" not in additional
+    assert "Prototype + AUC-C" not in additional
     assert "Tiny-ImageNet" in additional
-    assert "Prototype + AUC-C & 83.420 & 95.688 & 92.852" in additional and "94.779" in additional and "84.070" in additional
     assert "Random + AUC-C" in additional and "83.633" in additional and "94.062" in additional and "83.840" in additional
-    assert "Prototype + CLIP soft-CE" in additional and "82.463" in additional and "96.322" in additional and "80.660" in additional
+    assert "FCL+soft CE" in additional and "82.463" in additional and "96.322" in additional and "80.660" in additional
     assert "\\pm" not in additional
+    compared_start = supp_tex.index("\\paragraph{Compared methods.}")
+    compared = supp_tex[compared_start : supp_tex.index("Table~\\ref{tab:supp-additional-baselines}", compared_start)]
+    for method in ("CLIP-Zero-CE", "Xie-Trim-AUC", "FixMatch*", "SoftMatch*", "Random-Filter-CE", "FCL-CE", "FCL+soft CE", "Random + AUC-C", "FCL (ours)"):
+        assert method in compared, method
     method_table = main_tex[main_tex.index("\\label{tab:method-compare-clip}") : main_tex.index("\\end{table*}", main_tex.index("\\label{tab:method-compare-clip}"))]
-    assert "Random-Filter-CE" in method_table and "FCL-Filter-CE" in method_table
+    assert "Random-Filter-CE" in method_table and "FCL-CE" in method_table
     seed_table_start = supp_tex.index("\\label{tab:supp-controlled-training-seeds}")
     seed_table = supp_tex[supp_tex.rfind("\\begin{table}[t]", 0, seed_table_start) : supp_tex.index("\\end{table}", seed_table_start)]
     assert "Mean $\\pm$ SD" in seed_table and "95\\% CI" in seed_table
@@ -86,6 +91,9 @@ def main() -> None:
             "ablation_variance_removed": True,
             "tiny_imagenet_ablation_results": True,
             "seed_table_fills_column": True,
+            "obsolete_controls_removed": True,
+            "method_names_updated": True,
+            "all_table1_methods_described": True,
         },
     }
     out = ROOT / "docs" / "results" / "paper_revision_verification_v3.json"
