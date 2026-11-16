@@ -237,26 +237,18 @@ visual encoder.
 
 \section{Stability across Training Seeds}
 \label{sec:supp-controlled-training-seeds}
-To examine training variability, we repeat the CLIP-based prototype FCL
-condition with three independent training seeds under the fixed controlled
-protocol described in Compared methods. The feature cache,
-data partitions, CLIP labels, and prototype correction mask are held fixed;
-the seeds change the classifier initialization and sampling randomness.
-The test set is evaluated after validation-based checkpoint selection in
-each run. Table~\ref{tab:supp-controlled-training-seeds} reports the mean,
-sample standard deviation, and two-sided 95\% Student-$t$ interval for the
-mean; the individual seed columns are omitted for compactness. With three
-seeds, the interval is $\bar a\pm4.303s/\sqrt{3}$, where $s$ uses two
-degrees of freedom.
+We repeat CLIP-based prototype FCL with three training seeds under the fixed
+controlled protocol. The feature cache, partitions, CLIP labels, and
+correction mask are fixed; only classifier initialization and sampling vary.
+Table~\ref{tab:supp-controlled-training-seeds} reports the mean, sample SD,
+and two-sided 95\% Student-$t$ CI. For three seeds, the interval is
+$\bar a\pm4.303s/\sqrt{3}$.
 
 \begin{table}[t]
-\caption{CLIP-based prototype FCL test accuracy (\%) under three training
-seeds in the additional controlled reruns. SD is the sample standard
-deviation. The 95\% interval concerns the mean over training seeds, with
-data, VLM labels, and correction masks fixed. Caltech includes the
-background category and uses the 102-class label space of the main text.
-These values are not multi-seed estimates of the historical main-table
-entries.}
+\caption{CLIP-based prototype FCL test accuracy (\%) over three training
+seeds. Data, VLM labels, and correction masks are fixed; SD is the sample
+standard deviation and CI is the 95\% interval for the mean. Caltech uses
+the 102-class label space.}
 \label{tab:supp-controlled-training-seeds}
 \centering
 \scriptsize
@@ -273,23 +265,25 @@ Food-101 & $94.779\pm0.008$ & $[94.758, 94.799]$ \\
 \end{tabular*}
 \end{table}
 
-The 95\% CI is the two-sided Student-$t$ confidence interval for the mean
-test accuracy across the three training seeds. It quantifies uncertainty in
-that estimated mean under the fixed protocol. The sample standard deviations
-range from 0.008 to 0.037 percentage points in these four reruns, indicating
-limited variation from initialization and sampling under the fixed protocol. This uncertainty does not include new
-data splits, VLM generations, or correction masks. Moreover, these reruns
-use their own verified inputs and explicit training schedule; their seed-42
-results do not coincide with all historical main-table entries. They
-therefore assess repeatability under the stated conditions, rather than
-supplying error bars for those earlier entries or establishing a multi-seed
-ranking against the historical single-seed baselines.
+The SDs range from 0.008 to 0.037 percentage points, indicating limited
+variation under this protocol. The intervals quantify repeatability here;
+they do not cover new splits, VLM generations, correction masks, or the
+historical single-seed main-table entries.
 
 \section{Filter-Corrected Qwen Labels}
 \label{sec:supp-qwen-labels}
-We examine whether prototype-based correction also improves labels from an instruction-following VLM. We denote corrected CLIP labels by FCL-C and corrected Qwen labels by FCL-Q; both names refer to training-label sets rather than trained classifiers. This additional study uses Qwen2.5-VL-7B-Instruct with the English class-list prompt and greedy decoding constrained to legal class identifiers. The model uses a $448\times448$-equivalent visual pixel budget. It is a separate labeling experiment, while the frozen CLIP ViT-L/14 features and verified data partitions are shared with the controlled CLIP reruns in the main paper. The Qwen model is not updated. Its generated class identifiers are discrete annotations, not calibrated class probabilities.
+We test prototype correction on Qwen2.5-VL-7B-Instruct labels. FCL-C and
+FCL-Q denote corrected CLIP and Qwen label sets, respectively. Qwen uses an
+English class-list prompt, greedy legal-class decoding, and a
+$448\times448$-equivalent visual budget; it is not updated. Frozen CLIP
+ViT-L/14 features and verified partitions are shared with the CLIP study.
 
-For each Qwen-assigned class, we average the normalized CLIP image features and select the farthest $\lceil0.3n_c\rceil$ instances, where $n_c$ is the number of images assigned to class $c$. Only selected annotations are replaced by benchmark labels. UL-ER and FL-ER measure the Qwen error rates before correction within the unselected and selected subsets, respectively. Random-30 uniformly samples 30\% of the training set, while Random-M samples the same number of instances as prototype filtering; both random controls use selection seed 42. The table covers the five datasets used in the main paper, with Caltech including the background category in its 102-class label space.
+For each Qwen-assigned class, we average normalized CLIP features and
+replace the farthest $\lceil0.3n_c\rceil$ annotations with benchmark labels.
+UL-ER and FL-ER are pre-correction error rates in the unselected and
+selected subsets. Random-30 and Random-M use uniform sampling (seed 42),
+with Random-M matching the prototype count. Caltech uses 102 classes,
+including the background category.
 
 \begin{table*}[t]
 \caption{Training-label quality (\%) at nominal correction rate $\rho=0.3$. UL-ER and FL-ER are error rates before correction in the unfiltered and filtered subsets. Qwen denotes initial Qwen annotation accuracy; FCL-Q is accuracy after prototype correction. Gain is FCL-Q minus Qwen in percentage points. Random-30 uniformly samples 30\% of the training set. Random-M uniformly samples the same number of instances as prototype filtering. Caltech includes the background category and uses 102 classes.}
@@ -310,7 +304,10 @@ EuroSAT & 21,600 & 10 & 44.384 & 46.242 & 77.459 & $61.000$ & $61.023$ & 67.644 
 \end{tabular*}
 \end{table*}
 
-Table~\ref{tab:supp-qwen-labels} shows that the selected subsets contain more annotation errors than the unselected subsets on all five datasets. FCL-Q raises label accuracy by $13.820$--$25.853$ percentage points over the original Qwen annotations and exceeds the same-count random control in every row. Together with the CLIP comparison, these results support prototype distance as a way to concentrate a limited correction budget on erroneous labels across two VLM label sources. This conclusion concerns annotation quality; downstream classification also depends on the training objective and the residual label errors.
+The selected subsets have higher pre-correction error on all datasets. FCL-Q
+improves Qwen accuracy by $13.820$--$25.853$ percentage points and exceeds
+Random-M in every row, supporting prototype-based error concentration across
+both VLM label sources. These results concern annotation quality only.
 
 {
     \small
